@@ -1,10 +1,15 @@
+mod ldtk;
+mod levels;
+mod resources;
 mod shaders;
 
+use levels::*;
+use resources::*;
 use shaders::*;
 
 use miniquad::graphics::{
-    Bindings, Buffer, BufferType, GraphicsContext, PassAction, Pipeline, RenderPass, Texture,
-    TextureFormat, TextureParams,
+    Bindings, Buffer, BufferType, GraphicsContext, Pipeline, RenderPass, Texture, TextureFormat,
+    TextureParams,
 };
 use miniquad::{EventHandler, KeyCode, KeyMods};
 
@@ -17,6 +22,10 @@ struct App {
     screen_bindings: Bindings,
     window_width: f32,
     window_height: f32,
+    _res: Resources,
+    level: Level,
+    camera_x: i32,
+    camera_y: i32,
 }
 
 impl App {
@@ -46,12 +55,20 @@ impl App {
             images: vec![offscreen_texture],
         };
 
+        let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
+
+        let level = res.levels.level_by_identifier(gctx, &res, "Start");
+
         Self {
             offscreen_pass,
             screen_pipeline,
             screen_bindings,
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
+            _res: res,
+            level,
+            camera_x: SCREEN_WIDTH as i32 / 2,
+            camera_y: SCREEN_HEIGHT as i32 / 2,
         }
     }
 
@@ -68,10 +85,8 @@ impl App {
 
 impl EventHandler for App {
     fn draw(&mut self, gctx: &mut GraphicsContext) {
-        gctx.begin_pass(
-            self.offscreen_pass,
-            PassAction::clear_color(0.2, 0.3, 0.3, 1.0),
-        );
+        gctx.begin_pass(self.offscreen_pass, Default::default());
+        self.level.draw(gctx, self.camera_x, self.camera_y);
         gctx.end_render_pass();
 
         gctx.begin_default_pass(Default::default());
@@ -95,6 +110,13 @@ impl EventHandler for App {
     ) {
         if keycode == KeyCode::Escape {
             gctx.request_quit();
+        }
+        match keycode {
+            KeyCode::Up => self.camera_y -= 8,
+            KeyCode::Down => self.camera_y += 8,
+            KeyCode::Left => self.camera_x -= 8,
+            KeyCode::Right => self.camera_x += 8,
+            _ => {}
         }
     }
 

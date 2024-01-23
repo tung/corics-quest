@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 miniquad = "0.3.16"
+miniserde = "0.1.36"
+png = "0.17.11"
 
 [profile.dev]
 opt-level = 1
