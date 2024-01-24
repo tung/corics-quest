@@ -1,11 +1,14 @@
+mod async_utils;
+mod contexts;
 mod input;
 mod ldtk;
 mod levels;
+mod modes;
 mod resources;
+mod script;
 mod shaders;
 
-use input::*;
-use levels::*;
+use contexts::*;
 use resources::*;
 use shaders::*;
 
@@ -15,12 +18,19 @@ use miniquad::graphics::{
 };
 use miniquad::{EventHandler, KeyCode, KeyMods};
 
+use std::future::Future;
+use std::pin::Pin;
+use std::task::{Context, Poll, Waker};
+
 const SCREEN_WIDTH: u32 = 320;
 const SCREEN_HEIGHT: u32 = 176;
 const FRAME_TIME: f64 = 1.0 / 60.0;
 const MAX_FRAME_TIME: f64 = FRAME_TIME * 4.0;
 
 struct App {
+    sctx: ScriptContext,
+    script: Pin<Box<dyn Future<Output = ()>>>,
+    dummy_waker: Waker,
     last_time: f64,
     time_bank: f64,
     offscreen_pass: RenderPass,
@@ -28,11 +38,6 @@ struct App {
     screen_bindings: Bindings,
     window_width: f32,
     window_height: f32,
-    _res: Resources,
-    level: Level,
-    camera_x: i32,
-    camera_y: i32,
-    input: Input,
 }
 
 impl App {
@@ -63,10 +68,15 @@ impl App {
         };
 
         let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
+        let sctx = ScriptContext::new(gctx, res);
 
-        let level = res.levels.level_by_identifier(gctx, &res, "Start");
+        // SAFETY: This is immediately sent into [script::script_main].
+        let sctx_for_script = unsafe { ScriptContext::clone(&sctx) };
 
         Self {
+            sctx,
+            script: Box::pin(script::script_main(sctx_for_script)),
+            dummy_waker: async_utils::new_dummy_waker(),
             last_time: 0.0,
             time_bank: 0.0,
             offscreen_pass,
@@ -74,11 +84,6 @@ impl App {
             screen_bindings,
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
-            _res: res,
-            level,
-            camera_x: SCREEN_WIDTH as i32 / 2,
-            camera_y: SCREEN_HEIGHT as i32 / 2,
-            input: Input::new(),
         }
     }
 
@@ -96,7 +101,7 @@ impl App {
 impl EventHandler for App {
     fn draw(&mut self, gctx: &mut GraphicsContext) {
         gctx.begin_pass(self.offscreen_pass, Default::default());
-        self.level.draw(gctx, self.camera_x, self.camera_y);
+        self.sctx.modes.draw(&mut self.sctx.draw_context(gctx));
         gctx.end_render_pass();
 
         gctx.begin_default_pass(Default::default());
@@ -121,12 +126,12 @@ impl EventHandler for App {
         if keycode == KeyCode::Escape {
             gctx.request_quit();
         } else {
-            self.input.handle_key_down_event(keycode);
+            self.sctx.input.handle_key_down_event(keycode);
         }
     }
 
     fn key_up_event(&mut self, _gctx: &mut GraphicsContext, keycode: KeyCode, _keymods: KeyMods) {
-        self.input.handle_key_up_event(keycode);
+        self.sctx.input.handle_key_up_event(keycode);
     }
 
     fn resize_event(&mut self, _ctx: &mut GraphicsContext, width: f32, height: f32) {
@@ -134,7 +139,7 @@ impl EventHandler for App {
         self.window_height = height;
     }
 
-    fn update(&mut self, _gctx: &mut GraphicsContext) {
+    fn update(&mut self, gctx: &mut GraphicsContext) {
         let current_time = miniquad::date::now();
         self.time_bank += if self.last_time != 0.0 {
             (current_time - self.last_time).min(MAX_FRAME_TIME)
@@ -142,21 +147,16 @@ impl EventHandler for App {
             FRAME_TIME
         };
         self.last_time = current_time;
+        self.sctx.set_gctx(gctx);
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
-            if self.input.is_key_down(GameKey::Up) {
-                self.camera_y -= 1;
-            }
-            if self.input.is_key_down(GameKey::Down) {
-                self.camera_y += 1;
-            }
-            if self.input.is_key_down(GameKey::Left) {
-                self.camera_x -= 1;
-            }
-            if self.input.is_key_down(GameKey::Right) {
-                self.camera_x += 1;
+            let mut dummy_context = Context::from_waker(&self.dummy_waker);
+            if let Poll::Ready(()) = self.script.as_mut().poll(&mut dummy_context) {
+                gctx.order_quit();
+                break;
             }
         }
+        self.sctx.unset_gctx();
     }
 }
 
