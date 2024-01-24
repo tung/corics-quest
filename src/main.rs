@@ -1,8 +1,10 @@
+mod input;
 mod ldtk;
 mod levels;
 mod resources;
 mod shaders;
 
+use input::*;
 use levels::*;
 use resources::*;
 use shaders::*;
@@ -26,6 +28,7 @@ struct App {
     level: Level,
     camera_x: i32,
     camera_y: i32,
+    input: Input,
 }
 
 impl App {
@@ -69,6 +72,7 @@ impl App {
             level,
             camera_x: SCREEN_WIDTH as i32 / 2,
             camera_y: SCREEN_HEIGHT as i32 / 2,
+            input: Input::new(),
         }
     }
 
@@ -110,14 +114,13 @@ impl EventHandler for App {
     ) {
         if keycode == KeyCode::Escape {
             gctx.request_quit();
+        } else {
+            self.input.handle_key_down_event(keycode);
         }
-        match keycode {
-            KeyCode::Up => self.camera_y -= 8,
-            KeyCode::Down => self.camera_y += 8,
-            KeyCode::Left => self.camera_x -= 8,
-            KeyCode::Right => self.camera_x += 8,
-            _ => {}
-        }
+    }
+
+    fn key_up_event(&mut self, _gctx: &mut GraphicsContext, keycode: KeyCode, _keymods: KeyMods) {
+        self.input.handle_key_up_event(keycode);
     }
 
     fn resize_event(&mut self, _ctx: &mut GraphicsContext, width: f32, height: f32) {
@@ -125,7 +128,20 @@ impl EventHandler for App {
         self.window_height = height;
     }
 
-    fn update(&mut self, _gctx: &mut GraphicsContext) {}
+    fn update(&mut self, _gctx: &mut GraphicsContext) {
+        if self.input.is_key_down(GameKey::Up) {
+            self.camera_y -= 1;
+        }
+        if self.input.is_key_down(GameKey::Down) {
+            self.camera_y += 1;
+        }
+        if self.input.is_key_down(GameKey::Left) {
+            self.camera_x -= 1;
+        }
+        if self.input.is_key_down(GameKey::Right) {
+            self.camera_x += 1;
+        }
+    }
 }
 
 fn main() {
