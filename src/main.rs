@@ -17,8 +17,12 @@ use miniquad::{EventHandler, KeyCode, KeyMods};
 
 const SCREEN_WIDTH: u32 = 320;
 const SCREEN_HEIGHT: u32 = 176;
+const FRAME_TIME: f64 = 1.0 / 60.0;
+const MAX_FRAME_TIME: f64 = FRAME_TIME * 4.0;
 
 struct App {
+    last_time: f64,
+    time_bank: f64,
     offscreen_pass: RenderPass,
     screen_pipeline: Pipeline,
     screen_bindings: Bindings,
@@ -63,6 +67,8 @@ impl App {
         let level = res.levels.level_by_identifier(gctx, &res, "Start");
 
         Self {
+            last_time: 0.0,
+            time_bank: 0.0,
             offscreen_pass,
             screen_pipeline,
             screen_bindings,
@@ -129,17 +135,27 @@ impl EventHandler for App {
     }
 
     fn update(&mut self, _gctx: &mut GraphicsContext) {
-        if self.input.is_key_down(GameKey::Up) {
-            self.camera_y -= 1;
-        }
-        if self.input.is_key_down(GameKey::Down) {
-            self.camera_y += 1;
-        }
-        if self.input.is_key_down(GameKey::Left) {
-            self.camera_x -= 1;
-        }
-        if self.input.is_key_down(GameKey::Right) {
-            self.camera_x += 1;
+        let current_time = miniquad::date::now();
+        self.time_bank += if self.last_time != 0.0 {
+            (current_time - self.last_time).min(MAX_FRAME_TIME)
+        } else {
+            FRAME_TIME
+        };
+        self.last_time = current_time;
+        while self.time_bank >= FRAME_TIME {
+            self.time_bank -= FRAME_TIME;
+            if self.input.is_key_down(GameKey::Up) {
+                self.camera_y -= 1;
+            }
+            if self.input.is_key_down(GameKey::Down) {
+                self.camera_y += 1;
+            }
+            if self.input.is_key_down(GameKey::Left) {
+                self.camera_x -= 1;
+            }
+            if self.input.is_key_down(GameKey::Right) {
+                self.camera_x += 1;
+            }
         }
     }
 }
