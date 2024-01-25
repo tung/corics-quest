@@ -7,6 +7,7 @@ mod modes;
 mod resources;
 mod script;
 mod shaders;
+mod text;
 
 use contexts::*;
 use resources::*;

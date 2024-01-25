@@ -10,15 +10,16 @@ macro_rules! update_mode {
     ($name:ident, $event:ident) => {
         pub async fn $name(&mut self) -> $event {
             let gctx = self.gctx();
-            self.modes.$name(&mut ModeContext {
-                gctx,
-                _res: &self.res,
-                input: &mut self.input,
-                level: &mut self.level,
-                camera_x: &mut self.camera_x,
-                camera_y: &mut self.camera_y,
-            })
-            .await
+            self.modes
+                .$name(&mut ModeContext {
+                    gctx,
+                    res: &self.res,
+                    input: &mut self.input,
+                    level: &mut self.level,
+                    camera_x: &mut self.camera_x,
+                    camera_y: &mut self.camera_y,
+                })
+                .await
         }
     };
 }
@@ -32,7 +33,7 @@ pub struct DrawContext<'a, 'g> {
 
 pub struct ModeContext<'a, 'g> {
     pub gctx: &'g mut GraphicsContext,
-    pub _res: &'a Resources,
+    pub res: &'a Resources,
     pub input: &'a mut SharedMut<Input>,
     pub level: &'a mut SharedMut<Level>,
     pub camera_x: &'a mut SharedMut<i32>,
@@ -115,7 +116,7 @@ impl ScriptContext {
     }
 
     pub fn push_walk_around_mode(&mut self) {
-        self.modes.push(WalkAround::new());
+        self.modes.push(WalkAround::new(&self.res));
     }
 
     update_mode!(update_walk_around_mode, WalkAroundEvent);

@@ -19,13 +19,17 @@ pub struct Resources {
     pub quad_vbuf: Buffer,
     pub quad_ibuf: Buffer,
     pub layer_pipeline: Pipeline,
+    pub quad_pipeline: Pipeline,
     pub levels: Rc<LevelSet>,
+    pub font: Texture,
     pub textures_by_path: Rc<HashMap<&'static str, Texture>>,
 }
 
 impl Resources {
     pub fn new(gctx: &mut GraphicsContext, quad_vbuf: Buffer, quad_ibuf: Buffer) -> Self {
         let layer_pipeline = layer_shader::pipeline(gctx);
+        let quad_pipeline = quad_shader::pipeline(gctx);
+        let font = texture_from_png_bytes(gctx, &include_bytes!("../assets/hp-100lx-6x8.png")[..]);
 
         let textures_by_path = TEXTURES_BY_PATH
             .iter()
@@ -36,7 +40,9 @@ impl Resources {
             quad_vbuf,
             quad_ibuf,
             layer_pipeline,
+            quad_pipeline,
             levels: Rc::new(LevelSet::new()),
+            font,
             textures_by_path: Rc::new(textures_by_path),
         }
     }

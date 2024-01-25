@@ -1,0 +1,102 @@
+use crate::resources::*;
+use crate::shaders::quad_shader;
+use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+
+use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline, Texture};
+
+pub struct Text {
+    offset: [f32; 2],
+    font: Texture,
+    local_buf: Vec<[[f32; 2]; 3]>,
+    bindings: Option<Bindings>,
+    quad_pipeline: Pipeline,
+}
+
+impl Text {
+    pub fn new(res: &Resources, x: i32, y: i32) -> Self {
+        Self {
+            offset: [x as f32, y as f32],
+            font: res.font,
+            local_buf: Vec::new(),
+            bindings: None,
+            quad_pipeline: res.quad_pipeline,
+        }
+    }
+
+    pub fn draw(&self, gctx: &mut GraphicsContext) {
+        if let Some(bindings) = &self.bindings {
+            gctx.apply_pipeline(&self.quad_pipeline);
+            gctx.apply_bindings(bindings);
+            gctx.apply_uniforms(&quad_shader::Uniforms {
+                px_src_offset: [0.0, 0.0],
+                px_dest_offset: self.offset,
+                px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
+                px_texture_size: [self.font.width as f32, self.font.height as f32],
+            });
+            gctx.draw(0, 6, self.local_buf.len() as i32);
+        }
+    }
+
+    pub fn set_text(&mut self, gctx: &mut GraphicsContext, res: &Resources, s: &str) {
+        const FONT_COLUMNS: u32 = 16;
+        const FONT_ROWS: u32 = 16;
+        let char_width = self.font.width / FONT_COLUMNS;
+        let char_height = self.font.height / FONT_ROWS;
+
+        self.local_buf.clear();
+        let mut x: f32 = 0.0;
+        let mut y: f32 = 0.0;
+        for c in s.chars() {
+            if c == ' ' {
+                x += char_width as f32;
+            } else if c == '\n' {
+                x = 0.0;
+                y += char_height as f32;
+            } else {
+                let c = match c {
+                    '!'..='~' => c,
+                    '►' => 16 as char,
+                    _ => '?',
+                };
+                let src_x = (c as u32 % FONT_COLUMNS * char_width) as f32;
+                let src_y = (c as u32 / FONT_ROWS * char_height) as f32;
+                self.local_buf.push([
+                    [char_width as f32, char_height as f32],
+                    [src_x, src_y],
+                    [x, y],
+                ]);
+                x += char_width as f32;
+            }
+        }
+
+        if self.local_buf.is_empty() {
+            if let Some(bindings) = self.bindings.take() {
+                bindings.vertex_buffers[1].delete();
+            }
+        } else {
+            let needed_size = self.local_buf.len() * std::mem::size_of::<[[f32; 2]; 3]>();
+            let bindings = self.bindings.get_or_insert_with(|| {
+                let inst_buf = Buffer::stream(gctx, BufferType::VertexBuffer, needed_size);
+                Bindings {
+                    vertex_buffers: vec![res.quad_vbuf, inst_buf],
+                    index_buffer: res.quad_ibuf,
+                    images: vec![self.font],
+                }
+            });
+            let inst_buf = &mut bindings.vertex_buffers[1];
+            if inst_buf.size() < needed_size {
+                inst_buf.delete();
+                *inst_buf = Buffer::stream(gctx, BufferType::VertexBuffer, needed_size);
+            }
+            inst_buf.update(gctx, &self.local_buf[..]);
+        }
+    }
+}
+
+impl Drop for Text {
+    fn drop(&mut self) {
+        if let Some(bindings) = &self.bindings {
+            bindings.vertex_buffers[1].delete();
+        }
+    }
+}
