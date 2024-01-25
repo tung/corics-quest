@@ -1,5 +1,8 @@
+mod actor;
+mod aseprite;
 mod async_utils;
 mod contexts;
+mod direction;
 mod input;
 mod ldtk;
 mod levels;
@@ -7,6 +10,7 @@ mod modes;
 mod resources;
 mod script;
 mod shaders;
+mod sprite;
 mod text;
 
 use contexts::*;

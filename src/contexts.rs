@@ -1,3 +1,4 @@
+use crate::actor::*;
 use crate::async_utils::SharedMut;
 use crate::input::*;
 use crate::levels::*;
@@ -16,8 +17,7 @@ macro_rules! update_mode {
                     res: &self.res,
                     input: &mut self.input,
                     level: &mut self.level,
-                    camera_x: &mut self.camera_x,
-                    camera_y: &mut self.camera_y,
+                    actors: &mut self.actors,
                 })
                 .await
         }
@@ -27,8 +27,7 @@ macro_rules! update_mode {
 pub struct DrawContext<'a, 'g> {
     pub gctx: &'g mut GraphicsContext,
     pub level: &'a SharedMut<Level>,
-    pub camera_x: &'a SharedMut<i32>,
-    pub camera_y: &'a SharedMut<i32>,
+    pub actors: &'a SharedMut<Vec<Actor>>,
 }
 
 pub struct ModeContext<'a, 'g> {
@@ -36,8 +35,7 @@ pub struct ModeContext<'a, 'g> {
     pub res: &'a Resources,
     pub input: &'a mut SharedMut<Input>,
     pub level: &'a mut SharedMut<Level>,
-    pub camera_x: &'a mut SharedMut<i32>,
-    pub camera_y: &'a mut SharedMut<i32>,
+    pub actors: &'a mut SharedMut<Vec<Actor>>,
 }
 
 /// Code that polls async code should use this by moving a clone of it into the async code.
@@ -48,13 +46,13 @@ pub struct ScriptContext {
     pub input: SharedMut<Input>,
     pub res: Resources,
     pub level: SharedMut<Level>,
-    pub camera_x: SharedMut<i32>,
-    pub camera_y: SharedMut<i32>,
+    pub actors: SharedMut<Vec<Actor>>,
 }
 
 impl ScriptContext {
     pub fn new(gctx: &mut GraphicsContext, res: Resources) -> Self {
         let level = res.levels.level_by_identifier(gctx, &res, "Start");
+        let actors = vec![Actor::new(gctx, &res, 6, 3, "coric.png")];
 
         Self {
             gctx_ptr: SharedMut::new(std::ptr::null_mut()),
@@ -62,8 +60,7 @@ impl ScriptContext {
             input: SharedMut::new(Input::new()),
             res,
             level: SharedMut::new(level),
-            camera_x: SharedMut::new(160),
-            camera_y: SharedMut::new(88),
+            actors: SharedMut::new(actors),
         }
     }
 
@@ -78,8 +75,7 @@ impl ScriptContext {
             input: SharedMut::clone(&this.input),
             res: this.res.clone(),
             level: SharedMut::clone(&this.level),
-            camera_x: SharedMut::clone(&this.camera_x),
-            camera_y: SharedMut::clone(&this.camera_y),
+            actors: SharedMut::clone(&this.actors),
         }
     }
 
@@ -87,8 +83,7 @@ impl ScriptContext {
         DrawContext {
             gctx,
             level: &self.level,
-            camera_x: &self.camera_x,
-            camera_y: &self.camera_y,
+            actors: &self.actors,
         }
     }
 

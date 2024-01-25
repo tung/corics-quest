@@ -8,6 +8,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::{Rc, Weak};
 
+pub const TILE_SIZE: i32 = 16;
+
 struct Layer {
     c_wid: u16,
     c_hei: u16,

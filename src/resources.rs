@@ -1,3 +1,4 @@
+use crate::aseprite;
 use crate::levels::*;
 use crate::shaders::*;
 
@@ -7,8 +8,12 @@ use std::collections::HashMap;
 use std::io::Cursor;
 use std::rc::Rc;
 
+const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] =
+    &[("coric.png", include_str!("../assets/coric.json"))];
+
 const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("base.png", include_bytes!("../assets/base.png")),
+    ("coric.png", include_bytes!("../assets/coric.png")),
     ("edges.png", include_bytes!("../assets/edges.png")),
     ("grassdirt.png", include_bytes!("../assets/grassdirt.png")),
     ("props.png", include_bytes!("../assets/props.png")),
@@ -23,6 +28,7 @@ pub struct Resources {
     pub levels: Rc<LevelSet>,
     pub font: Texture,
     pub textures_by_path: Rc<HashMap<&'static str, Texture>>,
+    pub sprite_sheets_by_path: Rc<HashMap<&'static str, Rc<aseprite::SpriteSheet>>>,
 }
 
 impl Resources {
@@ -36,6 +42,16 @@ impl Resources {
             .map(|(p, b)| (*p, texture_from_png_bytes(gctx, b)))
             .collect::<HashMap<_, _>>();
 
+        let sprite_sheets_by_path = SPRITE_SHEETS_BY_PATH
+            .iter()
+            .map(|(p, j)| {
+                (
+                    *p,
+                    Rc::new(miniserde::json::from_str::<aseprite::SpriteSheet>(j).unwrap()),
+                )
+            })
+            .collect::<HashMap<_, _>>();
+
         Self {
             quad_vbuf,
             quad_ibuf,
@@ -44,6 +60,7 @@ impl Resources {
             levels: Rc::new(LevelSet::new()),
             font,
             textures_by_path: Rc::new(textures_by_path),
+            sprite_sheets_by_path: Rc::new(sprite_sheets_by_path),
         }
     }
 }
