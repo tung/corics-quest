@@ -81,7 +81,13 @@ impl WalkAround {
             if let Some(dir) = player_move {
                 mctx.actors[0].face_dir = dir;
                 mctx.actors[0].start_walk_animation(dir);
-                walk_player(&mut mctx.actors[..], dir).await;
+
+                let Actor { grid_x, grid_y, .. } = mctx.actors[0];
+                if mctx.level.is_edge_blocked(grid_x, grid_y, dir) {
+                    mctx.actors[0].stop_walk_animation();
+                } else {
+                    walk_player(&mut mctx.actors[..], dir).await;
+                }
             } else {
                 mctx.actors[0].stop_walk_animation();
 
