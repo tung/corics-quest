@@ -8,14 +8,23 @@ use std::collections::HashMap;
 use std::io::Cursor;
 use std::rc::Rc;
 
-const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] =
-    &[("coric.png", include_str!("../assets/coric.json"))];
+const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
+    ("coric.png", include_str!("../assets/coric.json")),
+    ("ducille.png", include_str!("../assets/ducille.json")),
+    ("jace.png", include_str!("../assets/jace.json")),
+    ("julis.png", include_str!("../assets/julis.json")),
+    ("matero.png", include_str!("../assets/matero.json")),
+];
 
 const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("base.png", include_bytes!("../assets/base.png")),
     ("coric.png", include_bytes!("../assets/coric.png")),
+    ("ducille.png", include_bytes!("../assets/ducille.png")),
     ("edges.png", include_bytes!("../assets/edges.png")),
     ("grassdirt.png", include_bytes!("../assets/grassdirt.png")),
+    ("jace.png", include_bytes!("../assets/jace.png")),
+    ("julis.png", include_bytes!("../assets/julis.png")),
+    ("matero.png", include_bytes!("../assets/matero.png")),
     ("props.png", include_bytes!("../assets/props.png")),
 ];
 

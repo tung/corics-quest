@@ -51,8 +51,8 @@ pub struct ScriptContext {
 
 impl ScriptContext {
     pub fn new(gctx: &mut GraphicsContext, res: Resources) -> Self {
-        let level = res.levels.level_by_identifier(gctx, &res, "Start");
-        let actors = vec![Actor::new(gctx, &res, 6, 3, "coric.png")];
+        let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");
+        actors.insert(0, Actor::new(gctx, &res, 6, 3, "coric.png"));
 
         Self {
             gctx_ptr: SharedMut::new(std::ptr::null_mut()),

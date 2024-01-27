@@ -1,3 +1,4 @@
+use crate::actor::*;
 use crate::direction::*;
 use crate::resources::*;
 use crate::{layer_shader, ldtk, SCREEN_HEIGHT, SCREEN_WIDTH};
@@ -169,7 +170,19 @@ impl Level {
         tileset_defs_json: &[ldtk::TilesetDefinition],
         edge_blocked_enum_uid: i64,
         level_json: &ldtk::Level,
-    ) -> Self {
+    ) -> (Self, Vec<Actor>) {
+        let actors = level_json
+            .layer_instances
+            .as_ref()
+            .expect("levels saved internally")
+            .iter()
+            .find(|l| l.identifier == "Actors")
+            .expect("Actors layer")
+            .entity_instances
+            .iter()
+            .map(|e| Actor::new_by_json(gctx, res, tileset_defs_json, e))
+            .collect::<Vec<Actor>>();
+
         let mut layers = Vec::new();
         for layer_json in level_json
             .layer_instances
@@ -189,14 +202,17 @@ impl Level {
             }
         }
 
-        Self {
-            identifier: level_json.identifier.clone(),
-            px_world_x: level_json.world_x.try_into().expect("world_x as i32"),
-            px_world_y: level_json.world_y.try_into().expect("world_y as i32"),
-            px_wid: level_json.px_wid.try_into().expect("px_wid as i32"),
-            px_hei: level_json.px_hei.try_into().expect("px_hei as i32"),
-            layers,
-        }
+        (
+            Self {
+                identifier: level_json.identifier.clone(),
+                px_world_x: level_json.world_x.try_into().expect("world_x as i32"),
+                px_world_y: level_json.world_y.try_into().expect("world_y as i32"),
+                px_wid: level_json.px_wid.try_into().expect("px_wid as i32"),
+                px_hei: level_json.px_hei.try_into().expect("px_hei as i32"),
+                layers,
+            },
+            actors,
+        )
     }
 
     pub fn draw(&self, gctx: &mut GraphicsContext, camera_x: i32, camera_y: i32) {
@@ -247,7 +263,7 @@ impl LevelSet {
         gctx: &mut GraphicsContext,
         res: &Resources,
         identifier: &str,
-    ) -> Level {
+    ) -> (Level, Vec<Actor>) {
         let level_index = self.levels_by_identifier[identifier];
         Level::new(
             gctx,

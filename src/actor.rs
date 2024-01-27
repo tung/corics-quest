@@ -1,5 +1,6 @@
 use crate::async_utils::wait_once;
 use crate::direction::*;
+use crate::ldtk;
 use crate::levels::TILE_SIZE;
 use crate::resources::*;
 use crate::sprite::*;
@@ -37,6 +38,34 @@ impl Actor {
             visible: true,
             sprite,
         }
+    }
+
+    pub fn new_by_json(
+        gctx: &mut GraphicsContext,
+        res: &Resources,
+        tileset_defs_json: &[ldtk::TilesetDefinition],
+        entity_json: &ldtk::EntityInstance,
+    ) -> Self {
+        let tileset_uid = entity_json
+            .tile
+            .as_ref()
+            .expect("entity tileset rectangle")
+            .tileset_uid;
+        let rel_path = &tileset_defs_json
+            .iter()
+            .find(|t| t.uid == tileset_uid)
+            .expect("entity tileset by uid")
+            .rel_path
+            .as_ref()
+            .expect("entity tileset rel_path");
+
+        Self::new(
+            gctx,
+            res,
+            entity_json.grid[0] as i32,
+            entity_json.grid[1] as i32,
+            rel_path,
+        )
     }
 
     pub fn animate(&mut self) {

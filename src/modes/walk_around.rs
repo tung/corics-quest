@@ -83,7 +83,9 @@ impl WalkAround {
                 mctx.actors[0].start_walk_animation(dir);
 
                 let Actor { grid_x, grid_y, .. } = mctx.actors[0];
-                if mctx.level.is_edge_blocked(grid_x, grid_y, dir) {
+                if mctx.level.is_edge_blocked(grid_x, grid_y, dir)
+                    || npc_actor_at(mctx, grid_x, grid_y, dir).is_some()
+                {
                     mctx.actors[0].stop_walk_animation();
                 } else {
                     walk_player(&mut mctx.actors[..], dir).await;
@@ -97,4 +99,17 @@ impl WalkAround {
             }
         }
     }
+}
+
+fn npc_actor_at(
+    mctx: &ModeContext<'_, '_>,
+    grid_x: i32,
+    grid_y: i32,
+    face_dir: Direction,
+) -> Option<usize> {
+    mctx.actors
+        .iter()
+        .skip(1)
+        .position(|a| a.grid_x == grid_x + face_dir.dx() && a.grid_y == grid_y + face_dir.dy())
+        .map(|i| i + 1)
 }
