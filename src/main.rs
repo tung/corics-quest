@@ -12,6 +12,7 @@ mod script;
 mod shaders;
 mod sprite;
 mod text;
+mod window;
 
 use contexts::*;
 use resources::*;

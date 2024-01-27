@@ -110,9 +110,15 @@ impl ScriptContext {
         self.modes.pop();
     }
 
+    pub fn push_text_box_mode(&mut self, s: &str) {
+        let gctx = self.gctx();
+        self.modes.push(TextBox::new(gctx, &self.res, s));
+    }
+
     pub fn push_walk_around_mode(&mut self) {
         self.modes.push(WalkAround::new(&self.res));
     }
 
+    update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
 }

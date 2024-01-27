@@ -1,3 +1,4 @@
+use crate::async_utils::wait_once;
 use crate::resources::*;
 use crate::shaders::quad_shader;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
@@ -6,6 +7,7 @@ use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline
 
 pub struct Text {
     offset: [f32; 2],
+    shown_chars: i32,
     font: Texture,
     local_buf: Vec<[[f32; 2]; 3]>,
     bindings: Option<Bindings>,
@@ -17,13 +19,28 @@ impl Text {
         Self {
             offset: [x as f32, y as f32],
             font: res.font,
+            shown_chars: 0,
             local_buf: Vec::new(),
             bindings: None,
             quad_pipeline: res.quad_pipeline,
         }
     }
 
+    pub fn from_str(gctx: &mut GraphicsContext, res: &Resources, x: i32, y: i32, s: &str) -> Self {
+        let mut text = Self::new(res, x, y);
+        text.set_text(gctx, res, s);
+        text
+    }
+
+    pub fn all_chars_shown(&self) -> bool {
+        self.shown_chars >= self.local_buf.len() as i32
+    }
+
     pub fn draw(&self, gctx: &mut GraphicsContext) {
+        if self.shown_chars <= 0 {
+            return;
+        }
+
         if let Some(bindings) = &self.bindings {
             gctx.apply_pipeline(&self.quad_pipeline);
             gctx.apply_bindings(bindings);
@@ -33,7 +50,19 @@ impl Text {
                 px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
                 px_texture_size: [self.font.width as f32, self.font.height as f32],
             });
-            gctx.draw(0, 6, self.local_buf.len() as i32);
+            gctx.draw(0, 6, self.shown_chars);
+        }
+    }
+
+    pub fn hide_all_chars(&mut self) {
+        self.shown_chars = 0;
+    }
+
+    pub async fn reveal(&mut self) {
+        self.hide_all_chars();
+        while !self.all_chars_shown() {
+            wait_once().await;
+            self.show_one_char();
         }
     }
 
@@ -69,6 +98,12 @@ impl Text {
             }
         }
 
+        self.shown_chars = self
+            .local_buf
+            .len()
+            .try_into()
+            .expect("local_buf.len() as i32");
+
         if self.local_buf.is_empty() {
             if let Some(bindings) = self.bindings.take() {
                 bindings.vertex_buffers[1].delete();
@@ -89,6 +124,12 @@ impl Text {
                 *inst_buf = Buffer::stream(gctx, BufferType::VertexBuffer, needed_size);
             }
             inst_buf.update(gctx, &self.local_buf[..]);
+        }
+    }
+
+    pub fn show_one_char(&mut self) {
+        if self.shown_chars < self.local_buf.len() as i32 {
+            self.shown_chars += 1;
         }
     }
 }

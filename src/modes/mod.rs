@@ -1,5 +1,7 @@
+mod text_box;
 mod walk_around;
 
+pub use text_box::*;
 pub use walk_around::*;
 
 use crate::contexts::*;
@@ -16,13 +18,13 @@ macro_rules! impl_mode {
             pub async fn $update(&mut self, mctx: &mut ModeContext<'_, '_>) -> $event {
                 match self.0.last_mut() {
                     Some(Mode::$sub_mode(m)) => m.update(mctx).await,
-                    //Some(_) => {
-                    //    panic!(
-                    //        "{} called on a mode that isn't {}",
-                    //        stringify!($update),
-                    //        stringify!($sub_mode),
-                    //    );
-                    //}
+                    Some(_) => {
+                        panic!(
+                            "{} called on a mode that isn't {}",
+                            stringify!($update),
+                            stringify!($sub_mode),
+                        );
+                    }
                     None => panic!("{} called on an empty mode stack", stringify!($update)),
                 }
             }
@@ -31,9 +33,11 @@ macro_rules! impl_mode {
 }
 
 pub enum Mode {
+    TextBox(Box<TextBox>),
     WalkAround(Box<WalkAround>),
 }
 
+impl_mode!(TextBox, TextBoxEvent, update_text_box_mode);
 impl_mode!(WalkAround, WalkAroundEvent, update_walk_around_mode);
 
 pub struct ModeStack(Vec<Mode>);
@@ -43,6 +47,7 @@ impl Mode {
         use Mode::*;
 
         match self {
+            TextBox(m) => m.draw(dctx),
             WalkAround(m) => m.draw(dctx),
         }
     }

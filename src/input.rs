@@ -7,6 +7,7 @@ pub enum GameKey {
     Down,
     Left,
     Right,
+    Confirm,
 }
 
 pub struct Input {
@@ -15,7 +16,7 @@ pub struct Input {
 }
 
 impl GameKey {
-    const NUM_KEYS: usize = Self::Right as usize + 1;
+    const NUM_KEYS: usize = Self::Confirm as usize + 1;
 }
 
 impl TryFrom<KeyCode> for GameKey {
@@ -28,6 +29,7 @@ impl TryFrom<KeyCode> for GameKey {
             KeyCode::Down => Self::Down,
             KeyCode::Left => Self::Left,
             KeyCode::Right => Self::Right,
+            KeyCode::Z => Self::Confirm,
             _ => return Err(()),
         })
     }
