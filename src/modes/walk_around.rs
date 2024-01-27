@@ -91,7 +91,7 @@ impl WalkAround {
             } else {
                 mctx.actors[0].stop_walk_animation();
 
-                if mctx.input.is_key_down(GameKey::DebugQuit) {
+                if mctx.input.is_key_pressed(GameKey::DebugQuit) {
                     return WalkAroundEvent::DebugQuit;
                 }
             }

@@ -11,6 +11,7 @@ pub enum GameKey {
 
 pub struct Input {
     keys_down: Vec<bool>,
+    keys_pressed: Vec<bool>,
 }
 
 impl GameKey {
@@ -36,12 +37,14 @@ impl Input {
     pub fn new() -> Self {
         Self {
             keys_down: vec![false; GameKey::NUM_KEYS],
+            keys_pressed: vec![false; GameKey::NUM_KEYS],
         }
     }
 
     pub fn handle_key_down_event(&mut self, keycode: KeyCode) {
         if let Ok(game_key) = GameKey::try_from(keycode) {
             self.keys_down[game_key as usize] = true;
+            self.keys_pressed[game_key as usize] = true;
         }
     }
 
@@ -53,5 +56,13 @@ impl Input {
 
     pub fn is_key_down(&self, game_key: GameKey) -> bool {
         self.keys_down[game_key as usize]
+    }
+
+    pub fn is_key_pressed(&self, game_key: GameKey) -> bool {
+        self.keys_pressed[game_key as usize]
+    }
+
+    pub fn reset_keys_pressed(&mut self) {
+        self.keys_pressed.fill(false);
     }
 }

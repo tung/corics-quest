@@ -160,6 +160,7 @@ impl EventHandler for App {
                 gctx.order_quit();
                 break;
             }
+            self.sctx.input.reset_keys_pressed();
         }
         self.sctx.unset_gctx();
     }
