@@ -9,6 +9,7 @@ use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use miniquad::graphics::GraphicsContext;
 
 pub struct Actor {
+    pub identifier: ActorType,
     pub grid_x: i32,
     pub grid_y: i32,
     pub offset_x: i32,
@@ -18,10 +19,20 @@ pub struct Actor {
     sprite: Sprite,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum ActorType {
+    Player,
+    Ducille,
+    Jace,
+    Julis,
+    Matero,
+}
+
 impl Actor {
     pub fn new(
         gctx: &mut GraphicsContext,
         res: &Resources,
+        identifier: ActorType,
         grid_x: i32,
         grid_y: i32,
         path: &str,
@@ -30,6 +41,7 @@ impl Actor {
         sprite.start_animation("face_s");
 
         Self {
+            identifier,
             grid_x,
             grid_y,
             offset_x: 0,
@@ -62,6 +74,7 @@ impl Actor {
         Self::new(
             gctx,
             res,
+            entity_json.identifier.as_str().try_into().unwrap(),
             entity_json.grid[0] as i32,
             entity_json.grid[1] as i32,
             rel_path,
@@ -88,6 +101,21 @@ impl Actor {
 
     pub fn stop_walk_animation(&mut self) {
         self.sprite.stop_walk_animation();
+    }
+}
+
+impl TryFrom<&str> for ActorType {
+    type Error = &'static str;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        match s {
+            "Player" => Ok(Self::Player),
+            "Ducille" => Ok(Self::Ducille),
+            "Jace" => Ok(Self::Jace),
+            "Julis" => Ok(Self::Julis),
+            "Matero" => Ok(Self::Matero),
+            _ => Err("unknown actor type"),
+        }
     }
 }
 

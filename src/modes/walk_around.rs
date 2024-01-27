@@ -14,6 +14,7 @@ pub struct WalkAround {
 
 pub enum WalkAroundEvent {
     DebugQuit,
+    TalkActor(usize),
 }
 
 impl WalkAround {
@@ -95,6 +96,17 @@ impl WalkAround {
 
                 if mctx.input.is_key_pressed(GameKey::DebugQuit) {
                     return WalkAroundEvent::DebugQuit;
+                } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                    let Actor {
+                        grid_x,
+                        grid_y,
+                        face_dir,
+                        ..
+                    } = mctx.actors[0];
+
+                    if let Some(npc) = npc_actor_at(mctx, grid_x, grid_y, face_dir) {
+                        return WalkAroundEvent::TalkActor(npc);
+                    }
                 }
             }
         }

@@ -258,6 +258,10 @@ impl LevelSet {
         }
     }
 
+    pub fn contains_identifier(&self, identifier: &str) -> bool {
+        self.levels_by_identifier.contains_key(identifier)
+    }
+
     pub fn level_by_identifier(
         &self,
         gctx: &mut GraphicsContext,
