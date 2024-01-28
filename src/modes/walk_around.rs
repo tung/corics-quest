@@ -4,13 +4,9 @@ use crate::contexts::*;
 use crate::direction::*;
 use crate::input::*;
 use crate::levels::TILE_SIZE;
-use crate::resources::*;
-use crate::text::*;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
-pub struct WalkAround {
-    debug_text: Text,
-}
+pub struct WalkAround;
 
 pub enum WalkAroundEvent {
     DebugQuit,
@@ -18,10 +14,8 @@ pub enum WalkAroundEvent {
 }
 
 impl WalkAround {
-    pub fn new(res: &Resources) -> Self {
-        Self {
-            debug_text: Text::new(res, 0, 0),
-        }
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn draw(&self, dctx: &mut DrawContext) {
@@ -55,17 +49,10 @@ impl WalkAround {
         for actor in dctx.actors.iter() {
             actor.draw(dctx.gctx, camera_x, camera_y);
         }
-        self.debug_text.draw(dctx.gctx);
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> WalkAroundEvent {
         loop {
-            self.debug_text.set_text(
-                mctx.gctx,
-                mctx.res,
-                &format!("{}\n{}", mctx.actors[0].grid_x, mctx.actors[0].grid_y),
-            );
-
             wait_once().await;
 
             let player_move = if mctx.input.is_key_down(GameKey::Up) {

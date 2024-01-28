@@ -119,7 +119,7 @@ impl ScriptContext {
     }
 
     pub fn push_walk_around_mode(&mut self) {
-        self.modes.push(WalkAround::new(&self.res));
+        self.modes.push(WalkAround::new());
     }
 
     update_mode!(update_text_box_mode, TextBoxEvent);
