@@ -3,6 +3,7 @@ use crate::async_utils::SharedMut;
 use crate::input::*;
 use crate::levels::*;
 use crate::modes::*;
+use crate::progress::*;
 use crate::resources::*;
 
 use miniquad::graphics::GraphicsContext;
@@ -16,6 +17,7 @@ macro_rules! update_mode {
                     gctx,
                     res: &self.res,
                     input: &mut self.input,
+                    progress: &mut self.progress,
                     level: &mut self.level,
                     actors: &mut self.actors,
                 })
@@ -34,6 +36,7 @@ pub struct ModeContext<'a, 'g> {
     pub gctx: &'g mut GraphicsContext,
     pub res: &'a Resources,
     pub input: &'a mut SharedMut<Input>,
+    pub progress: &'a mut SharedMut<Progress>,
     pub level: &'a mut SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
 }
@@ -45,6 +48,7 @@ pub struct ScriptContext {
     pub modes: SharedMut<ModeStack>,
     pub input: SharedMut<Input>,
     pub res: Resources,
+    pub progress: SharedMut<Progress>,
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
 }
@@ -62,6 +66,7 @@ impl ScriptContext {
             modes: SharedMut::new(ModeStack::new()),
             input: SharedMut::new(Input::new()),
             res,
+            progress: SharedMut::new(Progress::new()),
             level: SharedMut::new(level),
             actors: SharedMut::new(actors),
         }
@@ -77,6 +82,7 @@ impl ScriptContext {
             modes: SharedMut::clone(&this.modes),
             input: SharedMut::clone(&this.input),
             res: this.res.clone(),
+            progress: SharedMut::clone(&this.progress),
             level: SharedMut::clone(&this.level),
             actors: SharedMut::clone(&this.actors),
         }
@@ -113,6 +119,12 @@ impl ScriptContext {
         self.modes.pop();
     }
 
+    pub fn push_main_menu_mode(&mut self) {
+        let gctx = self.gctx();
+        self.modes
+            .push(MainMenu::new(gctx, &self.res, &self.progress));
+    }
+
     pub fn push_text_box_mode(&mut self, s: &str) {
         let gctx = self.gctx();
         self.modes.push(TextBox::new(gctx, &self.res, s));
@@ -122,6 +134,7 @@ impl ScriptContext {
         self.modes.push(WalkAround::new());
     }
 
+    update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
 }

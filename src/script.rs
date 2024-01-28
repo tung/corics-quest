@@ -63,6 +63,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.pop_mode(); // WalkAround
                 return;
             }
+            WalkAroundEvent::MainMenu => {
+                sctx.push_main_menu_mode();
+                let MainMenuEvent::Done = sctx.update_main_menu_mode().await;
+                sctx.pop_mode();
+            }
             WalkAroundEvent::TalkActor(actor) => {
                 let level_script = LEVEL_SCRIPTS
                     .iter()

@@ -7,6 +7,7 @@ mod input;
 mod ldtk;
 mod levels;
 mod modes;
+mod progress;
 mod resources;
 mod script;
 mod shaders;

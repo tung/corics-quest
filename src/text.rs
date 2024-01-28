@@ -66,6 +66,10 @@ impl Text {
         }
     }
 
+    pub fn set_offset(&mut self, x: i32, y: i32) {
+        self.offset = [x as f32, y as f32];
+    }
+
     pub fn set_text(&mut self, gctx: &mut GraphicsContext, res: &Resources, s: &str) {
         const FONT_COLUMNS: u32 = 16;
         const FONT_ROWS: u32 = 16;
