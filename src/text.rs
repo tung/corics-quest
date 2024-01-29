@@ -7,6 +7,8 @@ use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline
 
 pub struct Text {
     offset: [f32; 2],
+    width: i32,
+    height: i32,
     shown_chars: i32,
     font: Texture,
     local_buf: Vec<[[f32; 2]; 3]>,
@@ -18,6 +20,8 @@ impl Text {
     pub fn new(res: &Resources, x: i32, y: i32) -> Self {
         Self {
             offset: [x as f32, y as f32],
+            width: 0,
+            height: 0,
             font: res.font,
             shown_chars: 0,
             local_buf: Vec::new(),
@@ -54,6 +58,10 @@ impl Text {
         }
     }
 
+    pub fn height(&self) -> i32 {
+        self.height
+    }
+
     pub fn hide_all_chars(&mut self) {
         self.shown_chars = 0;
     }
@@ -77,6 +85,8 @@ impl Text {
         let char_height = self.font.height / FONT_ROWS;
 
         self.local_buf.clear();
+        self.width = 0;
+        self.height = 0;
         let mut x: f32 = 0.0;
         let mut y: f32 = 0.0;
         for c in s.chars() {
@@ -98,6 +108,8 @@ impl Text {
                     [src_x, src_y],
                     [x, y],
                 ]);
+                self.width = self.width.max((x + char_width as f32).trunc() as i32);
+                self.height = self.height.max((y + char_height as f32).trunc() as i32);
                 x += char_width as f32;
             }
         }
@@ -135,6 +147,10 @@ impl Text {
         if self.shown_chars < self.local_buf.len() as i32 {
             self.shown_chars += 1;
         }
+    }
+
+    pub fn width(&self) -> i32 {
+        self.width
     }
 }
 

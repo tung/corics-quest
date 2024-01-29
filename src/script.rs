@@ -1,5 +1,6 @@
 use crate::actor::*;
 use crate::contexts::*;
+use crate::enemy::*;
 use crate::modes::*;
 
 use std::collections::HashSet;
@@ -62,6 +63,30 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.pop_mode(); // TextBox
                 sctx.pop_mode(); // WalkAround
                 return;
+            }
+            WalkAroundEvent::Encounter => {
+                sctx.actors[0].visible = false;
+                sctx.push_battle_mode(Enemy {
+                    name: "Town Rat",
+                    sprite_path: "rat.png",
+                    hp: 52,
+                    attack: 5,
+                    defense: 5,
+                });
+                match sctx.update_battle_mode().await {
+                    BattleEvent::RanAway | BattleEvent::Victory => {
+                        sctx.pop_mode();
+                        sctx.actors[0].visible = true;
+                    }
+                    BattleEvent::Defeat => {
+                        sctx.pop_mode();
+                        sctx.actors[0].visible = true;
+                        sctx.push_text_box_mode("Coric:\nOuch!");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                        sctx.progress.hp = sctx.progress.max_hp;
+                    }
+                }
             }
             WalkAroundEvent::MainMenu => {
                 sctx.push_main_menu_mode();

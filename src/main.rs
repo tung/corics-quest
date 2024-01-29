@@ -3,6 +3,7 @@ mod aseprite;
 mod async_utils;
 mod contexts;
 mod direction;
+mod enemy;
 mod input;
 mod ldtk;
 mod levels;

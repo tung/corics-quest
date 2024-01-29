@@ -1,5 +1,6 @@
 use crate::actor::*;
 use crate::async_utils::SharedMut;
+use crate::enemy::*;
 use crate::input::*;
 use crate::levels::*;
 use crate::modes::*;
@@ -119,6 +120,11 @@ impl ScriptContext {
         self.modes.pop();
     }
 
+    pub fn push_battle_mode(&mut self, enemy: Enemy) {
+        let gctx = self.gctx();
+        self.modes.push(Battle::new(gctx, &self.res, enemy));
+    }
+
     pub fn push_main_menu_mode(&mut self) {
         let gctx = self.gctx();
         self.modes
@@ -134,6 +140,7 @@ impl ScriptContext {
         self.modes.push(WalkAround::new());
     }
 
+    update_mode!(update_battle_mode, BattleEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);

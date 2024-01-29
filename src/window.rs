@@ -184,6 +184,11 @@ impl Window {
             self.corners.len = 0;
         }
     }
+
+    pub fn set_offset(&mut self, x: i32, y: i32) {
+        self.x = x as f32;
+        self.y = y as f32;
+    }
 }
 
 impl<const N: usize> WindowPart<N> {

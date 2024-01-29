@@ -10,6 +10,7 @@ pub struct WalkAround;
 
 pub enum WalkAroundEvent {
     DebugQuit,
+    Encounter,
     MainMenu,
     TalkActor(usize),
 }
@@ -97,6 +98,8 @@ impl WalkAround {
                     }
                 } else if mctx.input.is_key_pressed(GameKey::Cancel) {
                     return WalkAroundEvent::MainMenu;
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle) {
+                    return WalkAroundEvent::Encounter;
                 }
             }
         }

@@ -3,6 +3,7 @@ use miniquad::KeyCode;
 #[derive(Clone, Copy)]
 pub enum GameKey {
     DebugQuit,
+    DebugBattle,
     Up,
     Down,
     Left,
@@ -26,6 +27,7 @@ impl TryFrom<KeyCode> for GameKey {
     fn try_from(value: KeyCode) -> Result<Self, Self::Error> {
         Ok(match value {
             KeyCode::Q => Self::DebugQuit,
+            KeyCode::B => Self::DebugBattle,
             KeyCode::Up => Self::Up,
             KeyCode::Down => Self::Down,
             KeyCode::Left => Self::Left,
