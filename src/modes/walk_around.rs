@@ -13,6 +13,7 @@ pub enum WalkAroundEvent {
     Encounter,
     MainMenu,
     TalkActor(usize),
+    TouchLevelEdge(Direction),
 }
 
 impl WalkAround {
@@ -78,7 +79,20 @@ impl WalkAround {
                 {
                     mctx.actors[0].stop_walk_animation();
                 } else {
-                    walk_player(&mut mctx.actors[..], dir).await;
+                    let c_level_wid = mctx.level.px_wid / TILE_SIZE;
+                    let c_level_hei = mctx.level.px_hei / TILE_SIZE;
+                    let in_bounds =
+                        grid_x >= 0 && grid_x < c_level_wid && grid_y >= 0 && grid_y < c_level_hei;
+                    if in_bounds
+                        && (grid_y == 0 && dir == Direction::North
+                            || grid_x == c_level_wid - 1 && dir == Direction::East
+                            || grid_y == c_level_hei - 1 && dir == Direction::South
+                            || grid_x == 0 && dir == Direction::West)
+                    {
+                        return WalkAroundEvent::TouchLevelEdge(dir);
+                    } else {
+                        walk_player(&mut mctx.actors[..], dir).await;
+                    }
                 }
             } else {
                 mctx.actors[0].stop_walk_animation();

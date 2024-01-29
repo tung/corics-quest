@@ -28,6 +28,7 @@ pub struct Level {
     pub px_wid: i32,
     pub px_hei: i32,
     layers: Vec<Layer>,
+    pub neighbours: Vec<NeighbourLevel>,
 }
 
 pub struct LevelSet {
@@ -35,6 +36,12 @@ pub struct LevelSet {
     tilesets: TilesetLoader,
     edge_blocked_enum_uid: i64,
     levels_by_identifier: HashMap<String, usize>,
+    levels_by_iid: HashMap<String, usize>,
+}
+
+pub struct NeighbourLevel {
+    dir: Direction,
+    level_iid: String,
 }
 
 struct Tileset {
@@ -210,6 +217,11 @@ impl Level {
                 px_wid: level_json.px_wid.try_into().expect("px_wid as i32"),
                 px_hei: level_json.px_hei.try_into().expect("px_hei as i32"),
                 layers,
+                neighbours: level_json
+                    .neighbours
+                    .iter()
+                    .map(NeighbourLevel::new)
+                    .collect(),
             },
             actors,
         )
@@ -246,8 +258,10 @@ impl LevelSet {
             .uid;
 
         let mut levels_by_identifier = HashMap::new();
+        let mut levels_by_iid = HashMap::new();
         for (i, level_json) in p.levels.iter().enumerate() {
             levels_by_identifier.insert(level_json.identifier.clone(), i);
+            levels_by_iid.insert(level_json.iid.clone(), i);
         }
 
         Self {
@@ -255,6 +269,7 @@ impl LevelSet {
             tilesets,
             edge_blocked_enum_uid,
             levels_by_identifier,
+            levels_by_iid,
         }
     }
 
@@ -278,11 +293,79 @@ impl LevelSet {
             &self.p.levels[level_index],
         )
     }
+
+    pub fn level_by_neighbour(
+        &self,
+        gctx: &mut GraphicsContext,
+        res: &Resources,
+        neighbours: &[NeighbourLevel],
+        px_world_x: i32,
+        px_world_y: i32,
+        dir: Direction,
+    ) -> Option<(Level, Vec<Actor>)> {
+        neighbours
+            .iter()
+            .filter(|n| n.dir == dir)
+            .map(|n| self.levels_by_iid[&n.level_iid[..]])
+            .filter(|&level_index| {
+                let ldtk::Level {
+                    px_wid,
+                    px_hei,
+                    world_x,
+                    world_y,
+                    ..
+                } = self.p.levels[level_index];
+                let px_wid: i32 = px_wid.try_into().expect("px_wid as i32");
+                let px_hei: i32 = px_hei.try_into().expect("px_hei as i32");
+                let world_x: i32 = world_x.try_into().expect("world_x as i32");
+                let world_y: i32 = world_y.try_into().expect("world_y as i32");
+                let px_dest_x = px_world_x + dir.dx() * TILE_SIZE;
+                let px_dest_y = px_world_y + dir.dy() * TILE_SIZE;
+                px_dest_x >= world_x
+                    && px_dest_x < world_x + px_wid
+                    && px_dest_y >= world_y
+                    && px_dest_y < world_y + px_hei
+            })
+            .take(1)
+            .map(|level_index| {
+                Level::new(
+                    gctx,
+                    res,
+                    &self.tilesets,
+                    &self.p.defs.tilesets[..],
+                    self.edge_blocked_enum_uid,
+                    &self.p.levels[level_index],
+                )
+            })
+            .next()
+    }
 }
 
 impl Default for LevelSet {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl NeighbourLevel {
+    fn new(neighbour_json: &ldtk::NeighbourLevel) -> Self {
+        let dir_char = neighbour_json
+            .dir
+            .chars()
+            .next()
+            .expect("first char of ldtk::NeighbourLevel.dir");
+        let dir = match dir_char {
+            'n' => Direction::North,
+            'e' => Direction::East,
+            's' => Direction::South,
+            'w' => Direction::West,
+            c => panic!("unknown ldtk::NeighbourLevel.dir char: '{c}'"),
+        };
+
+        Self {
+            dir,
+            level_iid: neighbour_json.level_iid.clone(),
+        }
     }
 }
 

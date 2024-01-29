@@ -1,6 +1,7 @@
 use crate::actor::*;
 use crate::contexts::*;
 use crate::enemy::*;
+use crate::levels::TILE_SIZE;
 use crate::modes::*;
 use crate::progress::*;
 
@@ -108,6 +109,28 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     .map(|(_, t)| t)
                     .unwrap();
                 (talk_script)(&mut sctx).await;
+            }
+            WalkAroundEvent::TouchLevelEdge(dir) => {
+                if let Some((level, mut actors)) = sctx.level_by_neighbour(dir) {
+                    // walk out of old level
+                    walk_player(&mut sctx.actors[..], dir).await;
+
+                    // move player to the new level
+                    sctx.actors.truncate(1);
+                    let mut player = sctx.actors.pop().expect("player actor");
+                    player.grid_x +=
+                        (sctx.level.px_world_x - level.px_world_x) / TILE_SIZE - dir.dx();
+                    player.grid_y +=
+                        (sctx.level.px_world_y - level.px_world_y) / TILE_SIZE - dir.dy();
+                    actors.insert(0, player);
+                    *sctx.actors = actors;
+                    *sctx.level = level;
+
+                    // walk into the new level
+                    walk_player(&mut sctx.actors[..], dir).await;
+                } else {
+                    sctx.actors[0].stop_walk_animation();
+                }
             }
         }
     }

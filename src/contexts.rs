@@ -1,5 +1,6 @@
 use crate::actor::*;
 use crate::async_utils::SharedMut;
+use crate::direction::*;
 use crate::enemy::*;
 use crate::input::*;
 use crate::levels::*;
@@ -114,6 +115,24 @@ impl ScriptContext {
 
     pub fn unset_gctx(&mut self) {
         *self.gctx_ptr = std::ptr::null_mut();
+    }
+
+    pub fn level_by_neighbour(&self, dir: Direction) -> Option<(Level, Vec<Actor>)> {
+        let Actor { grid_x, grid_y, .. } = self.actors[0];
+        let Level {
+            px_world_x,
+            px_world_y,
+            ..
+        } = *self.level;
+        let gctx = self.gctx();
+        self.res.levels.level_by_neighbour(
+            gctx,
+            &self.res,
+            &self.level.neighbours[..],
+            px_world_x + grid_x * TILE_SIZE,
+            px_world_y + grid_y * TILE_SIZE,
+            dir,
+        )
     }
 
     pub fn pop_mode(&mut self) {
