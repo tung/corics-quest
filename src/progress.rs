@@ -1,3 +1,16 @@
+#[derive(Clone, Copy)]
+pub enum Item {
+    Salve,
+    XSalve,
+    Tonic,
+    XTonic,
+}
+
+pub struct ItemSlot {
+    pub item: Item,
+    pub amount: i32,
+}
+
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Magic {
     Heal,
@@ -20,7 +33,29 @@ pub struct Progress {
     pub defense: i32,
     pub level: i32,
     pub exp: i32,
+    pub items: Vec<ItemSlot>,
     pub magic: Vec<MagicSlot>,
+}
+
+impl Item {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Salve => "Salve",
+            Self::XSalve => "XSalve",
+            Self::Tonic => "Tonic",
+            Self::XTonic => "XTonic",
+        }
+    }
+}
+
+impl ItemSlot {
+    pub fn battle_menu_entry(&self) -> String {
+        if self.amount > 0 {
+            format!("{:9.9}{:2}", self.item.name(), self.amount)
+        } else {
+            String::new()
+        }
+    }
 }
 
 impl Magic {
@@ -64,6 +99,24 @@ impl Progress {
             defense: 5,
             level: 1,
             exp: 0,
+            items: vec![
+                ItemSlot {
+                    item: Item::Salve,
+                    amount: 4,
+                },
+                ItemSlot {
+                    item: Item::XSalve,
+                    amount: 3,
+                },
+                ItemSlot {
+                    item: Item::Tonic,
+                    amount: 2,
+                },
+                ItemSlot {
+                    item: Item::XTonic,
+                    amount: 1,
+                },
+            ],
             magic: vec![
                 MagicSlot {
                     magic: Magic::Heal,

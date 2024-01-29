@@ -49,6 +49,7 @@ pub enum BattleEvent {
 enum PlayerChoice {
     Fight,
     Magic(usize),
+    Item(usize),
     Run,
 }
 
@@ -173,6 +174,7 @@ impl Battle {
                 let choice = match selection {
                     0 => Some(PlayerChoice::Fight),
                     1 => self.magic_menu(mctx).await.map(PlayerChoice::Magic),
+                    2 => self.item_menu(mctx).await.map(PlayerChoice::Item),
                     3 => Some(PlayerChoice::Run),
                     _ => None,
                 };
@@ -243,6 +245,78 @@ impl Battle {
         self.enemy_hp_meter
             .set_value(mctx.gctx, self.enemy.hp - damage);
         self.show_change_text_at(mctx, ENEMY_X + 56, ENEMY_Y + 16, &format!("{damage}"));
+    }
+
+    async fn item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<usize> {
+        fn update_item_cursor(cursor: &mut Text, which: usize) {
+            //           1         2         3
+            // 012345678901234567890123456789012345
+            // .Back  .Salve     1   .Tonic     2
+            //        .XSalve    3   .XTonic    4
+            const ITEM_POSITIONS: [(i32, i32); 5] = [(0, 0), (7, 0), (22, 0), (7, 1), (22, 1)];
+            let x = ITEM_POSITIONS[which].0 * 6;
+            let y = ITEM_POSITIONS[which].1 * 8;
+            cursor.set_offset(MESSAGE_X + 8 + x, MESSAGE_Y + 24 + y);
+        }
+
+        self.message_text.set_text(mctx.gctx, mctx.res, "Use item:");
+        self.menu_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!(
+                " Back   {:11.11}    {:11.11}\n        {:11.11}    {:11.11}",
+                mctx.progress.items[0].battle_menu_entry(),
+                mctx.progress.items[1].battle_menu_entry(),
+                mctx.progress.items[2].battle_menu_entry(),
+                mctx.progress.items[3].battle_menu_entry(),
+            ),
+        );
+
+        let mut selection = 0;
+        update_item_cursor(&mut self.cursor, selection);
+
+        loop {
+            self.enemy_sprite.animate();
+
+            wait_once().await;
+
+            if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if selection == 0 {
+                    return None;
+                } else {
+                    let choice = selection - 1;
+                    if mctx.progress.items[choice].amount > 0 {
+                        return Some(choice);
+                    }
+                }
+            } else if mctx.input.is_key_pressed(GameKey::Up)
+                || mctx.input.is_key_pressed(GameKey::Down)
+            {
+                match selection {
+                    0 => {}
+                    1 | 2 => selection += 2,
+                    3 | 4 => selection -= 2,
+                    _ => unreachable!(),
+                }
+                update_item_cursor(&mut self.cursor, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Left) {
+                match selection {
+                    0 => selection = 2,
+                    3 => selection = 4,
+                    1 | 2 | 4 => selection -= 1,
+                    _ => unreachable!(),
+                }
+                update_item_cursor(&mut self.cursor, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Right) {
+                match selection {
+                    2 => selection = 0,
+                    4 => selection = 3,
+                    0 | 1 | 3 => selection += 1,
+                    _ => unreachable!(),
+                }
+                update_item_cursor(&mut self.cursor, selection);
+            }
+        }
     }
 
     async fn magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<usize> {
@@ -433,6 +507,52 @@ impl Battle {
 
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
+                }
+
+                PlayerChoice::Item(choice) => {
+                    mctx.progress.items[choice].amount -= 1;
+
+                    let item = mctx.progress.items[choice].item;
+                    let (heal_hp, heal_mp) = match item {
+                        Item::Salve => (mctx.progress.max_hp * 3 / 10, 0),
+                        Item::XSalve => (mctx.progress.max_hp, 0),
+                        Item::Tonic => (0, mctx.progress.max_mp * 3 / 10),
+                        Item::XTonic => (0, mctx.progress.max_mp),
+                    };
+
+                    if heal_hp > 0 {
+                        self.show_status_change(mctx, &format!("{heal_hp:+}"));
+                        mctx.progress.hp = mctx.progress.max_hp.min(mctx.progress.hp + heal_hp);
+                        self.update_status(mctx);
+
+                        self.message_text.set_text(
+                            mctx.gctx,
+                            mctx.res,
+                            &format!(
+                                "Coric uses {}.\n{heal_hp} HP healed for Coric!",
+                                item.name()
+                            ),
+                        );
+                        self.message_text.reveal().await;
+                        self.wait_for_confirmation(mctx).await;
+                    }
+
+                    if heal_mp > 0 {
+                        self.show_status_change(mctx, &format!("{heal_mp:+}MP"));
+                        mctx.progress.mp = mctx.progress.max_mp.min(mctx.progress.mp + heal_mp);
+                        self.update_status(mctx);
+
+                        self.message_text.set_text(
+                            mctx.gctx,
+                            mctx.res,
+                            &format!(
+                                "Coric uses {}.\n{heal_mp} MP healed for Coric!",
+                                item.name()
+                            ),
+                        );
+                        self.message_text.reveal().await;
+                        self.wait_for_confirmation(mctx).await;
+                    }
                 }
 
                 PlayerChoice::Run => {
