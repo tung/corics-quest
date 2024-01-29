@@ -2,6 +2,7 @@ use crate::async_utils::wait_once;
 use crate::contexts::*;
 use crate::enemy::*;
 use crate::input::*;
+use crate::meter::*;
 use crate::resources::*;
 use crate::sprite::*;
 use crate::text::*;
@@ -19,6 +20,7 @@ const STATUS_Y: i32 = 116;
 pub struct Battle {
     enemy_window: Window,
     enemy_sprite: Sprite,
+    enemy_hp_meter: Meter,
     enemy_visible: bool,
     message_window: Window,
     message_text: Text,
@@ -29,6 +31,8 @@ pub struct Battle {
     status_visible: bool,
     hp_text: Text,
     mp_text: Text,
+    hp_meter: Meter,
+    mp_meter: Meter,
     change_window: Window,
     change_text: Text,
     change_visible: bool,
@@ -47,13 +51,28 @@ enum PlayerChoice {
 }
 
 impl Battle {
-    pub fn new(gctx: &mut GraphicsContext, res: &Resources, enemy: Enemy) -> Self {
+    pub fn new(
+        gctx: &mut GraphicsContext,
+        res: &Resources,
+        max_hp: i32,
+        max_mp: i32,
+        enemy: Enemy,
+    ) -> Self {
         let mut enemy_sprite = Sprite::new(gctx, res, enemy.sprite_path);
         enemy_sprite.start_animation("idle");
 
         Self {
             enemy_window: Window::new(gctx, res, ENEMY_X, ENEMY_Y, 112, 80),
             enemy_sprite,
+            enemy_hp_meter: Meter::new(
+                gctx,
+                res,
+                ENEMY_X + 40,
+                ENEMY_Y + 18,
+                32,
+                [0, 192, 0],
+                enemy.hp,
+            ),
             enemy_visible: true,
             message_window: Window::new(gctx, res, MESSAGE_X, MESSAGE_Y, 232, 48),
             message_text: Text::new(res, MESSAGE_X + 8, MESSAGE_Y + 8),
@@ -64,6 +83,24 @@ impl Battle {
             status_visible: true,
             hp_text: Text::new(res, STATUS_X + 8, STATUS_Y + 8),
             mp_text: Text::new(res, STATUS_X + 8, STATUS_Y + 24),
+            hp_meter: Meter::new(
+                gctx,
+                res,
+                STATUS_X + 8,
+                STATUS_Y + 17,
+                36,
+                [0, 192, 0],
+                max_hp,
+            ),
+            mp_meter: Meter::new(
+                gctx,
+                res,
+                STATUS_X + 8,
+                STATUS_Y + 33,
+                36,
+                [0, 192, 192],
+                max_mp,
+            ),
             change_window: Window::new(gctx, res, 0, 0, 16, 24),
             change_text: Text::new(res, 0, 0),
             change_visible: false,
@@ -170,6 +207,7 @@ impl Battle {
         if self.enemy_visible {
             self.enemy_sprite
                 .draw(dctx.gctx, ENEMY_X + 40, ENEMY_Y + 24);
+            self.enemy_hp_meter.draw(dctx.gctx);
         }
         self.message_window.draw(dctx.gctx);
         self.message_text.draw(dctx.gctx);
@@ -181,6 +219,8 @@ impl Battle {
             self.status_window.draw(dctx.gctx);
             self.hp_text.draw(dctx.gctx);
             self.mp_text.draw(dctx.gctx);
+            self.hp_meter.draw(dctx.gctx);
+            self.mp_meter.draw(dctx.gctx);
         }
         if self.change_visible {
             self.change_window.draw(dctx.gctx);
@@ -197,6 +237,8 @@ impl Battle {
             wait_once().await;
             wait_once().await;
         }
+        self.enemy_hp_meter
+            .set_value(mctx.gctx, self.enemy.hp - damage);
         self.show_change_text_at(mctx, ENEMY_X + 56, ENEMY_Y + 16, &format!("{damage}"));
     }
 
@@ -309,6 +351,8 @@ impl Battle {
             .set_text(mctx.gctx, mctx.res, &format!("HP{:4}", mctx.progress.hp));
         self.mp_text
             .set_text(mctx.gctx, mctx.res, &format!("MP{:4}", mctx.progress.mp));
+        self.hp_meter.set_value(mctx.gctx, mctx.progress.hp);
+        self.mp_meter.set_value(mctx.gctx, mctx.progress.mp);
     }
 
     async fn wait_for_confirmation(&mut self, mctx: &mut ModeContext<'_, '_>) {

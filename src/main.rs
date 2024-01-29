@@ -7,6 +7,7 @@ mod enemy;
 mod input;
 mod ldtk;
 mod levels;
+mod meter;
 mod modes;
 mod progress;
 mod resources;

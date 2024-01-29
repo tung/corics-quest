@@ -122,7 +122,13 @@ impl ScriptContext {
 
     pub fn push_battle_mode(&mut self, enemy: Enemy) {
         let gctx = self.gctx();
-        self.modes.push(Battle::new(gctx, &self.res, enemy));
+        self.modes.push(Battle::new(
+            gctx,
+            &self.res,
+            self.progress.max_hp,
+            self.progress.max_mp,
+            enemy,
+        ));
     }
 
     pub fn push_main_menu_mode(&mut self) {
