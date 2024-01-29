@@ -2,6 +2,7 @@ use crate::actor::*;
 use crate::contexts::*;
 use crate::enemy::*;
 use crate::modes::*;
+use crate::progress::*;
 
 use std::collections::HashSet;
 use std::future::Future;
@@ -72,6 +73,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     hp: 52,
                     attack: 5,
                     defense: 5,
+                    weakness: Some(Magic::FireEdge),
                 });
                 match sctx.update_battle_mode().await {
                     BattleEvent::RanAway | BattleEvent::Victory => {

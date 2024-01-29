@@ -3,6 +3,7 @@ use crate::contexts::*;
 use crate::enemy::*;
 use crate::input::*;
 use crate::meter::*;
+use crate::progress::*;
 use crate::resources::*;
 use crate::sprite::*;
 use crate::text::*;
@@ -47,6 +48,7 @@ pub enum BattleEvent {
 
 enum PlayerChoice {
     Fight,
+    Magic(usize),
     Run,
 }
 
@@ -170,6 +172,7 @@ impl Battle {
             if mctx.input.is_key_pressed(GameKey::Confirm) {
                 let choice = match selection {
                     0 => Some(PlayerChoice::Fight),
+                    1 => self.magic_menu(mctx).await.map(PlayerChoice::Magic),
                     3 => Some(PlayerChoice::Run),
                     _ => None,
                 };
@@ -242,6 +245,81 @@ impl Battle {
         self.show_change_text_at(mctx, ENEMY_X + 56, ENEMY_Y + 16, &format!("{damage}"));
     }
 
+    async fn magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<usize> {
+        fn update_magic_cursor(cursor: &mut Text, which: usize) {
+            //           1         2         3
+            // 012345678901234567890123456789012345
+            // .Back  .Heal      5MP .EarthEdge 2MP
+            //        .WaterEdge 5MP .FireEdge  2MP
+            const MAGIC_POSITIONS: [(i32, i32); 5] = [(0, 0), (7, 0), (22, 0), (7, 1), (22, 1)];
+            let x = MAGIC_POSITIONS[which].0 * 6;
+            let y = MAGIC_POSITIONS[which].1 * 8;
+            cursor.set_offset(MESSAGE_X + 8 + x, MESSAGE_Y + 24 + y);
+        }
+
+        self.message_text
+            .set_text(mctx.gctx, mctx.res, "Cast magic:");
+        self.menu_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!(
+                " Back   {:13.13}  {:13.13}\n        {:13.13}  {:13.13}",
+                mctx.progress.magic[0].battle_menu_entry(),
+                mctx.progress.magic[1].battle_menu_entry(),
+                mctx.progress.magic[2].battle_menu_entry(),
+                mctx.progress.magic[3].battle_menu_entry(),
+            ),
+        );
+
+        let mut selection = 0;
+        update_magic_cursor(&mut self.cursor, selection);
+
+        loop {
+            self.enemy_sprite.animate();
+
+            wait_once().await;
+
+            if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if selection == 0 {
+                    return None;
+                } else {
+                    let choice = selection - 1;
+                    let magic_known = mctx.progress.magic[choice].known;
+                    let mp_cost = mctx.progress.magic[choice].magic.mp_cost();
+                    if magic_known && mctx.progress.mp >= mp_cost {
+                        return Some(choice);
+                    }
+                }
+            } else if mctx.input.is_key_pressed(GameKey::Up)
+                || mctx.input.is_key_pressed(GameKey::Down)
+            {
+                match selection {
+                    0 => {}
+                    1 | 2 => selection += 2,
+                    3 | 4 => selection -= 2,
+                    _ => unreachable!(),
+                }
+                update_magic_cursor(&mut self.cursor, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Left) {
+                match selection {
+                    0 => selection = 2,
+                    3 => selection = 4,
+                    1 | 2 | 4 => selection -= 1,
+                    _ => unreachable!(),
+                }
+                update_magic_cursor(&mut self.cursor, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Right) {
+                match selection {
+                    2 => selection = 0,
+                    4 => selection = 3,
+                    0 | 1 | 3 => selection += 1,
+                    _ => unreachable!(),
+                }
+                update_magic_cursor(&mut self.cursor, selection);
+            }
+        }
+    }
+
     fn show_change_text_at(
         &mut self,
         mctx: &mut ModeContext<'_, '_>,
@@ -268,13 +346,27 @@ impl Battle {
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> BattleEvent {
+        let mut follow_up: Option<(Magic, usize)> = None;
+
         self.update_status(mctx);
 
         loop {
-            match self.action_menu(mctx, false).await {
+            if let Some((magic, turns)) = follow_up {
+                follow_up = if turns > 0 {
+                    Some((magic, turns - 1))
+                } else {
+                    None
+                };
+            }
+
+            match self.action_menu(mctx, follow_up.is_some()).await {
                 PlayerChoice::Fight => {
-                    let damage =
-                        calc_base_damage(mctx.progress.attack, self.enemy.defense).trunc() as i32;
+                    let damage = calc_magic_damage(
+                        mctx.progress.attack,
+                        self.enemy.defense,
+                        follow_up,
+                        self.enemy.weakness,
+                    );
                     self.enemy_hit_animation(mctx, damage).await;
                     self.enemy.hp -= damage.min(self.enemy.hp);
 
@@ -283,6 +375,62 @@ impl Battle {
                         mctx.res,
                         &format!("Coric attacks!\n{damage} damage to {}", self.enemy.name),
                     );
+                    self.message_text.reveal().await;
+                    self.wait_for_confirmation(mctx).await;
+                }
+
+                PlayerChoice::Magic(choice) => {
+                    mctx.progress.mp -= mctx.progress.magic[choice].magic.mp_cost();
+                    self.update_status(mctx);
+
+                    match mctx.progress.magic[choice].magic {
+                        Magic::Heal => {
+                            let heal_amount = (mctx.progress.max_hp + 1) / 2;
+                            self.show_status_change(mctx, &format!("{heal_amount:+}"));
+                            mctx.progress.hp =
+                                mctx.progress.max_hp.min(mctx.progress.hp + heal_amount);
+                            self.update_status(mctx);
+
+                            self.message_text.set_text(
+                                mctx.gctx,
+                                mctx.res,
+                                &format!("Coric casts Heal!\n{heal_amount} HP recovered."),
+                            );
+                        }
+
+                        magic @ (Magic::EarthEdge | Magic::WaterEdge | Magic::FireEdge) => {
+                            follow_up = Some((magic, 1));
+                            let damage = calc_magic_damage(
+                                mctx.progress.attack,
+                                self.enemy.defense,
+                                follow_up,
+                                self.enemy.weakness,
+                            );
+                            self.enemy_hit_animation(mctx, damage).await;
+                            self.enemy.hp -= damage.min(self.enemy.hp);
+
+                            self.message_text.set_text(
+                                mctx.gctx,
+                                mctx.res,
+                                &format!(
+                                    "Coric casts {}!\n{}{damage} HP damage to {}.",
+                                    magic.name(),
+                                    match (follow_up, self.enemy.weakness) {
+                                        (Some((magic, _)), Some(weakness)) if magic == weakness => {
+                                            format!(
+                                                "{} is weak to {}!\n",
+                                                self.enemy.name,
+                                                weakness.name(),
+                                            )
+                                        }
+                                        _ => String::new(),
+                                    },
+                                    self.enemy.name,
+                                ),
+                            );
+                        }
+                    }
+
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
                 }
@@ -374,4 +522,23 @@ fn calc_base_damage(attack: i32, defense: i32) -> f32 {
     } else {
         attack * 2.0 - defense
     }
+}
+
+fn calc_magic_damage(
+    attack: i32,
+    defense: i32,
+    follow_up: Option<(Magic, usize)>,
+    weakness: Option<Magic>,
+) -> i32 {
+    let base_damage = calc_base_damage(attack, defense);
+    let bonus: f32 = match follow_up {
+        Some((magic, turns)) => {
+            let weak = weakness.map(|m| m == magic).unwrap_or(false);
+            let which = if weak { turns + 1 } else { turns };
+            [0.5, 1.0, 2.0][which.min(2)]
+        }
+        None => 0.0,
+    };
+    let damage = base_damage * (1.0 + bonus);
+    damage.trunc() as i32
 }
