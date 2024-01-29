@@ -447,7 +447,7 @@ impl Battle {
                     self.message_text.set_text(
                         mctx.gctx,
                         mctx.res,
-                        &format!("Coric attacks!\n{damage} damage to {}", self.enemy.name),
+                        &format!("Coric attacks!\n{damage} HP damage to {}.", self.enemy.name),
                     );
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
