@@ -1,5 +1,6 @@
 use crate::actor::*;
 use crate::direction::*;
+use crate::enemy::*;
 use crate::resources::*;
 use crate::{layer_shader, ldtk, SCREEN_HEIGHT, SCREEN_WIDTH};
 
@@ -29,6 +30,7 @@ pub struct Level {
     pub px_hei: i32,
     layers: Vec<Layer>,
     pub neighbours: Vec<NeighbourLevel>,
+    pub encounters: Option<EncounterGroup>,
 }
 
 pub struct LevelSet {
@@ -209,6 +211,20 @@ impl Level {
             }
         }
 
+        let mut encounters: Option<EncounterGroup> = None;
+        for field in &level_json.field_instances {
+            match &field.identifier[..] {
+                "EncounterGroup" => {
+                    encounters = match &field.value {
+                        Some(json::Value::String(s)) => Some(s.as_str().into()),
+                        None | Some(json::Value::Null) => None,
+                        v => panic!("EncounterGroup must be a string or null: {:?}", v),
+                    };
+                }
+                id => panic!("unknown level field: {id}"),
+            }
+        }
+
         (
             Self {
                 identifier: level_json.identifier.clone(),
@@ -222,6 +238,7 @@ impl Level {
                     .iter()
                     .map(NeighbourLevel::new)
                     .collect(),
+                encounters,
             },
             actors,
         )

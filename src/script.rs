@@ -68,14 +68,18 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             WalkAroundEvent::Encounter => {
                 sctx.actors[0].visible = false;
-                sctx.push_battle_mode(Enemy {
-                    name: "Town Rat",
-                    sprite_path: "rat.png",
-                    hp: 52,
-                    attack: 5,
-                    defense: 5,
-                    weakness: Some(Magic::FireEdge),
-                });
+                if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
+                    sctx.push_battle_mode(enemy);
+                } else {
+                    sctx.push_battle_mode(Enemy {
+                        name: "Debug Rat",
+                        sprite_path: "rat.png",
+                        hp: 52,
+                        attack: 5,
+                        defense: 5,
+                        weakness: Some(Magic::FireEdge),
+                    });
+                }
                 match sctx.update_battle_mode().await {
                     BattleEvent::RanAway | BattleEvent::Victory => {
                         sctx.pop_mode();
