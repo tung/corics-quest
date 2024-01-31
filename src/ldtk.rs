@@ -35,6 +35,12 @@ pub struct Project {
     /// An array of command lines that can be ran manually by the user
     #[serde(rename = "customCommands")]
     pub custom_commands: Vec<LdtkCustomCommand>,
+    /// Default height for new entities
+    #[serde(rename = "defaultEntityHeight")]
+    pub default_entity_height: i64,
+    /// Default width for new entities
+    #[serde(rename = "defaultEntityWidth")]
+    pub default_entity_width: i64,
     /// Default grid size for new layers
     #[serde(rename = "defaultGridSize")]
     pub default_grid_size: i64,
@@ -78,8 +84,9 @@ pub struct Project {
     #[serde(rename = "externalLevels")]
     pub external_levels: bool,
     /// An array containing various advanced flags (ie. options or other states). Possible
-    /// values: `DiscardPreCsvIntGrid`, `ExportPreCsvIntGridFormat`, `IgnoreBackupSuggest`,
-    /// `PrependIndexToLevelFileNames`, `MultiWorlds`, `UseMultilinesType`
+    /// values: `DiscardPreCsvIntGrid`, `ExportOldTableOfContentData`,
+    /// `ExportPreCsvIntGridFormat`, `IgnoreBackupSuggest`, `PrependIndexToLevelFileNames`,
+    /// `MultiWorlds`, `UseMultilinesType`
     pub flags: Vec<Flag>,
     /// Naming convention for Identifiers (first-letter uppercase, full uppercase etc.) Possible
     /// values: `Capitalize`, `Uppercase`, `Lowercase`, `Free`
@@ -158,6 +165,15 @@ pub struct LdtkCustomCommand {
     pub when: When,
 }
 
+/// Possible values: `Manual`, `AfterLoad`, `BeforeSave`, `AfterSave`
+#[derive(Serialize, Deserialize)]
+pub enum When {
+    AfterLoad,
+    AfterSave,
+    BeforeSave,
+    Manual,
+}
+
 /// If you're writing your own LDtk importer, you should probably just ignore *most* stuff in
 /// the `defs` section, as it contains data that are mostly important to the editor. To keep
 /// you away from the `defs` section and avoid some unnecessary JSON parsing, important data
@@ -187,6 +203,9 @@ pub struct Definitions {
 
 #[derive(Serialize, Deserialize)]
 pub struct EntityDefinition {
+    /// If enabled, this entity is allowed to stay outside of the current level bounds
+    #[serde(rename = "allowOutOfBounds")]
+    pub allow_out_of_bounds: bool,
     /// Base entity color
     pub color: String,
     /// User defined documentation for this element to provide help/tips to level designers.
@@ -277,6 +296,9 @@ pub struct EntityDefinition {
     pub tileset_id: Option<i64>,
     /// Unique Int identifier
     pub uid: i64,
+    /// This tile overrides the one defined in `tileRect` in the UI
+    #[serde(rename = "uiTileRect")]
+    pub ui_tile_rect: Option<TilesetRectangle>,
     /// Pixel width
     pub width: i64,
 }
@@ -327,6 +349,8 @@ pub struct FieldDefinition {
     pub editor_always_show: bool,
     #[serde(rename = "editorCutLongValues")]
     pub editor_cut_long_values: bool,
+    #[serde(rename = "editorDisplayColor")]
+    pub editor_display_color: Option<String>,
     /// Possible values: `Hidden`, `ValueOnly`, `NameAndValue`, `EntityTile`, `LevelTile`,
     /// `Points`, `PointStar`, `PointPath`, `PointPathLoop`, `RadiusPx`, `RadiusGrid`,
     /// `ArrayCountWithLabel`, `ArrayCountNoLabel`, `RefLinkBetweenPivots`,
@@ -347,6 +371,10 @@ pub struct FieldDefinition {
     pub editor_text_prefix: Option<String>,
     #[serde(rename = "editorTextSuffix")]
     pub editor_text_suffix: Option<String>,
+    /// If TRUE, the field value will be exported to the `toc` project JSON field. Only applies
+    /// to Entity fields.
+    #[serde(rename = "exportToToc")]
+    pub export_to_toc: bool,
     /// User defined unique identifier
     pub identifier: String,
     /// TRUE if the value is an array of multiple values
@@ -359,6 +387,8 @@ pub struct FieldDefinition {
     /// Optional regular expression that needs to be matched to accept values. Expected format:
     /// `/some_reg_ex/g`, with optional "i" flag.
     pub regex: Option<String>,
+    /// If enabled, this field will be searchable through LDtk command palette
+    pub searchable: bool,
     #[serde(rename = "symmetricalRef")]
     pub symmetrical_ref: bool,
     /// Possible values: &lt;`null`&gt;, `LangPython`, `LangRuby`, `LangJS`, `LangLua`, `LangC`,
@@ -381,6 +411,98 @@ pub struct FieldDefinition {
     pub use_for_smart_color: bool,
 }
 
+/// Possible values: `Any`, `OnlySame`, `OnlyTags`, `OnlySpecificEntity`
+#[derive(Serialize, Deserialize)]
+pub enum AllowedRefs {
+    Any,
+    OnlySame,
+    OnlySpecificEntity,
+    OnlyTags,
+}
+
+/// Possible values: `Hidden`, `ValueOnly`, `NameAndValue`, `EntityTile`, `LevelTile`,
+/// `Points`, `PointStar`, `PointPath`, `PointPathLoop`, `RadiusPx`, `RadiusGrid`,
+/// `ArrayCountWithLabel`, `ArrayCountNoLabel`, `RefLinkBetweenPivots`,
+/// `RefLinkBetweenCenters`
+#[derive(Serialize, Deserialize)]
+pub enum EditorDisplayMode {
+    ArrayCountNoLabel,
+    ArrayCountWithLabel,
+    EntityTile,
+    Hidden,
+    LevelTile,
+    NameAndValue,
+    PointPath,
+    PointPathLoop,
+    PointStar,
+    Points,
+    RadiusGrid,
+    RadiusPx,
+    RefLinkBetweenCenters,
+    RefLinkBetweenPivots,
+    ValueOnly,
+}
+
+/// Possible values: `Above`, `Center`, `Beneath`
+#[derive(Serialize, Deserialize)]
+pub enum EditorDisplayPos {
+    Above,
+    Beneath,
+    Center,
+}
+
+/// Possible values: `ZigZag`, `StraightArrow`, `CurvedArrow`, `ArrowsLine`, `DashedLine`
+#[derive(Serialize, Deserialize)]
+pub enum EditorLinkStyle {
+    ArrowsLine,
+    CurvedArrow,
+    DashedLine,
+    StraightArrow,
+    ZigZag,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TextLanguageMode {
+    LangC,
+    LangHaxe,
+    #[serde(rename = "LangJS")]
+    LangJs,
+    LangJson,
+    LangLog,
+    LangLua,
+    LangMarkdown,
+    LangPython,
+    LangRuby,
+    LangXml,
+}
+
+/// Possible values: `DiscardOldOnes`, `PreventAdding`, `MoveLastOne`
+#[derive(Serialize, Deserialize)]
+pub enum LimitBehavior {
+    DiscardOldOnes,
+    MoveLastOne,
+    PreventAdding,
+}
+
+/// If TRUE, the maxCount is a "per world" limit, if FALSE, it's a "per level". Possible
+/// values: `PerLayer`, `PerLevel`, `PerWorld`
+#[allow(clippy::enum_variant_names)]
+#[derive(Serialize, Deserialize)]
+pub enum LimitScope {
+    PerLayer,
+    PerLevel,
+    PerWorld,
+}
+
+/// Possible values: `Rectangle`, `Ellipse`, `Tile`, `Cross`
+#[derive(Serialize, Deserialize)]
+pub enum RenderMode {
+    Cross,
+    Ellipse,
+    Rectangle,
+    Tile,
+}
+
 /// This object represents a custom sub rectangle in a Tileset image.
 #[derive(Serialize, Deserialize)]
 pub struct TilesetRectangle {
@@ -395,6 +517,20 @@ pub struct TilesetRectangle {
     pub x: i64,
     /// Y pixels coordinate of the top-left corner in the Tileset image
     pub y: i64,
+}
+
+/// An enum describing how the the Entity tile is rendered inside the Entity bounds. Possible
+/// values: `Cover`, `FitInside`, `Repeat`, `Stretch`, `FullSizeCropped`,
+/// `FullSizeUncropped`, `NineSlice`
+#[derive(Serialize, Deserialize)]
+pub enum TileRenderMode {
+    Cover,
+    FitInside,
+    FullSizeCropped,
+    FullSizeUncropped,
+    NineSlice,
+    Repeat,
+    Stretch,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -419,16 +555,16 @@ pub struct EnumDefinition {
 
 #[derive(Serialize, Deserialize)]
 pub struct EnumValueDefinition {
-    /// **WARNING**: this deprecated value will be *removed* completely on version 1.4.0+
-    /// Replaced by: `tileRect`
+    /// **WARNING**: this deprecated value is no longer exported since version 1.4.0  Replaced
+    /// by: `tileRect`
     #[serde(rename = "__tileSrcRect")]
     pub tile_src_rect: Option<Vec<i64>>,
     /// Optional color
     pub color: i64,
     /// Enum value
     pub id: String,
-    /// **WARNING**: this deprecated value will be *removed* completely on version 1.4.0+
-    /// Replaced by: `tileRect`
+    /// **WARNING**: this deprecated value is no longer exported since version 1.4.0  Replaced
+    /// by: `tileRect`
     #[serde(rename = "tileId")]
     pub tile_id: Option<i64>,
     /// Optional tileset rectangle to represents this value
@@ -450,6 +586,10 @@ pub struct LayerDefinition {
     /// by: `tilesetDefUid`
     #[serde(rename = "autoTilesetDefUid")]
     pub auto_tileset_def_uid: Option<i64>,
+    #[serde(rename = "autoTilesKilledByOtherLayerUid")]
+    pub auto_tiles_killed_by_other_layer_uid: Option<i64>,
+    #[serde(rename = "biomeFieldUid")]
+    pub biome_field_uid: Option<i64>,
     /// Allow editor selections when the layer is not currently active.
     #[serde(rename = "canSelectWhenInactive")]
     pub can_select_when_inactive: bool,
@@ -485,6 +625,9 @@ pub struct LayerDefinition {
     /// freely, you may value "2" before value "1" in this array.
     #[serde(rename = "intGridValues")]
     pub int_grid_values: Vec<IntGridValueDefinition>,
+    /// Group informations for IntGrid values
+    #[serde(rename = "intGridValuesGroups")]
+    pub int_grid_values_groups: Vec<IntGridValueGroupDefinition>,
     /// Parallax horizontal factor (from -1 to 1, defaults to 0) which affects the scrolling
     /// speed of this layer, creating a fake 3D (parallax) effect.
     #[serde(rename = "parallaxFactorX")]
@@ -534,16 +677,28 @@ pub struct LayerDefinition {
     pub ui_color: Option<String>,
     /// Unique Int identifier
     pub uid: i64,
+    /// Display tags
+    #[serde(rename = "uiFilterTags")]
+    pub ui_filter_tags: Vec<String>,
+    /// Asynchronous rendering option for large/complex layers
+    #[serde(rename = "useAsyncRender")]
+    pub use_async_render: bool,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct AutoLayerRuleGroup {
     pub active: bool,
+    #[serde(rename = "biomeRequirementMode")]
+    pub biome_requirement_mode: i64,
     /// *This field was removed in 1.0.0 and should no longer be used.*
     pub collapsed: Option<bool>,
+    pub color: Option<String>,
+    pub icon: Option<TilesetRectangle>,
     #[serde(rename = "isOptional")]
     pub is_optional: bool,
     pub name: String,
+    #[serde(rename = "requiredBiomeValues")]
+    pub required_biome_values: Vec<String>,
     pub rules: Vec<AutoLayerRuleDefinition>,
     pub uid: i64,
     #[serde(rename = "usesWizard")]
@@ -572,6 +727,8 @@ pub struct AutoLayerRuleDefinition {
     /// If TRUE, allow rule to be matched by flipping its pattern vertically
     #[serde(rename = "flipY")]
     pub flip_y: bool,
+    /// If TRUE, then the rule should be re-evaluated by the editor at one point
+    pub invalidated: bool,
     /// Default IntGrid value when checking cells outside of level bounds
     #[serde(rename = "outOfBoundsValue")]
     pub out_of_bounds_value: Option<i64>,
@@ -594,9 +751,10 @@ pub struct AutoLayerRuleDefinition {
     pub pivot_y: f64,
     /// Pattern width & height. Should only be 1,3,5 or 7.
     pub size: i64,
-    /// Array of all the tile IDs. They are used randomly or as stamps, based on `tileMode` value.
+    /// **WARNING**: this deprecated value is no longer exported since version 1.5.0  Replaced
+    /// by: `tileRectsIds`
     #[serde(rename = "tileIds")]
-    pub tile_ids: Vec<i64>,
+    pub tile_ids: Option<Vec<i64>>,
     /// Defines how tileIds array is used Possible values: `Single`, `Stamp`
     #[serde(rename = "tileMode")]
     pub tile_mode: TileMode,
@@ -612,6 +770,9 @@ pub struct AutoLayerRuleDefinition {
     /// Min random offset for Y tile pos
     #[serde(rename = "tileRandomYMin")]
     pub tile_random_y_min: i64,
+    /// Array containing all the possible tile IDs rectangles (picked randomly).
+    #[serde(rename = "tileRectsIds")]
+    pub tile_rects_ids: Vec<Vec<i64>>,
     /// Tile X offset
     #[serde(rename = "tileXOffset")]
     pub tile_x_offset: i64,
@@ -634,15 +795,54 @@ pub struct AutoLayerRuleDefinition {
     pub y_offset: i64,
 }
 
+/// Checker mode Possible values: `None`, `Horizontal`, `Vertical`
+#[derive(Serialize, Deserialize)]
+pub enum Checker {
+    Horizontal,
+    None,
+    Vertical,
+}
+
+/// Defines how tileIds array is used Possible values: `Single`, `Stamp`
+#[derive(Serialize, Deserialize)]
+pub enum TileMode {
+    Single,
+    Stamp,
+}
+
 /// IntGrid value definition
 #[derive(Serialize, Deserialize)]
 pub struct IntGridValueDefinition {
     pub color: String,
+    /// Parent group identifier (0 if none)
+    #[serde(rename = "groupUid")]
+    pub group_uid: i64,
     /// User defined unique identifier
     pub identifier: Option<String>,
     pub tile: Option<TilesetRectangle>,
     /// The IntGrid value itself
     pub value: i64,
+}
+
+/// IntGrid value group definition
+#[derive(Serialize, Deserialize)]
+pub struct IntGridValueGroupDefinition {
+    /// User defined color
+    pub color: Option<String>,
+    /// User defined string identifier
+    pub identifier: Option<String>,
+    /// Group unique ID
+    pub uid: i64,
+}
+
+/// Type of the layer as Haxe Enum Possible values: `IntGrid`, `Entities`, `Tiles`,
+/// `AutoLayer`
+#[derive(Serialize, Deserialize)]
+pub enum Type {
+    AutoLayer,
+    Entities,
+    IntGrid,
+    Tiles,
 }
 
 /// The `Tileset` definition is the most important part among project definitions. It
@@ -709,6 +909,11 @@ pub struct TileCustomMetadata {
     pub tile_id: i64,
 }
 
+#[derive(Serialize, Deserialize)]
+pub enum EmbedAtlas {
+    LdtkIcons,
+}
+
 /// In a tileset definition, enum based tag infos
 #[derive(Serialize, Deserialize)]
 pub struct EnumTagValue {
@@ -716,6 +921,17 @@ pub struct EnumTagValue {
     pub enum_value_id: String,
     #[serde(rename = "tileIds")]
     pub tile_ids: Vec<i64>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum Flag {
+    DiscardPreCsvIntGrid,
+    ExportOldTableOfContentData,
+    ExportPreCsvIntGridFormat,
+    IgnoreBackupSuggest,
+    MultiWorlds,
+    PrependIndexToLevelFileNames,
+    UseMultilinesType,
 }
 
 /// This object is not actually used by LDtk. It ONLY exists to force explicit references to
@@ -751,6 +967,8 @@ pub struct ForcedRefs {
     pub grid_point: Option<GridPoint>,
     #[serde(rename = "IntGridValueDef")]
     pub int_grid_value_def: Option<IntGridValueDefinition>,
+    #[serde(rename = "IntGridValueGroupDef")]
+    pub int_grid_value_group_def: Option<IntGridValueGroupDefinition>,
     #[serde(rename = "IntGridValueInstance")]
     pub int_grid_value_instance: Option<IntGridValueInstance>,
     #[serde(rename = "LayerDef")]
@@ -773,6 +991,8 @@ pub struct ForcedRefs {
     pub tileset_def: Option<TilesetDefinition>,
     #[serde(rename = "TilesetRect")]
     pub tileset_rect: Option<TilesetRectangle>,
+    #[serde(rename = "TocInstanceData")]
+    pub toc_instance_data: Option<LdtkTocInstanceData>,
     #[serde(rename = "World")]
     pub world: Option<World>,
 }
@@ -799,6 +1019,12 @@ pub struct EntityInstance {
     /// tile, or some tile provided by a field value, like an Enum).
     #[serde(rename = "__tile")]
     pub tile: Option<TilesetRectangle>,
+    /// X world coordinate in pixels. Only available in GridVania or Free world layouts.
+    #[serde(rename = "__worldX")]
+    pub world_x: Option<i64>,
+    /// Y world coordinate in pixels Only available in GridVania or Free world layouts.
+    #[serde(rename = "__worldY")]
+    pub world_y: Option<i64>,
     /// Reference of the **Entity definition** UID
     #[serde(rename = "defUid")]
     pub def_uid: i64,
@@ -852,6 +1078,8 @@ pub struct FieldInstance {
 }
 
 /// This object describes the "location" of an Entity instance in the project worlds.
+///
+/// IID information of this instance
 #[derive(Serialize, Deserialize)]
 pub struct ReferenceToAnEntityInstance {
     /// IID of the refered EntityInstance
@@ -1008,9 +1236,10 @@ pub struct Level {
     /// Position informations of the background image, if there is one.
     #[serde(rename = "__bgPos")]
     pub bg_pos: Option<LevelBackgroundPosition>,
-    /// An array listing all other levels touching this one on the world map.<br/>  Only relevant
-    /// for world layouts where level spatial positioning is manual (ie. GridVania, Free). For
-    /// Horizontal and Vertical layouts, this array is always empty.
+    /// An array listing all other levels touching this one on the world map. Since 1.4.0, this
+    /// includes levels that overlap in the same world layer, or in nearby world layers.<br/>
+    /// Only relevant for world layouts where level spatial positioning is manual (ie. GridVania,
+    /// Free). For Horizontal and Vertical layouts, this array is always empty.
     #[serde(rename = "__neighbours")]
     pub neighbours: Vec<NeighbourLevel>,
     /// The "guessed" color for this level in the editor, decided using either the background
@@ -1098,11 +1327,23 @@ pub struct LevelBackgroundPosition {
     pub top_left_px: Vec<i64>,
 }
 
+#[derive(Serialize, Deserialize)]
+pub enum BgPos {
+    Contain,
+    Cover,
+    CoverDirty,
+    Repeat,
+    Unscaled,
+}
+
 /// Nearby level info
 #[derive(Serialize, Deserialize)]
 pub struct NeighbourLevel {
-    /// A single lowercase character tipping on the level location (`n`orth, `s`outh, `w`est,
-    /// `e`ast).
+    /// A lowercase string tipping on the level location (`n`orth, `s`outh, `w`est,
+    /// `e`ast).<br/>  Since 1.4.0, this value can also be `<` (neighbour depth is lower), `>`
+    /// (neighbour depth is greater) or `o` (levels overlap and share the same world
+    /// depth).<br/>  Since 1.5.3, this value can also be `nw`,`ne`,`sw` or `se` for levels only
+    /// touching corners.
     pub dir: String,
     /// Neighbour Instance Identifier
     #[serde(rename = "levelIid")]
@@ -1116,7 +1357,28 @@ pub struct NeighbourLevel {
 #[derive(Serialize, Deserialize)]
 pub struct LdtkTableOfContentEntry {
     pub identifier: String,
-    pub instances: Vec<ReferenceToAnEntityInstance>,
+    /// **WARNING**: this deprecated value will be *removed* completely on version 1.7.0+
+    /// Replaced by: `instancesData`
+    pub instances: Option<Vec<ReferenceToAnEntityInstance>>,
+    #[serde(rename = "instancesData")]
+    pub instances_data: Vec<LdtkTocInstanceData>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LdtkTocInstanceData {
+    /// An object containing the values of all entity fields with the `exportToToc` option
+    /// enabled. This object typing depends on actual field value types.
+    pub fields: Option<json::Value>,
+    #[serde(rename = "heiPx")]
+    pub hei_px: i64,
+    /// IID information of this instance
+    pub iids: ReferenceToAnEntityInstance,
+    #[serde(rename = "widPx")]
+    pub wid_px: i64,
+    #[serde(rename = "worldX")]
+    pub world_x: i64,
+    #[serde(rename = "worldY")]
+    pub world_y: i64,
 }
 
 /// **IMPORTANT**: this type is available as a preview. You can rely on it to update your
@@ -1148,170 +1410,6 @@ pub struct World {
     /// space). Possible values: `Free`, `GridVania`, `LinearHorizontal`, `LinearVertical`, `null`
     #[serde(rename = "worldLayout")]
     pub world_layout: Option<WorldLayout>,
-}
-
-/// Possible values: `Manual`, `AfterLoad`, `BeforeSave`, `AfterSave`
-#[derive(Serialize, Deserialize)]
-pub enum When {
-    AfterLoad,
-    AfterSave,
-    BeforeSave,
-    Manual,
-}
-
-/// Possible values: `Any`, `OnlySame`, `OnlyTags`, `OnlySpecificEntity`
-#[derive(Serialize, Deserialize)]
-pub enum AllowedRefs {
-    Any,
-    OnlySame,
-    OnlySpecificEntity,
-    OnlyTags,
-}
-
-/// Possible values: `Hidden`, `ValueOnly`, `NameAndValue`, `EntityTile`, `LevelTile`,
-/// `Points`, `PointStar`, `PointPath`, `PointPathLoop`, `RadiusPx`, `RadiusGrid`,
-/// `ArrayCountWithLabel`, `ArrayCountNoLabel`, `RefLinkBetweenPivots`,
-/// `RefLinkBetweenCenters`
-#[derive(Serialize, Deserialize)]
-pub enum EditorDisplayMode {
-    ArrayCountNoLabel,
-    ArrayCountWithLabel,
-    EntityTile,
-    Hidden,
-    LevelTile,
-    NameAndValue,
-    PointPath,
-    PointPathLoop,
-    PointStar,
-    Points,
-    RadiusGrid,
-    RadiusPx,
-    RefLinkBetweenCenters,
-    RefLinkBetweenPivots,
-    ValueOnly,
-}
-
-/// Possible values: `Above`, `Center`, `Beneath`
-#[derive(Serialize, Deserialize)]
-pub enum EditorDisplayPos {
-    Above,
-    Beneath,
-    Center,
-}
-
-/// Possible values: `ZigZag`, `StraightArrow`, `CurvedArrow`, `ArrowsLine`, `DashedLine`
-#[derive(Serialize, Deserialize)]
-pub enum EditorLinkStyle {
-    ArrowsLine,
-    CurvedArrow,
-    DashedLine,
-    StraightArrow,
-    ZigZag,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum TextLanguageMode {
-    LangC,
-    LangHaxe,
-    #[serde(rename = "LangJS")]
-    LangJs,
-    LangJson,
-    LangLog,
-    LangLua,
-    LangMarkdown,
-    LangPython,
-    LangRuby,
-    LangXml,
-}
-
-/// Possible values: `DiscardOldOnes`, `PreventAdding`, `MoveLastOne`
-#[derive(Serialize, Deserialize)]
-pub enum LimitBehavior {
-    DiscardOldOnes,
-    MoveLastOne,
-    PreventAdding,
-}
-
-/// If TRUE, the maxCount is a "per world" limit, if FALSE, it's a "per level". Possible
-/// values: `PerLayer`, `PerLevel`, `PerWorld`
-#[allow(clippy::enum_variant_names)]
-#[derive(Serialize, Deserialize)]
-pub enum LimitScope {
-    PerLayer,
-    PerLevel,
-    PerWorld,
-}
-
-/// Possible values: `Rectangle`, `Ellipse`, `Tile`, `Cross`
-#[derive(Serialize, Deserialize)]
-pub enum RenderMode {
-    Cross,
-    Ellipse,
-    Rectangle,
-    Tile,
-}
-
-/// An enum describing how the the Entity tile is rendered inside the Entity bounds. Possible
-/// values: `Cover`, `FitInside`, `Repeat`, `Stretch`, `FullSizeCropped`,
-/// `FullSizeUncropped`, `NineSlice`
-#[derive(Serialize, Deserialize)]
-pub enum TileRenderMode {
-    Cover,
-    FitInside,
-    FullSizeCropped,
-    FullSizeUncropped,
-    NineSlice,
-    Repeat,
-    Stretch,
-}
-
-/// Checker mode Possible values: `None`, `Horizontal`, `Vertical`
-#[derive(Serialize, Deserialize)]
-pub enum Checker {
-    Horizontal,
-    None,
-    Vertical,
-}
-
-/// Defines how tileIds array is used Possible values: `Single`, `Stamp`
-#[derive(Serialize, Deserialize)]
-pub enum TileMode {
-    Single,
-    Stamp,
-}
-
-/// Type of the layer as Haxe Enum Possible values: `IntGrid`, `Entities`, `Tiles`,
-/// `AutoLayer`
-#[derive(Serialize, Deserialize)]
-pub enum Type {
-    AutoLayer,
-    Entities,
-    IntGrid,
-    Tiles,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum EmbedAtlas {
-    LdtkIcons,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum Flag {
-    DiscardPreCsvIntGrid,
-    ExportPreCsvIntGridFormat,
-    IgnoreBackupSuggest,
-    MultiWorlds,
-    PrependIndexToLevelFileNames,
-    UseMultilinesType,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum BgPos {
-    Contain,
-    Cover,
-    CoverDirty,
-    Repeat,
-    Unscaled,
 }
 
 #[derive(Serialize, Deserialize)]

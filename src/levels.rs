@@ -192,24 +192,22 @@ impl Level {
             .map(|e| Actor::new_by_json(gctx, res, tileset_defs_json, e))
             .collect::<Vec<Actor>>();
 
-        let mut layers = Vec::new();
-        for layer_json in level_json
+        let layers = level_json
             .layer_instances
             .as_ref()
             .expect("levels saved internally")
             .iter()
-        {
-            if let Some(layer) = Layer::new(
-                gctx,
-                res,
-                tilesets,
-                tileset_defs_json,
-                edge_blocked_enum_uid,
-                layer_json,
-            ) {
-                layers.push(layer);
-            }
-        }
+            .filter_map(|layer_json| {
+                Layer::new(
+                    gctx,
+                    res,
+                    tilesets,
+                    tileset_defs_json,
+                    edge_blocked_enum_uid,
+                    layer_json,
+                )
+            })
+            .collect::<Vec<Layer>>();
 
         let mut encounters: Option<EncounterGroup> = None;
         for field in &level_json.field_instances {
@@ -236,7 +234,7 @@ impl Level {
                 neighbours: level_json
                     .neighbours
                     .iter()
-                    .map(NeighbourLevel::new)
+                    .filter_map(NeighbourLevel::new)
                     .collect(),
                 encounters,
             },
@@ -365,24 +363,17 @@ impl Default for LevelSet {
 }
 
 impl NeighbourLevel {
-    fn new(neighbour_json: &ldtk::NeighbourLevel) -> Self {
-        let dir_char = neighbour_json
-            .dir
-            .chars()
-            .next()
-            .expect("first char of ldtk::NeighbourLevel.dir");
-        let dir = match dir_char {
-            'n' => Direction::North,
-            'e' => Direction::East,
-            's' => Direction::South,
-            'w' => Direction::West,
-            c => panic!("unknown ldtk::NeighbourLevel.dir char: '{c}'"),
-        };
-
-        Self {
-            dir,
+    fn new(neighbour_json: &ldtk::NeighbourLevel) -> Option<Self> {
+        Some(Self {
+            dir: match neighbour_json.dir.as_str() {
+                "n" => Direction::North,
+                "e" => Direction::East,
+                "s" => Direction::South,
+                "w" => Direction::West,
+                _ => return None,
+            },
             level_iid: neighbour_json.level_iid.clone(),
-        }
+        })
     }
 }
 
