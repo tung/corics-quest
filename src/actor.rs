@@ -7,6 +7,7 @@ use crate::sprite::*;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
 use miniquad::graphics::GraphicsContext;
+use miniserde::json;
 
 pub struct Actor {
     pub identifier: ActorType,
@@ -17,15 +18,22 @@ pub struct Actor {
     pub face_dir: Direction,
     pub visible: bool,
     sprite: Sprite,
+    pub chest_type: Option<ChestType>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ActorType {
     Player,
+    Chest,
     Ducille,
     Jace,
     Julis,
     Matero,
+}
+
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum ChestType {
+    FireEdge,
 }
 
 impl Actor {
@@ -37,9 +45,6 @@ impl Actor {
         grid_y: i32,
         path: &str,
     ) -> Self {
-        let mut sprite = Sprite::new(gctx, res, path);
-        sprite.start_animation("face_s");
-
         Self {
             identifier,
             grid_x,
@@ -48,7 +53,8 @@ impl Actor {
             offset_y: 0,
             face_dir: Direction::South,
             visible: true,
-            sprite,
+            sprite: Sprite::new(gctx, res, path),
+            chest_type: None,
         }
     }
 
@@ -71,14 +77,29 @@ impl Actor {
             .as_ref()
             .expect("entity tileset rel_path");
 
-        Self::new(
+        let mut actor = Self::new(
             gctx,
             res,
-            entity_json.identifier.as_str().try_into().unwrap(),
+            entity_json.identifier.as_str().into(),
             entity_json.grid[0] as i32,
             entity_json.grid[1] as i32,
             rel_path,
-        )
+        );
+
+        if actor.identifier == ActorType::Chest {
+            let chest_type_field = entity_json
+                .field_instances
+                .iter()
+                .find(|fi| fi.identifier == "ChestType")
+                .expect("ChestType field instance for ActorType::Chest");
+
+            actor.chest_type = match &chest_type_field.value {
+                Some(json::Value::String(s)) => Some(s.as_str().into()),
+                _ => panic!("ChestType value must be a string"),
+            };
+        }
+
+        actor
     }
 
     pub fn animate(&mut self) {
@@ -95,6 +116,10 @@ impl Actor {
         }
     }
 
+    pub fn start_animation(&mut self, tag: &str) {
+        self.sprite.start_animation(tag);
+    }
+
     pub fn start_walk_animation(&mut self, dir: Direction) {
         self.sprite.start_walk_animation(dir);
     }
@@ -104,17 +129,25 @@ impl Actor {
     }
 }
 
-impl TryFrom<&str> for ActorType {
-    type Error = &'static str;
-
-    fn try_from(s: &str) -> Result<Self, Self::Error> {
+impl From<&str> for ActorType {
+    fn from(s: &str) -> Self {
         match s {
-            "Player" => Ok(Self::Player),
-            "Ducille" => Ok(Self::Ducille),
-            "Jace" => Ok(Self::Jace),
-            "Julis" => Ok(Self::Julis),
-            "Matero" => Ok(Self::Matero),
-            _ => Err("unknown actor type"),
+            "Player" => Self::Player,
+            "Chest" => Self::Chest,
+            "Ducille" => Self::Ducille,
+            "Jace" => Self::Jace,
+            "Julis" => Self::Julis,
+            "Matero" => Self::Matero,
+            _ => panic!("unknown actor type: {s}"),
+        }
+    }
+}
+
+impl From<&str> for ChestType {
+    fn from(s: &str) -> Self {
+        match s {
+            "FireEdge" => Self::FireEdge,
+            _ => panic!("unknown chest type: {s}"),
         }
     }
 }

@@ -58,10 +58,9 @@ pub struct ScriptContext {
 impl ScriptContext {
     pub fn new(gctx: &mut GraphicsContext, res: Resources) -> Self {
         let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");
-        actors.insert(
-            0,
-            Actor::new(gctx, &res, ActorType::Player, 6, 3, "coric.png"),
-        );
+        let mut player = Actor::new(gctx, &res, ActorType::Player, 6, 3, "coric.png");
+        player.start_animation("face_s");
+        actors.insert(0, player);
 
         Self {
             gctx_ptr: SharedMut::new(std::ptr::null_mut()),
@@ -125,14 +124,31 @@ impl ScriptContext {
             ..
         } = *self.level;
         let gctx = self.gctx();
-        self.res.levels.level_by_neighbour(
+
+        if let Some((level, mut actors)) = self.res.levels.level_by_neighbour(
             gctx,
             &self.res,
             &self.level.neighbours[..],
             px_world_x + grid_x * TILE_SIZE,
             px_world_y + grid_y * TILE_SIZE,
             dir,
-        )
+        ) {
+            if self
+                .progress
+                .collected_chests
+                .iter()
+                .map(String::as_str)
+                .any(|s| s == level.identifier)
+            {
+                if let Some(chest) = actors.iter_mut().find(|a| a.identifier == ActorType::Chest) {
+                    chest.start_animation("open");
+                }
+            }
+
+            Some((level, actors))
+        } else {
+            None
+        }
     }
 
     pub fn pop_mode(&mut self) {

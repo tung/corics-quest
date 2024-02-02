@@ -101,18 +101,50 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.pop_mode();
             }
             WalkAroundEvent::TalkActor(actor) => {
-                let level_script = LEVEL_SCRIPTS
+                if let Some((_, talk_script)) = LEVEL_SCRIPTS
                     .iter()
                     .find(|(id, _)| *id == sctx.level.identifier)
-                    .map(|(_, l)| l)
-                    .unwrap();
-                let talk_script = level_script
-                    .on_talk
-                    .iter()
-                    .find(|(ty, _)| *ty == sctx.actors[actor].identifier)
-                    .map(|(_, t)| t)
-                    .unwrap();
-                (talk_script)(&mut sctx).await;
+                    .and_then(|(_, l)| {
+                        l.on_talk
+                            .iter()
+                            .find(|(ty, _)| *ty == sctx.actors[actor].identifier)
+                    })
+                {
+                    (talk_script)(&mut sctx).await;
+                } else if sctx.actors[actor].identifier == ActorType::Chest {
+                    if !sctx
+                        .progress
+                        .collected_chests
+                        .iter()
+                        .map(String::as_str)
+                        .any(|s| s == sctx.level.identifier.as_str())
+                    {
+                        let ChestType::FireEdge =
+                            sctx.actors[actor].chest_type.expect("ChestType for Chest");
+                        let magic_slot = sctx
+                            .progress
+                            .magic
+                            .iter_mut()
+                            .find(|m| m.magic == Magic::FireEdge)
+                            .expect("FireEdge magic slot");
+                        magic_slot.known = true;
+
+                        sctx.actors[actor].start_animation("open");
+
+                        sctx.push_text_box_mode("Coric learned FireEdge!");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+
+                        sctx.progress
+                            .collected_chests
+                            .push(sctx.level.identifier.clone());
+                    }
+                } else {
+                    panic!(
+                        "missing on_talk script for {:?} in level {}",
+                        sctx.actors[actor].identifier, sctx.level.identifier,
+                    );
+                }
             }
             WalkAroundEvent::TouchLevelEdge(dir) => {
                 if let Some((level, mut actors)) = sctx.level_by_neighbour(dir) {

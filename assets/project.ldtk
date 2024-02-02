@@ -11,7 +11,7 @@
 	"iid": "00979bb0-b0a0-11ee-b761-dd5714ea4fc9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 88,
+	"nextUid": 92,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -1103,6 +1103,82 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Chest",
+			"uid": 89,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#733E39",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 88,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 1,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "ChestType",
+					"doc": null,
+					"__type": "LocalEnum.ChestType",
+					"uid": 91,
+					"type": "F_Enum(90)",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "ValueOnly",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["FireEdge"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -1268,6 +1344,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "8654" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 2,
+			"identifier": "Chest",
+			"uid": 88,
+			"relPath": "chest.png",
+			"embedAtlas": null,
+			"pxWid": 16,
+			"pxHei": 32,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "00", "averageColors": "99639853" }
 		}
 	], "enums": [
 		{ "identifier": "EdgeBlocked", "uid": 72, "values": [
@@ -1276,7 +1371,8 @@
 			{ "id": "South", "tileRect": null, "color": 39387 },
 			{ "id": "West", "tileRect": null, "color": 16705377 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "EncounterGroup", "uid": 83, "values": [{ "id": "Forest1", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+		{ "identifier": "EncounterGroup", "uid": 83, "values": [{ "id": "Forest1", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "ChestType", "uid": 90, "values": [{ "id": "FireEdge", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "EncounterGroup",
@@ -4857,7 +4953,24 @@
 					"seed": 9946627,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Chest",
+							"__grid": [10,7],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "410adb30-b0a0-11ee-9048-87bc53d8fa7f",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [160,112],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "FireEdge", "__tile": null, "defUid": 91, "realEditorValues": [] }],
+							"__worldX": 800,
+							"__worldY": -240
+						}
+					]
 				},
 				{
 					"__identifier": "Props",

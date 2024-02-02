@@ -35,6 +35,7 @@ pub struct Progress {
     pub exp: i32,
     pub items: Vec<ItemSlot>,
     pub magic: Vec<MagicSlot>,
+    pub collected_chests: Vec<String>,
 }
 
 impl Item {
@@ -123,6 +124,10 @@ impl Progress {
                     known: true,
                 },
                 MagicSlot {
+                    magic: Magic::FireEdge,
+                    known: true,
+                },
+                MagicSlot {
                     magic: Magic::EarthEdge,
                     known: true,
                 },
@@ -130,11 +135,8 @@ impl Progress {
                     magic: Magic::WaterEdge,
                     known: true,
                 },
-                MagicSlot {
-                    magic: Magic::FireEdge,
-                    known: true,
-                },
             ],
+            collected_chests: Vec::new(),
         }
     }
 }
