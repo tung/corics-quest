@@ -515,9 +515,9 @@ impl Battle {
 
                     let item = mctx.progress.items[choice].item;
                     let (heal_hp, heal_mp) = match item {
-                        Item::Salve => (mctx.progress.max_hp * 3 / 10, 0),
+                        Item::Salve => ((mctx.progress.max_hp * 3 + 9) / 10, 0),
                         Item::XSalve => (mctx.progress.max_hp, 0),
-                        Item::Tonic => (0, mctx.progress.max_mp * 3 / 10),
+                        Item::Tonic => (0, (mctx.progress.max_mp * 3 + 9) / 10),
                         Item::XTonic => (0, mctx.progress.max_mp),
                     };
 
