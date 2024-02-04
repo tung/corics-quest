@@ -10,6 +10,7 @@ mod levels;
 mod meter;
 mod modes;
 mod progress;
+mod random;
 mod resources;
 mod script;
 mod shaders;

@@ -1,4 +1,5 @@
 use crate::progress::*;
+use crate::random::*;
 
 #[derive(Clone, Copy)]
 pub enum EncounterGroup {
@@ -17,13 +18,25 @@ pub struct Enemy {
 impl EncounterGroup {
     pub fn random_enemy(self) -> Enemy {
         let Self::Forest1 = self;
-        Enemy {
-            name: "Rat",
-            sprite_path: "rat.png",
-            hp: 52,
-            attack: 5,
-            defense: 5,
-            weakness: Some(Magic::FireEdge),
+        let r = random(2);
+        if r == 0 {
+            Enemy {
+                name: "Rat",
+                sprite_path: "rat.png",
+                hp: 52,
+                attack: 5,
+                defense: 5,
+                weakness: Some(Magic::FireEdge),
+            }
+        } else {
+            Enemy {
+                name: "Dog",
+                sprite_path: "dog.png",
+                hp: 52,
+                attack: 5,
+                defense: 5,
+                weakness: Some(Magic::FireEdge),
+            }
         }
     }
 }
