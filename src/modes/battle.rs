@@ -4,6 +4,7 @@ use crate::enemy::*;
 use crate::input::*;
 use crate::meter::*;
 use crate::progress::*;
+use crate::random::*;
 use crate::resources::*;
 use crate::sprite::*;
 use crate::text::*;
@@ -586,7 +587,13 @@ impl Battle {
             }
 
             let base_damage = calc_base_damage(self.enemy.attack, mctx.progress.defense);
-            let damage = base_damage.trunc() as i32;
+            let damage = base_damage.trunc() as i32
+                + if (random(100) as f32) < base_damage.fract() * 100.0 {
+                    1
+                } else {
+                    0
+                };
+
             for _ in 0..5 {
                 self.status_visible = false;
                 wait_once().await;
@@ -661,4 +668,9 @@ fn calc_magic_damage(
     };
     let damage = base_damage * (1.0 + bonus);
     damage.trunc() as i32
+        + if (random(100) as f32) < damage.fract() * 100.0 {
+            1
+        } else {
+            0
+        }
 }
