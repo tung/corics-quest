@@ -51,7 +51,7 @@ impl Meter {
             },
             quad_pipeline: res.quad_pipeline,
         };
-        meter.set_value(gctx, max_value);
+        meter.set_value_and_max(gctx, max_value, max_value);
         meter
     }
 
@@ -74,7 +74,13 @@ impl Meter {
     }
 
     pub fn set_value(&mut self, gctx: &mut GraphicsContext, value: i32) {
-        let value = value.max(0) as f32;
+        let max_value = self.max_value;
+        self.set_value_and_max(gctx, value, max_value);
+    }
+
+    pub fn set_value_and_max(&mut self, gctx: &mut GraphicsContext, value: i32, max_value: i32) {
+        self.max_value = max_value.max(1);
+        let value = value.max(0).min(self.max_value) as f32;
         let inst_data: [[[f32; 2]; 3]; 5] = [
             // left edge
             [[1.0, 2.0], [0.0, 0.0], [0.0, 1.0]],

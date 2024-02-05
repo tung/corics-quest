@@ -650,8 +650,10 @@ impl Battle {
             .set_text(mctx.gctx, mctx.res, &format!("HP{:4}", mctx.progress.hp));
         self.mp_text
             .set_text(mctx.gctx, mctx.res, &format!("MP{:4}", mctx.progress.mp));
-        self.hp_meter.set_value(mctx.gctx, mctx.progress.hp);
-        self.mp_meter.set_value(mctx.gctx, mctx.progress.mp);
+        self.hp_meter
+            .set_value_and_max(mctx.gctx, mctx.progress.hp, mctx.progress.max_hp);
+        self.mp_meter
+            .set_value_and_max(mctx.gctx, mctx.progress.mp, mctx.progress.max_mp);
     }
 
     async fn wait_for_confirmation(&mut self, mctx: &mut ModeContext<'_, '_>) {
