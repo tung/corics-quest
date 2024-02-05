@@ -281,7 +281,9 @@ impl Battle {
 
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Confirm) {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                return None;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if selection == 0 {
                     return None;
                 } else {
@@ -354,7 +356,9 @@ impl Battle {
 
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Confirm) {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                return None;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if selection == 0 {
                     return None;
                 } else {
