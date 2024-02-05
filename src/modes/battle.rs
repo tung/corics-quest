@@ -574,12 +574,6 @@ impl Battle {
             if self.enemy.hp <= 0 {
                 self.enemy_visible = false;
 
-                if mctx.progress.mp < mctx.progress.max_mp {
-                    self.show_status_change(mctx, "+1MP");
-                    mctx.progress.mp += 1;
-                    self.update_status(mctx);
-                }
-
                 self.message_text.set_text(
                     mctx.gctx,
                     mctx.res,
