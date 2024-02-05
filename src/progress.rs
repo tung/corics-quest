@@ -33,6 +33,7 @@ pub struct Progress {
     pub defense: i32,
     pub level: i32,
     pub exp: i32,
+    pub next_exp: i32,
     pub items: Vec<ItemSlot>,
     pub magic: Vec<MagicSlot>,
     pub collected_chests: Vec<String>,
@@ -100,6 +101,7 @@ impl Progress {
             defense: 5,
             level: 1,
             exp: 0,
+            next_exp: 20,
             items: vec![
                 ItemSlot {
                     item: Item::Salve,

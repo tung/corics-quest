@@ -13,6 +13,7 @@ pub struct Enemy {
     pub attack: i32,
     pub defense: i32,
     pub weakness: Option<Magic>,
+    pub exp: i32,
 }
 
 impl EncounterGroup {
@@ -27,6 +28,7 @@ impl EncounterGroup {
                 attack: 5,
                 defense: 5,
                 weakness: Some(Magic::FireEdge),
+                exp: 5,
             }
         } else {
             Enemy {
@@ -36,6 +38,7 @@ impl EncounterGroup {
                 attack: 5,
                 defense: 5,
                 weakness: Some(Magic::FireEdge),
+                exp: 5,
             }
         }
     }

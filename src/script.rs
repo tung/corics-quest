@@ -89,6 +89,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         attack: 5,
                         defense: 5,
                         weakness: Some(Magic::FireEdge),
+                        exp: 5,
                     });
                 }
                 match sctx.update_battle_mode().await {

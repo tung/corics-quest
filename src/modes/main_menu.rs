@@ -37,7 +37,8 @@ impl MainMenu {
                  MP: {} / {}\n\
                  Attack: {}\n\
                  Defense: {}\n\
-                 Experience: {}",
+                 Experience: {}\n\
+                 Next Level: {}",
                 progress.level,
                 progress.hp,
                 progress.max_hp,
@@ -46,6 +47,7 @@ impl MainMenu {
                 progress.attack,
                 progress.defense,
                 progress.exp,
+                progress.next_exp,
             ),
         );
         let menu_window = Window::new(gctx, res, 234, 44, 60, 56);
