@@ -11,7 +11,7 @@
 	"iid": "00979bb0-b0a0-11ee-b761-dd5714ea4fc9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 92,
+	"nextUid": 94,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -1179,6 +1179,41 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Bed",
+			"uid": 93,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#3E2731",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 92,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 92, "x": 0, "y": 0, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 1,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -1363,6 +1398,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "00", "averageColors": "99639853" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "Bed",
+			"uid": 92,
+			"relPath": "bed.png",
+			"embedAtlas": null,
+			"pxWid": 16,
+			"pxHei": 16,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "1", "averageColors": "f668" }
 		}
 	], "enums": [
 		{ "identifier": "EdgeBlocked", "uid": 72, "values": [
@@ -1521,6 +1575,22 @@
 							"fieldInstances": [],
 							"__worldX": 400,
 							"__worldY": 240
+						},
+						{
+							"__identifier": "Bed",
+							"__grid": [5,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 92, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#3E2731",
+							"iid": "4e5497a0-b0a0-11ee-8bd4-8f53b88220c7",
+							"width": 16,
+							"height": 16,
+							"defUid": 93,
+							"px": [80,48],
+							"fieldInstances": [],
+							"__worldX": 80,
+							"__worldY": 48
 						}
 					]
 				},

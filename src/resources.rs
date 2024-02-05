@@ -9,6 +9,7 @@ use std::io::Cursor;
 use std::rc::Rc;
 
 const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
+    ("bed.png", include_str!("../assets/bed.json")),
     ("chest.png", include_str!("../assets/chest.json")),
     ("coric.png", include_str!("../assets/coric.json")),
     ("dog.png", include_str!("../assets/dog.json")),
@@ -21,6 +22,7 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
 
 const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("base.png", include_bytes!("../assets/base.png")),
+    ("bed.png", include_bytes!("../assets/bed.png")),
     ("chest.png", include_bytes!("../assets/chest.png")),
     ("coric.png", include_bytes!("../assets/coric.png")),
     ("dog.png", include_bytes!("../assets/dog.png")),

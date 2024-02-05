@@ -24,6 +24,7 @@ pub struct Actor {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ActorType {
     Player,
+    Bed,
     Chest,
     Ducille,
     Jace,
@@ -133,6 +134,7 @@ impl From<&str> for ActorType {
     fn from(s: &str) -> Self {
         match s {
             "Player" => Self::Player,
+            "Bed" => Self::Bed,
             "Chest" => Self::Chest,
             "Ducille" => Self::Ducille,
             "Jace" => Self::Jace,

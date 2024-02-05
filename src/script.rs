@@ -19,6 +19,17 @@ static LEVEL_SCRIPTS: &[(&str, LevelScripts)] = &[(
     "Start",
     LevelScripts {
         on_talk: &[
+            (ActorType::Bed, |sctx| {
+                Box::pin(async {
+                    sctx.progress.hp = sctx.progress.max_hp;
+                    sctx.progress.mp = sctx.progress.max_mp;
+                    sctx.push_text_box_mode(
+                        "Coric takes a moment to rest...\nHP and MP recovered!",
+                    );
+                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                    sctx.pop_mode();
+                })
+            }),
             (ActorType::Ducille, |sctx| {
                 Box::pin(async {
                     sctx.push_text_box_mode("Ducille:\nHi Coric!");
