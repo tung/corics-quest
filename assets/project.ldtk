@@ -4998,7 +4998,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Forest1"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -7105,7 +7108,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Forest1"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -8067,7 +8073,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Forest1"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
