@@ -91,7 +91,7 @@ impl WalkAround {
                     {
                         return WalkAroundEvent::TouchLevelEdge(dir);
                     } else {
-                        walk_player(&mut mctx.actors[..], dir).await;
+                        walk_player(&mut mctx.actors[..], dir, None).await;
                     }
                 }
             } else {

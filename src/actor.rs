@@ -167,14 +167,31 @@ pub fn move_actors(actors: &mut [Actor]) {
     }
 }
 
-pub async fn walk_player(actors: &mut [Actor], dir: Direction) {
+pub async fn walk_player(actors: &mut [Actor], dir: Direction, mut fade: Option<(&mut f32, f32)>) {
     actors[0].grid_x += dir.dx();
     actors[0].grid_y += dir.dy();
     actors[0].offset_x -= dir.dx() * TILE_SIZE;
     actors[0].offset_y -= dir.dy() * TILE_SIZE;
+
+    let fade_delta = fade
+        .as_ref()
+        .map(|f| f.1 - *f.0)
+        .filter(|df| df.abs() > f32::EPSILON)
+        .map(|df| df / (TILE_SIZE as f32))
+        .unwrap_or(0.0);
+
     while actors[0].offset_x != 0 || actors[0].offset_y != 0 {
         move_actors(actors);
         animate_actors(actors);
+
+        if let Some((fade_alpha, _)) = fade.as_mut() {
+            **fade_alpha = (**fade_alpha + fade_delta).max(0.0).min(1.0);
+        }
+
         wait_once().await;
+    }
+
+    if let Some((fade_alpha, fade_end)) = fade.as_mut() {
+        **fade_alpha = *fade_end;
     }
 }

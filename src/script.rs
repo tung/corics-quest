@@ -160,8 +160,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             WalkAroundEvent::TouchLevelEdge(dir) => {
                 if let Some((level, mut actors)) = sctx.level_by_neighbour(dir) {
+                    // prepare black fade color
+                    *sctx.fade = [0.0; 4];
+
                     // walk out of old level
-                    walk_player(&mut sctx.actors[..], dir).await;
+                    walk_player(&mut sctx.actors[..], dir, Some((&mut sctx.fade[3], 1.0))).await;
 
                     // move player to the new level
                     sctx.actors.truncate(1);
@@ -175,7 +178,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     *sctx.level = level;
 
                     // walk into the new level
-                    walk_player(&mut sctx.actors[..], dir).await;
+                    walk_player(&mut sctx.actors[..], dir, Some((&mut sctx.fade[3], 0.0))).await;
                 } else {
                     sctx.actors[0].stop_walk_animation();
                 }

@@ -20,16 +20,24 @@ const FRAGMENT: &str = r#"#version 100
 precision mediump float;
 
 varying vec2 tex_coord;
+uniform vec4 fade;
 uniform sampler2D offscreen_texture;
 
 void main() {
-    gl_FragColor = texture2D(offscreen_texture, tex_coord);
+    gl_FragColor = vec4(
+        vec3(1.0 - fade.a)
+            * texture2D(offscreen_texture, tex_coord).rgb
+            + vec3(fade.a)
+            * fade.rgb,
+        1.0
+    );
 }
 "#;
 
 #[repr(C)]
 pub struct Uniforms {
     pub scale: [f32; 2],
+    pub fade: [f32; 4],
 }
 
 pub fn pipeline(gctx: &mut GraphicsContext) -> Pipeline {
@@ -40,7 +48,10 @@ pub fn pipeline(gctx: &mut GraphicsContext) -> Pipeline {
         ShaderMeta {
             images: vec!["offscreen_texture".to_string()],
             uniforms: UniformBlockLayout {
-                uniforms: vec![UniformDesc::new("scale", UniformType::Float2)],
+                uniforms: vec![
+                    UniformDesc::new("scale", UniformType::Float2),
+                    UniformDesc::new("fade", UniformType::Float4),
+                ],
             },
         },
     )

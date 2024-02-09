@@ -119,6 +119,7 @@ impl EventHandler for App {
         gctx.apply_bindings(&self.screen_bindings);
         gctx.apply_uniforms(&screen_shader::Uniforms {
             scale: self.window_scale(),
+            fade: *self.sctx.fade,
         });
         gctx.draw(0, 6, 1);
         gctx.end_render_pass();
