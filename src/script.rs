@@ -99,11 +99,27 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     }
                     BattleEvent::Defeat => {
                         sctx.pop_mode();
+
                         sctx.actors[0].visible = true;
+                        sctx.fade_out(90).await;
+
+                        // warp player back to town
+                        let (level, mut actors) = sctx.level_by_identifier("Start");
+                        sctx.actors.truncate(1);
+                        let mut player = sctx.actors.pop().expect("player actor");
+                        player.grid_x = 6;
+                        player.grid_y = 3;
+                        player.start_animation("face_s");
+                        actors.insert(0, player);
+                        *sctx.level = level;
+                        *sctx.actors = actors;
+
+                        sctx.progress.hp = sctx.progress.max_hp;
+                        sctx.fade_in(90).await;
+
                         sctx.push_text_box_mode("Coric:\nOuch!");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
-                        sctx.progress.hp = sctx.progress.max_hp;
                     }
                 }
             }

@@ -137,6 +137,13 @@ impl ScriptContext {
         }
     }
 
+    pub fn level_by_identifier(&self, identifier: &str) -> (Level, Vec<Actor>) {
+        let gctx = self.gctx();
+        self.res
+            .levels
+            .level_by_identifier(gctx, &self.res, identifier)
+    }
+
     pub fn level_by_neighbour(&self, dir: Direction) -> Option<(Level, Vec<Actor>)> {
         let Actor { grid_x, grid_y, .. } = self.actors[0];
         let Level {
