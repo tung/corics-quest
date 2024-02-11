@@ -1,5 +1,5 @@
 use crate::actor::*;
-use crate::async_utils::SharedMut;
+use crate::async_utils::*;
 use crate::direction::*;
 use crate::enemy::*;
 use crate::input::*;
@@ -119,6 +119,22 @@ impl ScriptContext {
 
     pub fn unset_gctx(&mut self) {
         *self.gctx_ptr = std::ptr::null_mut();
+    }
+
+    pub async fn fade_in(&mut self, frames: u16) {
+        let step = self.fade[3] / if frames > 0 { frames as f32 } else { 1.0 };
+        while self.fade[3] > 0.0 {
+            self.fade[3] = (self.fade[3] - step).max(0.0);
+            wait_once().await;
+        }
+    }
+
+    pub async fn fade_out(&mut self, frames: u16) {
+        let step = (1.0 - self.fade[3]) / if frames > 0 { frames as f32 } else { 1.0 };
+        while self.fade[3] < 1.0 {
+            self.fade[3] = (self.fade[3] + step).min(1.0);
+            wait_once().await;
+        }
     }
 
     pub fn level_by_neighbour(&self, dir: Direction) -> Option<(Level, Vec<Actor>)> {
