@@ -1480,7 +1480,7 @@
 			{ "id": "West", "tileRect": null, "color": 16705377 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "EncounterGroup", "uid": 83, "values": [{ "id": "Forest1", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ChestType", "uid": 90, "values": [{ "id": "FireEdge", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+		{ "identifier": "ChestType", "uid": 90, "values": [ { "id": "FireEdge", "tileRect": null, "color": 12470831 }, { "id": "LongSword", "tileRect": null, "color": 14120515 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "EncounterGroup",
@@ -9756,6 +9756,25 @@
 							"fieldInstances": [],
 							"__worldX": 1056,
 							"__worldY": -544
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [33,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "1d124bc0-b0a0-11ee-90a3-9d449c086955",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [528,176],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "LongSword", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["LongSword"]
+							}] }],
+							"__worldX": 1168,
+							"__worldY": -528
 						}
 					]
 				},

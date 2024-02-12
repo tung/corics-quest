@@ -157,25 +157,46 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         .map(String::as_str)
                         .any(|s| s == sctx.level.identifier.as_str())
                     {
-                        let ChestType::FireEdge =
-                            sctx.actors[actor].chest_type.expect("ChestType for Chest");
-                        let magic_slot = sctx
-                            .progress
-                            .magic
-                            .iter_mut()
-                            .find(|m| m.magic == Magic::FireEdge)
-                            .expect("FireEdge magic slot");
-                        magic_slot.known = true;
+                        let chest_opened =
+                            match sctx.actors[actor].chest_type.expect("ChestType for Chest") {
+                                ChestType::FireEdge => {
+                                    let magic_slot = sctx
+                                        .progress
+                                        .magic
+                                        .iter_mut()
+                                        .find(|m| m.magic == Magic::FireEdge)
+                                        .expect("FireEdge magic slot");
+                                    magic_slot.known = true;
+                                    sctx.actors[actor].start_animation("open");
+                                    sctx.push_text_box_mode("Coric learned FireEdge!");
+                                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                                    sctx.pop_mode();
+                                    true
+                                }
 
-                        sctx.actors[actor].start_animation("open");
+                                ChestType::LongSword => {
+                                    if sctx.progress.maybe_upgrade_weapon("Long Sword", 2) {
+                                        sctx.actors[actor].start_animation("open");
+                                        sctx.push_text_box_mode("Coric found the Long Sword!");
+                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                                        sctx.pop_mode();
+                                        true
+                                    } else {
+                                        sctx.push_text_box_mode(
+                                            "Coric found the Long Sword, but\ndoesn't need it.",
+                                        );
+                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                                        sctx.pop_mode();
+                                        false
+                                    }
+                                }
+                            };
 
-                        sctx.push_text_box_mode("Coric learned FireEdge!");
-                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                        sctx.pop_mode();
-
-                        sctx.progress
-                            .collected_chests
-                            .push(sctx.level.identifier.clone());
+                        if chest_opened {
+                            sctx.progress
+                                .collected_chests
+                                .push(sctx.level.identifier.clone());
+                        }
                     }
                 } else if sctx.actors[actor].identifier == ActorType::Lever {
                     if sctx.lever_is_turned() {

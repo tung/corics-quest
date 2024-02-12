@@ -36,6 +36,7 @@ pub enum ActorType {
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum ChestType {
     FireEdge,
+    LongSword,
 }
 
 impl Actor {
@@ -151,6 +152,7 @@ impl From<&str> for ChestType {
     fn from(s: &str) -> Self {
         match s {
             "FireEdge" => Self::FireEdge,
+            "LongSword" => Self::LongSword,
             _ => panic!("unknown chest type: {s}"),
         }
     }
