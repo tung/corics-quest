@@ -167,6 +167,16 @@ pub async fn script_main(mut sctx: ScriptContext) {
                             .collected_chests
                             .push(sctx.level.identifier.clone());
                     }
+                } else if sctx.actors[actor].identifier == ActorType::Lever {
+                    if sctx.lever_is_turned() {
+                        sctx.push_text_box_mode("Coric turns the lever to the left.");
+                    } else {
+                        sctx.push_text_box_mode("Coric turns the lever to the right.");
+                    }
+                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                    sctx.pop_mode();
+
+                    sctx.toggle_lever();
                 } else {
                     panic!(
                         "missing on_talk script for {:?} in level {}",

@@ -14,6 +14,7 @@ use std::rc::{Rc, Weak};
 pub const TILE_SIZE: i32 = 16;
 
 struct Layer {
+    identifier: String,
     c_wid: u16,
     c_hei: u16,
     tileset: Rc<Tileset>,
@@ -102,6 +103,7 @@ impl Layer {
         };
 
         Some(Self {
+            identifier: layer_json.identifier.clone(),
             c_wid,
             c_hei,
             tileset,
@@ -161,6 +163,28 @@ impl Layer {
         };
 
         forward_blocked || backward_blocked
+    }
+
+    fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
+        if lever_turned {
+            for tile in self.tile_data.chunks_exact_mut(4) {
+                if tile[0] == 1 && tile[1] == 0 {
+                    // closed door -> open door
+                    tile[0] = 1;
+                    tile[1] = 1;
+                }
+            }
+        } else {
+            for tile in self.tile_data.chunks_exact_mut(4) {
+                if tile[0] == 1 && tile[1] == 1 {
+                    // open door -> closed door
+                    tile[0] = 1;
+                    tile[1] = 0;
+                }
+            }
+        }
+
+        self.bindings.images[0].update(gctx, &self.tile_data[..]);
     }
 }
 
@@ -254,6 +278,14 @@ impl Level {
         self.layers
             .iter()
             .any(|l| l.is_edge_blocked(tile_x, tile_y, dir))
+    }
+
+    pub fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
+        self.layers
+            .iter_mut()
+            .find(|l| l.identifier == "Props")
+            .expect("Props layer")
+            .sync_props_with_lever(gctx, lever_turned);
     }
 }
 

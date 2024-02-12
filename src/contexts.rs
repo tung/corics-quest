@@ -137,11 +137,35 @@ impl ScriptContext {
         }
     }
 
+    fn prepare_level_and_actors(&self, level: &mut Level, actors: &mut [Actor]) {
+        // display chest according to open/closed state in progress
+        if let Some(chest) = actors.iter_mut().find(|a| a.identifier == ActorType::Chest) {
+            let chest_opened = self
+                .progress
+                .collected_chests
+                .iter()
+                .map(String::as_str)
+                .any(|s| s == level.identifier);
+            chest.start_animation(if chest_opened { "open" } else { "closed" });
+        }
+
+        // show lever turned to its last position and update the map tiles it controls
+        let lever_turned = self
+            .progress
+            .turned_levers
+            .iter()
+            .any(|l| l == level.identifier.as_str());
+        sync_level_and_actors_with_lever(self.gctx(), lever_turned, level, actors);
+    }
+
     pub fn level_by_identifier(&self, identifier: &str) -> (Level, Vec<Actor>) {
         let gctx = self.gctx();
-        self.res
+        let (mut level, mut actors) = self
+            .res
             .levels
-            .level_by_identifier(gctx, &self.res, identifier)
+            .level_by_identifier(gctx, &self.res, identifier);
+        self.prepare_level_and_actors(&mut level, &mut actors[..]);
+        (level, actors)
     }
 
     pub fn level_by_neighbour(&self, dir: Direction) -> Option<(Level, Vec<Actor>)> {
@@ -153,30 +177,50 @@ impl ScriptContext {
         } = *self.level;
         let gctx = self.gctx();
 
-        if let Some((level, mut actors)) = self.res.levels.level_by_neighbour(
-            gctx,
-            &self.res,
-            &self.level.neighbours[..],
-            px_world_x + grid_x * TILE_SIZE,
-            px_world_y + grid_y * TILE_SIZE,
-            dir,
-        ) {
-            if self
-                .progress
-                .collected_chests
-                .iter()
-                .map(String::as_str)
-                .any(|s| s == level.identifier)
-            {
-                if let Some(chest) = actors.iter_mut().find(|a| a.identifier == ActorType::Chest) {
-                    chest.start_animation("open");
-                }
-            }
+        self.res
+            .levels
+            .level_by_neighbour(
+                gctx,
+                &self.res,
+                &self.level.neighbours[..],
+                px_world_x + grid_x * TILE_SIZE,
+                px_world_y + grid_y * TILE_SIZE,
+                dir,
+            )
+            .map(|(mut level, mut actors)| {
+                self.prepare_level_and_actors(&mut level, &mut actors[..]);
+                (level, actors)
+            })
+    }
 
-            Some((level, actors))
+    pub fn lever_is_turned(&self) -> bool {
+        self.progress
+            .turned_levers
+            .iter()
+            .any(|l| l == self.level.identifier.as_str())
+    }
+
+    pub fn toggle_lever(&mut self) {
+        if self.lever_is_turned() {
+            let turned_lever_pos = self
+                .progress
+                .turned_levers
+                .iter()
+                .position(|l| l == self.level.identifier.as_str())
+                .expect("turned lever position");
+            self.progress.turned_levers.swap_remove(turned_lever_pos);
         } else {
-            None
+            self.progress
+                .turned_levers
+                .push(self.level.identifier.clone());
         }
+
+        sync_level_and_actors_with_lever(
+            self.gctx(),
+            self.lever_is_turned(),
+            &mut self.level,
+            &mut self.actors[..],
+        );
     }
 
     pub fn pop_mode(&mut self) {
@@ -213,4 +257,17 @@ impl ScriptContext {
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
+}
+
+fn sync_level_and_actors_with_lever(
+    gctx: &mut GraphicsContext,
+    lever_turned: bool,
+    level: &mut Level,
+    actors: &mut [Actor],
+) {
+    if let Some(lever) = actors.iter_mut().find(|a| a.identifier == ActorType::Lever) {
+        lever.start_animation(if lever_turned { "right" } else { "left" });
+    }
+
+    level.sync_props_with_lever(gctx, lever_turned);
 }
