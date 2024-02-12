@@ -49,6 +49,11 @@ static LEVEL_SCRIPTS: &[(&str, LevelScripts)] = &[(
                     sctx.push_text_box_mode("Julis:\nHi Coric!");
                     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                     sctx.pop_mode();
+                    if sctx.progress.maybe_upgrade_armor("Leather Armor", 1) {
+                        sctx.push_text_box_mode("Julis:\nHere's your Leather Armor.");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
                 })
             }),
             (ActorType::Matero, |sctx| {
@@ -59,6 +64,11 @@ static LEVEL_SCRIPTS: &[(&str, LevelScripts)] = &[(
                     sctx.push_text_box_mode("Matero:\nNice cape!");
                     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                     sctx.pop_mode();
+                    if sctx.progress.maybe_upgrade_weapon("Short Sword", 1) {
+                        sctx.push_text_box_mode("Matero:\nHere's your Short Sword.");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
                 })
             }),
         ],

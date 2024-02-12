@@ -1,3 +1,8 @@
+pub struct Armor {
+    pub name: String,
+    pub defense: i32,
+}
+
 #[derive(Clone, Copy)]
 pub enum Item {
     Salve,
@@ -24,6 +29,11 @@ pub struct MagicSlot {
     pub known: bool,
 }
 
+pub struct Weapon {
+    pub name: String,
+    pub attack: i32,
+}
+
 pub struct Progress {
     pub hp: i32,
     pub max_hp: i32,
@@ -34,6 +44,8 @@ pub struct Progress {
     pub level: i32,
     pub exp: i32,
     pub next_exp: i32,
+    pub weapon: Option<Weapon>,
+    pub armor: Option<Armor>,
     pub items: Vec<ItemSlot>,
     pub magic: Vec<MagicSlot>,
     pub collected_chests: Vec<String>,
@@ -103,6 +115,8 @@ impl Progress {
             level: 1,
             exp: 0,
             next_exp: 20,
+            weapon: None,
+            armor: None,
             items: vec![
                 ItemSlot {
                     item: Item::Salve,
@@ -141,6 +155,34 @@ impl Progress {
             ],
             collected_chests: Vec::new(),
             turned_levers: Vec::new(),
+        }
+    }
+
+    pub fn maybe_upgrade_armor(&mut self, name: &str, defense: i32) -> bool {
+        let current_armor_defense = self.armor.as_ref().map(|a| a.defense).unwrap_or(0);
+        if defense <= current_armor_defense {
+            false
+        } else {
+            self.defense += defense - current_armor_defense;
+            self.armor = Some(Armor {
+                name: name.to_string(),
+                defense,
+            });
+            true
+        }
+    }
+
+    pub fn maybe_upgrade_weapon(&mut self, name: &str, attack: i32) -> bool {
+        let current_weapon_attack = self.weapon.as_ref().map(|w| w.attack).unwrap_or(0);
+        if attack <= current_weapon_attack {
+            false
+        } else {
+            self.attack += attack - current_weapon_attack;
+            self.weapon = Some(Weapon {
+                name: name.to_string(),
+                attack,
+            });
+            true
         }
     }
 }

@@ -23,12 +23,12 @@ pub enum MainMenuEvent {
 
 impl MainMenu {
     pub fn new(gctx: &mut GraphicsContext, res: &Resources, progress: &Progress) -> Self {
-        let status_window = Window::new(gctx, res, 44, 44, 180, 90);
+        let status_window = Window::new(gctx, res, 44, 36, 180, 106);
         let status_text = Text::from_str(
             gctx,
             res,
             52,
-            52,
+            44,
             &format!(
                 "Coric\n\
                  \n\
@@ -38,7 +38,9 @@ impl MainMenu {
                  Attack: {}\n\
                  Defense: {}\n\
                  Experience: {}\n\
-                 Next Level: {}",
+                 Next Level: {}\n\
+                 {}\n\
+                 {}",
                 progress.level,
                 progress.hp,
                 progress.max_hp,
@@ -48,11 +50,21 @@ impl MainMenu {
                 progress.defense,
                 progress.exp,
                 progress.next_exp,
+                progress
+                    .weapon
+                    .as_ref()
+                    .map(|w| w.name.as_str())
+                    .unwrap_or(""),
+                progress
+                    .armor
+                    .as_ref()
+                    .map(|a| a.name.as_str())
+                    .unwrap_or(""),
             ),
         );
-        let menu_window = Window::new(gctx, res, 234, 44, 60, 56);
-        let menu_text = Text::from_str(gctx, res, 248, 52, "RETURN\n\nMAGIC\n\nITEM");
-        let menu_cursor = Text::from_str(gctx, res, 240, 52, "►");
+        let menu_window = Window::new(gctx, res, 234, 36, 60, 56);
+        let menu_text = Text::from_str(gctx, res, 248, 44, "RETURN\n\nMAGIC\n\nITEM");
+        let menu_cursor = Text::from_str(gctx, res, 240, 44, "►");
 
         Self {
             status_window,
@@ -93,7 +105,7 @@ impl MainMenu {
                     self.selection += 1;
                 }
             }
-            self.menu_cursor.set_offset(240, 52 + 16 * self.selection);
+            self.menu_cursor.set_offset(240, 44 + 16 * self.selection);
         }
     }
 }
