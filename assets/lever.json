@@ -1,0 +1,33 @@
+{ "frames": [
+   {
+    "filename": "lever 0.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   },
+   {
+    "filename": "lever 1.aseprite",
+    "frame": { "x": 0, "y": 16, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3-rc2-dev",
+  "image": "lever.png",
+  "format": "RGBA8888",
+  "size": { "w": 16, "h": 32 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "left", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "right", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" }
+  ]
+ }
+}
