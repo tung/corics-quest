@@ -14,6 +14,11 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
     ("coric.png", include_str!("../assets/coric.json")),
     ("dog.png", include_str!("../assets/dog.json")),
     ("ducille.png", include_str!("../assets/ducille.json")),
+    ("earth.png", include_str!("../assets/earth.json")),
+    (
+        "earth-small.png",
+        include_str!("../assets/earth-small.json"),
+    ),
     ("jace.png", include_str!("../assets/jace.json")),
     ("julis.png", include_str!("../assets/julis.json")),
     ("lever.png", include_str!("../assets/lever.json")),
@@ -28,6 +33,11 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("coric.png", include_bytes!("../assets/coric.png")),
     ("dog.png", include_bytes!("../assets/dog.png")),
     ("ducille.png", include_bytes!("../assets/ducille.png")),
+    ("earth.png", include_bytes!("../assets/earth.png")),
+    (
+        "earth-small.png",
+        include_bytes!("../assets/earth-small.png"),
+    ),
     ("edges.png", include_bytes!("../assets/edges.png")),
     ("grassdirt.png", include_bytes!("../assets/grassdirt.png")),
     ("jace.png", include_bytes!("../assets/jace.png")),

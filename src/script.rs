@@ -12,12 +12,15 @@ use std::pin::Pin;
 type ScriptCallback = for<'a> fn(&'a mut ScriptContext) -> Pin<Box<dyn Future<Output = ()> + 'a>>;
 
 struct LevelScripts {
+    level_name: &'static str,
+    on_enter: Option<ScriptCallback>,
     on_talk: &'static [(ActorType, ScriptCallback)],
 }
 
-static LEVEL_SCRIPTS: &[(&str, LevelScripts)] = &[(
-    "Start",
+static LEVEL_SCRIPTS: &[LevelScripts] = &[
     LevelScripts {
+        level_name: "Start",
+        on_enter: None,
         on_talk: &[
             (ActorType::Bed, |sctx| {
                 Box::pin(async {
@@ -73,7 +76,64 @@ static LEVEL_SCRIPTS: &[(&str, LevelScripts)] = &[(
             }),
         ],
     },
-)];
+    LevelScripts {
+        level_name: "Earth_4",
+        on_enter: Some(|sctx| {
+            Box::pin(async {
+                if sctx.progress.earth_defeated {
+                    let earth = sctx
+                        .actors
+                        .iter()
+                        .position(|a| a.identifier == ActorType::Earth)
+                        .expect("Earth actor");
+                    sctx.actors.remove(earth);
+                }
+            })
+        }),
+        on_talk: &[(ActorType::Earth, |sctx| {
+            Box::pin(async {
+                sctx.push_text_box_mode("Earth:\nI am the Earth Spirit.\nPrepare to die!");
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.push_battle_mode(
+                    Enemy {
+                        name: "Earth",
+                        sprite_path: "earth.png",
+                        hp: 250,
+                        attack: 5,
+                        defense: 5,
+                        weakness: None,
+                        exp: 50,
+                    },
+                    true,
+                );
+
+                let earth = sctx
+                    .actors
+                    .iter()
+                    .position(|a| a.identifier == ActorType::Earth)
+                    .expect("Earth actor");
+                sctx.actors[earth].visible = false;
+
+                if !handle_battle(sctx).await {
+                    return;
+                }
+
+                sctx.actors[earth].visible = true;
+
+                sctx.push_text_box_mode(
+                    "Earth:\nI was... possessed... please...\nsave... the others...",
+                );
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.actors.remove(earth);
+                sctx.progress.earth_defeated = true;
+            })
+        })],
+    },
+];
 
 pub async fn script_main(mut sctx: ScriptContext) {
     validate_level_scripts(&mut sctx);
@@ -88,50 +148,23 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 return;
             }
             WalkAroundEvent::Encounter => {
-                sctx.actors[0].visible = false;
                 if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
-                    sctx.push_battle_mode(enemy);
+                    sctx.push_battle_mode(enemy, false);
                 } else {
-                    sctx.push_battle_mode(Enemy {
-                        name: "Debug Rat",
-                        sprite_path: "rat.png",
-                        hp: 52,
-                        attack: 5,
-                        defense: 5,
-                        weakness: Some(Magic::FireEdge),
-                        exp: 5,
-                    });
+                    sctx.push_battle_mode(
+                        Enemy {
+                            name: "Debug Rat",
+                            sprite_path: "rat.png",
+                            hp: 52,
+                            attack: 5,
+                            defense: 5,
+                            weakness: Some(Magic::FireEdge),
+                            exp: 5,
+                        },
+                        false,
+                    );
                 }
-                match sctx.update_battle_mode().await {
-                    BattleEvent::RanAway | BattleEvent::Victory => {
-                        sctx.pop_mode();
-                        sctx.actors[0].visible = true;
-                    }
-                    BattleEvent::Defeat => {
-                        sctx.pop_mode();
-
-                        sctx.actors[0].visible = true;
-                        sctx.fade_out(90).await;
-
-                        // warp player back to town
-                        let (level, mut actors) = sctx.level_by_identifier("Start");
-                        sctx.actors.truncate(1);
-                        let mut player = sctx.actors.pop().expect("player actor");
-                        player.grid_x = 6;
-                        player.grid_y = 3;
-                        player.start_animation("face_s");
-                        actors.insert(0, player);
-                        *sctx.level = level;
-                        *sctx.actors = actors;
-
-                        sctx.progress.hp = sctx.progress.max_hp;
-                        sctx.fade_in(90).await;
-
-                        sctx.push_text_box_mode("Coric:\nOuch!");
-                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                        sctx.pop_mode();
-                    }
-                }
+                handle_battle(&mut sctx).await;
             }
             WalkAroundEvent::MainMenu => {
                 sctx.push_main_menu_mode();
@@ -141,8 +174,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
             WalkAroundEvent::TalkActor(actor) => {
                 if let Some((_, talk_script)) = LEVEL_SCRIPTS
                     .iter()
-                    .find(|(id, _)| *id == sctx.level.identifier)
-                    .and_then(|(_, l)| {
+                    .find(|l| l.level_name == sctx.level.identifier)
+                    .and_then(|l| {
                         l.on_talk
                             .iter()
                             .find(|(ty, _)| *ty == sctx.actors[actor].identifier)
@@ -251,6 +284,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     *sctx.actors = actors;
                     *sctx.level = level;
 
+                    run_level_on_enter(&mut sctx).await;
+
                     // walk into the new level
                     walk_player(&mut sctx.actors[..], dir, Some((&mut sctx.fade[3], 0.0))).await;
                 } else {
@@ -264,23 +299,72 @@ pub async fn script_main(mut sctx: ScriptContext) {
 fn validate_level_scripts(sctx: &mut ScriptContext) {
     let mut level_identifiers: HashSet<String> = HashSet::new();
     for l in LEVEL_SCRIPTS {
-        if !sctx.res.levels.contains_identifier(l.0) {
-            panic!("LEVEL_SCRIPTS: unknown level identifier: {}", l.0);
+        if !sctx.res.levels.contains_identifier(l.level_name) {
+            panic!("LEVEL_SCRIPTS: unknown level identifier: {}", l.level_name);
         }
 
-        if !level_identifiers.contains(l.0) {
-            level_identifiers.insert(l.0.to_string());
+        if !level_identifiers.contains(l.level_name) {
+            level_identifiers.insert(l.level_name.to_string());
         } else {
-            panic!("LEVEL_SCRIPTS: duplicate level identifier: {}", l.0);
+            panic!(
+                "LEVEL_SCRIPTS: duplicate level identifier: {}",
+                l.level_name
+            );
         }
 
         let mut actor_types: HashSet<ActorType> = HashSet::new();
-        for t in l.1.on_talk {
+        for t in l.on_talk {
             if !actor_types.contains(&t.0) {
                 actor_types.insert(t.0);
             } else {
                 panic!("on_talk: duplicate ActorType: {:?}", t.0);
             }
+        }
+    }
+}
+
+async fn run_level_on_enter(sctx: &mut ScriptContext) {
+    if let Some(on_enter) = LEVEL_SCRIPTS
+        .iter()
+        .find(|l| l.level_name == sctx.level.identifier)
+        .and_then(|l| l.on_enter)
+    {
+        (on_enter)(sctx).await;
+    }
+}
+
+async fn handle_battle(sctx: &mut ScriptContext) -> bool {
+    sctx.actors[0].visible = false;
+    let event = sctx.update_battle_mode().await;
+    sctx.pop_mode();
+    sctx.actors[0].visible = true;
+    match event {
+        BattleEvent::Victory => true,
+        BattleEvent::RanAway => false,
+        BattleEvent::Defeat => {
+            sctx.fade_out(90).await;
+
+            // warp player back to town
+            let (level, mut actors) = sctx.level_by_identifier("Start");
+            sctx.actors.truncate(1);
+            let mut player = sctx.actors.pop().expect("player actor");
+            player.grid_x = 6;
+            player.grid_y = 3;
+            player.start_animation("face_s");
+            actors.insert(0, player);
+            *sctx.level = level;
+            *sctx.actors = actors;
+
+            run_level_on_enter(sctx).await;
+
+            sctx.progress.hp = sctx.progress.max_hp;
+            sctx.fade_in(90).await;
+
+            sctx.push_text_box_mode("Coric:\nOuch!");
+            let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+            sctx.pop_mode();
+
+            false
         }
     }
 }

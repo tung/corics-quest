@@ -227,7 +227,7 @@ impl ScriptContext {
         self.modes.pop();
     }
 
-    pub fn push_battle_mode(&mut self, enemy: Enemy) {
+    pub fn push_battle_mode(&mut self, enemy: Enemy, boss_fight: bool) {
         let gctx = self.gctx();
         self.modes.push(Battle::new(
             gctx,
@@ -235,6 +235,7 @@ impl ScriptContext {
             self.progress.max_hp,
             self.progress.max_mp,
             enemy,
+            boss_fight,
         ));
     }
 

@@ -39,6 +39,7 @@ pub struct Battle {
     change_text: Text,
     change_visible: bool,
     enemy: Enemy,
+    boss_fight: bool,
 }
 
 pub enum BattleEvent {
@@ -61,6 +62,7 @@ impl Battle {
         max_hp: i32,
         max_mp: i32,
         enemy: Enemy,
+        boss_fight: bool,
     ) -> Self {
         let mut enemy_sprite = Sprite::new(gctx, res, enemy.sprite_path);
         enemy_sprite.start_animation("idle");
@@ -109,6 +111,7 @@ impl Battle {
             change_text: Text::new(res, 0, 0),
             change_visible: false,
             enemy,
+            boss_fight,
         }
     }
 
@@ -176,7 +179,7 @@ impl Battle {
                     0 => Some(PlayerChoice::Fight),
                     1 => self.magic_menu(mctx).await.map(PlayerChoice::Magic),
                     2 => self.item_menu(mctx).await.map(PlayerChoice::Item),
-                    3 => Some(PlayerChoice::Run),
+                    3 => Some(PlayerChoice::Run).filter(|_| !self.boss_fight),
                     _ => None,
                 };
                 if let Some(choice) = choice {
