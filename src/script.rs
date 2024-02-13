@@ -190,6 +190,23 @@ pub async fn script_main(mut sctx: ScriptContext) {
                                         false
                                     }
                                 }
+
+                                ChestType::ChainVest => {
+                                    if sctx.progress.maybe_upgrade_armor("Chain Vest", 2) {
+                                        sctx.actors[actor].start_animation("open");
+                                        sctx.push_text_box_mode("Coric found the Chain Vest!");
+                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                                        sctx.pop_mode();
+                                        true
+                                    } else {
+                                        sctx.push_text_box_mode(
+                                            "Coric found the Chain Vest, but\ndoesn't need it.",
+                                        );
+                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                                        sctx.pop_mode();
+                                        false
+                                    }
+                                }
                             };
 
                         if chest_opened {

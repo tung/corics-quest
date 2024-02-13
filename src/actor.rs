@@ -37,6 +37,7 @@ pub enum ActorType {
 pub enum ChestType {
     FireEdge,
     LongSword,
+    ChainVest,
 }
 
 impl Actor {
@@ -153,6 +154,7 @@ impl From<&str> for ChestType {
         match s {
             "FireEdge" => Self::FireEdge,
             "LongSword" => Self::LongSword,
+            "ChainVest" => Self::ChainVest,
             _ => panic!("unknown chest type: {s}"),
         }
     }
