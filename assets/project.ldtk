@@ -1536,6 +1536,7 @@
 		{ "identifier": "EncounterGroup", "uid": 83, "values": [{ "id": "Forest1", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "ChestType", "uid": 90, "values": [
 			{ "id": "FireEdge", "tileRect": null, "color": 12470831 },
+			{ "id": "EarthEdge", "tileRect": null, "color": 4073265 },
 			{ "id": "LongSword", "tileRect": null, "color": 14120515 },
 			{ "id": "ChainVest", "tileRect": null, "color": 15389866 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
@@ -13981,7 +13982,27 @@
 					"seed": 8612765,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Chest",
+							"__grid": [5,12],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "7fff1070-b0a0-11ee-bbfd-2d8b9801b5f2",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [80,192],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "EarthEdge", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["EarthEdge"]
+							}] }],
+							"__worldX": -560,
+							"__worldY": -160
+						}
+					]
 				},
 				{
 					"__identifier": "Props",

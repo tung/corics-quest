@@ -193,17 +193,14 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         let chest_opened =
                             match sctx.actors[actor].chest_type.expect("ChestType for Chest") {
                                 ChestType::FireEdge => {
-                                    let magic_slot = sctx
-                                        .progress
-                                        .magic
-                                        .iter_mut()
-                                        .find(|m| m.magic == Magic::FireEdge)
-                                        .expect("FireEdge magic slot");
-                                    magic_slot.known = true;
                                     sctx.actors[actor].start_animation("open");
-                                    sctx.push_text_box_mode("Coric learned FireEdge!");
-                                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                                    sctx.pop_mode();
+                                    learn_magic(&mut sctx, Magic::FireEdge).await;
+                                    true
+                                }
+
+                                ChestType::EarthEdge => {
+                                    sctx.actors[actor].start_animation("open");
+                                    learn_magic(&mut sctx, Magic::EarthEdge).await;
                                     true
                                 }
 
@@ -367,4 +364,18 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
             false
         }
     }
+}
+
+async fn learn_magic(sctx: &mut ScriptContext, magic: Magic) {
+    let magic_slot = sctx
+        .progress
+        .magic
+        .iter_mut()
+        .find(|m| m.magic == magic)
+        .expect("magic slot");
+    magic_slot.known = true;
+
+    sctx.push_text_box_mode(&format!("Coric learned {}!", magic.name()));
+    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+    sctx.pop_mode();
 }
