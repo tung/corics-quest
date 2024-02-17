@@ -74,13 +74,14 @@ impl WalkAround {
                 mctx.actors[0].start_walk_animation(dir);
 
                 let Actor { grid_x, grid_y, .. } = mctx.actors[0];
+                let c_level_wid = mctx.level.px_wid / TILE_SIZE;
+                let c_level_hei = mctx.level.px_hei / TILE_SIZE;
+
                 if mctx.level.is_edge_blocked(grid_x, grid_y, dir)
                     || npc_actor_at(mctx, grid_x, grid_y, dir).is_some()
                 {
                     mctx.actors[0].stop_walk_animation();
                 } else {
-                    let c_level_wid = mctx.level.px_wid / TILE_SIZE;
-                    let c_level_hei = mctx.level.px_hei / TILE_SIZE;
                     let in_bounds =
                         grid_x >= 0 && grid_x < c_level_wid && grid_y >= 0 && grid_y < c_level_hei;
                     if in_bounds
@@ -92,6 +93,27 @@ impl WalkAround {
                         return WalkAroundEvent::TouchLevelEdge(dir);
                     } else {
                         walk_player(&mut mctx.actors[..], dir, None).await;
+
+                        // slide over ice tiles until level or blocking tile edge is reached
+                        loop {
+                            let Actor { grid_x, grid_y, .. } = mctx.actors[0];
+                            let next_x = grid_x + dir.dx();
+                            let next_y = grid_y + dir.dy();
+                            let next_step_in_bounds = next_x >= 0
+                                && next_x < c_level_wid
+                                && next_y >= 0
+                                && next_y < c_level_hei;
+
+                            if !next_step_in_bounds
+                                || !mctx.level.is_ice_tile(grid_x, grid_y)
+                                || mctx.level.is_edge_blocked(grid_x, grid_y, dir)
+                            {
+                                break;
+                            }
+
+                            mctx.actors[0].stop_walk_animation();
+                            walk_player(&mut mctx.actors[..], dir, None).await;
+                        }
                     }
                 }
             } else {

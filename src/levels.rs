@@ -165,7 +165,21 @@ impl Layer {
         forward_blocked || backward_blocked
     }
 
+    fn is_ice_tile(&self, tile_x: i32, tile_y: i32) -> bool {
+        assert!(self.identifier == "Base");
+
+        if tile_x < 0 || tile_x >= self.c_wid as i32 || tile_y < 0 || tile_y >= self.c_hei as i32 {
+            return false;
+        }
+
+        let offset = 4 * (tile_y as usize * self.c_wid as usize + tile_x as usize);
+        const ICE_TILE: [u8; 2] = [0, 4];
+        self.tile_data[offset..offset + 2] == ICE_TILE
+    }
+
     fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
+        assert!(self.identifier == "Props");
+
         if lever_turned {
             for tile in self.tile_data.chunks_exact_mut(4) {
                 if tile[0] == 1 && tile[1] == 0 {
@@ -278,6 +292,14 @@ impl Level {
         self.layers
             .iter()
             .any(|l| l.is_edge_blocked(tile_x, tile_y, dir))
+    }
+
+    pub fn is_ice_tile(&self, tile_x: i32, tile_y: i32) -> bool {
+        self.layers
+            .iter()
+            .find(|l| l.identifier == "Base")
+            .expect("Base layer")
+            .is_ice_tile(tile_x, tile_y)
     }
 
     pub fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
