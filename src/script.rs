@@ -205,37 +205,19 @@ pub async fn script_main(mut sctx: ScriptContext) {
                                 }
 
                                 ChestType::LongSword => {
-                                    if sctx.progress.maybe_upgrade_weapon("Long Sword", 2) {
-                                        sctx.actors[actor].start_animation("open");
-                                        sctx.push_text_box_mode("Coric found the Long Sword!");
-                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                                        sctx.pop_mode();
-                                        true
-                                    } else {
-                                        sctx.push_text_box_mode(
-                                            "Coric found the Long Sword, but\ndoesn't need it.",
-                                        );
-                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                                        sctx.pop_mode();
-                                        false
-                                    }
+                                    chest_with_weapon(&mut sctx, actor, "Long Sword", 2).await
                                 }
 
                                 ChestType::ChainVest => {
-                                    if sctx.progress.maybe_upgrade_armor("Chain Vest", 2) {
-                                        sctx.actors[actor].start_animation("open");
-                                        sctx.push_text_box_mode("Coric found the Chain Vest!");
-                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                                        sctx.pop_mode();
-                                        true
-                                    } else {
-                                        sctx.push_text_box_mode(
-                                            "Coric found the Chain Vest, but\ndoesn't need it.",
-                                        );
-                                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                                        sctx.pop_mode();
-                                        false
-                                    }
+                                    chest_with_armor(&mut sctx, actor, "Chain Vest", 2).await
+                                }
+
+                                ChestType::DuelistSword => {
+                                    chest_with_weapon(&mut sctx, actor, "Duelist Sword", 3).await
+                                }
+
+                                ChestType::SteelArmor => {
+                                    chest_with_armor(&mut sctx, actor, "Steel Armor", 3).await
                                 }
                             };
 
@@ -363,6 +345,48 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
 
             false
         }
+    }
+}
+
+async fn chest_with_armor(
+    sctx: &mut ScriptContext,
+    chest: usize,
+    name: &'static str,
+    defense: i32,
+) -> bool {
+    sctx.actors[chest].start_animation("open");
+    if sctx.progress.maybe_upgrade_armor(name, defense) {
+        sctx.push_text_box_mode(&format!("Coric found the {name}!"));
+        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+        sctx.pop_mode();
+        true
+    } else {
+        sctx.push_text_box_mode(&format!("Coric found the {name}, but\ndoesn't need it."));
+        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+        sctx.pop_mode();
+        sctx.actors[chest].start_animation("closed");
+        false
+    }
+}
+
+async fn chest_with_weapon(
+    sctx: &mut ScriptContext,
+    chest: usize,
+    name: &'static str,
+    attack: i32,
+) -> bool {
+    sctx.actors[chest].start_animation("open");
+    if sctx.progress.maybe_upgrade_weapon(name, attack) {
+        sctx.push_text_box_mode(&format!("Coric found the {name}!"));
+        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+        sctx.pop_mode();
+        true
+    } else {
+        sctx.push_text_box_mode(&format!("Coric found the {name}, but\ndoesn't need it."));
+        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+        sctx.pop_mode();
+        sctx.actors[chest].start_animation("closed");
+        false
     }
 }
 

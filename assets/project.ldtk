@@ -1538,7 +1538,9 @@
 			{ "id": "FireEdge", "tileRect": null, "color": 12470831 },
 			{ "id": "EarthEdge", "tileRect": null, "color": 4073265 },
 			{ "id": "LongSword", "tileRect": null, "color": 14120515 },
-			{ "id": "ChainVest", "tileRect": null, "color": 15389866 }
+			{ "id": "ChainVest", "tileRect": null, "color": 15389866 },
+			{ "id": "DuelistSword", "tileRect": null, "color": 14984818 },
+			{ "id": "SteelArmor", "tileRect": null, "color": 7552569 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
@@ -18006,6 +18008,25 @@
 							"fieldInstances": [],
 							"__worldX": -1168,
 							"__worldY": -992
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [19,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "4254c4e0-b0a0-11ee-b3f6-6d508f4b22a4",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [304,160],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "DuelistSword", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["DuelistSword"]
+							}] }],
+							"__worldX": -1296,
+							"__worldY": -896
 						}
 					]
 				},
@@ -19186,6 +19207,25 @@
 							"fieldInstances": [],
 							"__worldX": -448,
 							"__worldY": -800
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [14,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "4de71c40-b0a0-11ee-b3f6-371a348a799e",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [224,64],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "SteelArmor", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["SteelArmor"]
+							}] }],
+							"__worldX": -416,
+							"__worldY": -992
 						}
 					]
 				},
