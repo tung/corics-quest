@@ -133,6 +133,63 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             })
         })],
     },
+    LevelScripts {
+        level_name: "Water_4",
+        on_enter: Some(|sctx| {
+            Box::pin(async {
+                if sctx.progress.water_defeated {
+                    let water = sctx
+                        .actors
+                        .iter()
+                        .position(|a| a.identifier == ActorType::Water)
+                        .expect("Water actor");
+                    sctx.actors.remove(water);
+                }
+            })
+        }),
+        on_talk: &[(ActorType::Water, |sctx| {
+            Box::pin(async {
+                sctx.push_text_box_mode("Water:\nI am the Water Spirit.\nPrepare to die!");
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.push_battle_mode(
+                    Enemy {
+                        name: "Water",
+                        sprite_path: "water.png",
+                        hp: 250,
+                        attack: 5,
+                        defense: 5,
+                        weakness: None,
+                        exp: 50,
+                    },
+                    true,
+                );
+
+                let water = sctx
+                    .actors
+                    .iter()
+                    .position(|a| a.identifier == ActorType::Water)
+                    .expect("Water actor");
+                sctx.actors[water].visible = false;
+
+                if !handle_battle(sctx).await {
+                    return;
+                }
+
+                sctx.actors[water].visible = true;
+
+                sctx.push_text_box_mode(
+                    "Water:\nI was... possessed... please...\nsave... the others...",
+                );
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.actors.remove(water);
+                sctx.progress.water_defeated = true;
+            })
+        })],
+    },
 ];
 
 pub async fn script_main(mut sctx: ScriptContext) {

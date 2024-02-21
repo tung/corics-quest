@@ -11,7 +11,7 @@
 	"iid": "00979bb0-b0a0-11ee-b761-dd5714ea4fc9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 110,
+	"nextUid": 112,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -1284,6 +1284,41 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Water",
+			"uid": 111,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#0099DB",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 110,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 110, "x": 0, "y": 0, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 1,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -1525,6 +1560,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "a751" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "Water",
+			"uid": 110,
+			"relPath": "water-small.png",
+			"embedAtlas": null,
+			"pxWid": 16,
+			"pxHei": 16,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "a45b" }
 		}
 	], "enums": [
 		{ "identifier": "EdgeBlocked", "uid": 72, "values": [
@@ -19604,7 +19658,7 @@
 						{ "px": [80,80], "src": [16,16], "f": 0, "t": 5, "d": [205], "a": 1 },
 						{ "px": [96,80], "src": [0,48], "f": 0, "t": 12, "d": [206], "a": 1 },
 						{ "px": [112,80], "src": [16,48], "f": 0, "t": 13, "d": [207], "a": 1 },
-						{ "px": [128,80], "src": [0,96], "f": 0, "t": 24, "d": [208], "a": 1 },
+						{ "px": [128,80], "src": [16,96], "f": 0, "t": 25, "d": [208], "a": 1 },
 						{ "px": [144,80], "src": [16,16], "f": 0, "t": 5, "d": [209], "a": 1 },
 						{ "px": [160,80], "src": [16,16], "f": 0, "t": 5, "d": [210], "a": 1 },
 						{ "px": [176,80], "src": [16,80], "f": 0, "t": 21, "d": [211], "a": 1 },
@@ -20378,7 +20432,24 @@
 					"seed": 4466435,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Water",
+							"__grid": [14,9],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 110, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#0099DB",
+							"iid": "c2991700-b0a0-11ee-afc6-8bfe24cefd87",
+							"width": 16,
+							"height": 16,
+							"defUid": 111,
+							"px": [224,144],
+							"fieldInstances": [],
+							"__worldX": -1056,
+							"__worldY": -1264
+						}
+					]
 				},
 				{
 					"__identifier": "Props",
