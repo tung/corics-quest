@@ -182,18 +182,34 @@ impl Layer {
 
         if lever_turned {
             for tile in self.tile_data.chunks_exact_mut(4) {
-                if tile[0] == 1 && tile[1] == 0 {
-                    // closed door -> open door
-                    tile[0] = 1;
-                    tile[1] = 1;
+                match (tile[0], tile[1]) {
+                    (1, 0) => {
+                        // closed door -> open door
+                        tile[0] = 1;
+                        tile[1] = 1;
+                    }
+                    (3, 2) => {
+                        // lowered spikes -> raised spikes
+                        tile[0] = 3;
+                        tile[1] = 3;
+                    }
+                    _ => {}
                 }
             }
         } else {
             for tile in self.tile_data.chunks_exact_mut(4) {
-                if tile[0] == 1 && tile[1] == 1 {
-                    // open door -> closed door
-                    tile[0] = 1;
-                    tile[1] = 0;
+                match (tile[0], tile[1]) {
+                    (1, 1) => {
+                        // open door -> closed door
+                        tile[0] = 1;
+                        tile[1] = 0;
+                    }
+                    (3, 3) => {
+                        // raised spikes -> lowered spikes
+                        tile[0] = 3;
+                        tile[1] = 2;
+                    }
+                    _ => {}
                 }
             }
         }
