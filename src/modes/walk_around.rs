@@ -107,6 +107,7 @@ impl WalkAround {
                             if !next_step_in_bounds
                                 || !mctx.level.is_ice_tile(grid_x, grid_y)
                                 || mctx.level.is_edge_blocked(grid_x, grid_y, dir)
+                                || npc_actor_at(mctx, grid_x, grid_y, dir).is_some()
                             {
                                 break;
                             }
