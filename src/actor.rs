@@ -33,6 +33,7 @@ pub enum ActorType {
     Matero,
     Earth,
     Water,
+    Fire,
 }
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -154,6 +155,7 @@ impl From<&str> for ActorType {
             "Matero" => Self::Matero,
             "Earth" => Self::Earth,
             "Water" => Self::Water,
+            "Fire" => Self::Fire,
             _ => panic!("unknown actor type: {s}"),
         }
     }

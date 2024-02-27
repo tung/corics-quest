@@ -52,6 +52,7 @@ pub struct Progress {
     pub turned_levers: Vec<String>,
     pub earth_defeated: bool,
     pub water_defeated: bool,
+    pub fire_defeated: bool,
 }
 
 impl Item {
@@ -159,6 +160,7 @@ impl Progress {
             turned_levers: Vec::new(),
             earth_defeated: false,
             water_defeated: false,
+            fire_defeated: false,
         }
     }
 

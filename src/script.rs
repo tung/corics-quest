@@ -190,6 +190,61 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             })
         })],
     },
+    LevelScripts {
+        level_name: "Fire_4",
+        on_enter: Some(|sctx| {
+            Box::pin(async {
+                if sctx.progress.fire_defeated {
+                    let fire = sctx
+                        .actors
+                        .iter()
+                        .position(|a| a.identifier == ActorType::Fire)
+                        .expect("Fire actor");
+                    sctx.actors.remove(fire);
+                }
+            })
+        }),
+        on_talk: &[(ActorType::Fire, |sctx| {
+            Box::pin(async {
+                sctx.push_text_box_mode("Fire:\nI am the Fire Spirit.\nPrepare to die!");
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.push_battle_mode(
+                    Enemy {
+                        name: "Fire",
+                        sprite_path: "fire.png",
+                        hp: 250,
+                        attack: 5,
+                        defense: 5,
+                        weakness: None,
+                        exp: 50,
+                    },
+                    true,
+                );
+
+                let fire = sctx
+                    .actors
+                    .iter()
+                    .position(|a| a.identifier == ActorType::Fire)
+                    .expect("Fire actor");
+                sctx.actors[fire].visible = false;
+
+                if !handle_battle(sctx).await {
+                    return;
+                }
+
+                sctx.actors[fire].visible = true;
+
+                sctx.push_text_box_mode("Fire:\nI was... possessed...\nThank you... Coric...");
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.actors.remove(fire);
+                sctx.progress.fire_defeated = true;
+            })
+        })],
+    },
 ];
 
 pub async fn script_main(mut sctx: ScriptContext) {

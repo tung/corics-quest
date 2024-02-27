@@ -11,7 +11,7 @@
 	"iid": "00979bb0-b0a0-11ee-b761-dd5714ea4fc9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 117,
+	"nextUid": 119,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -1319,6 +1319,41 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Fire",
+			"uid": 118,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#F77622",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 117,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 117, "x": 0, "y": 0, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 1,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -1579,6 +1614,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "a45b" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "Fire",
+			"uid": 117,
+			"relPath": "fire-small.png",
+			"embedAtlas": null,
+			"pxWid": 16,
+			"pxHei": 16,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "ab91" }
 		}
 	], "enums": [
 		{ "identifier": "EdgeBlocked", "uid": 72, "values": [
@@ -28730,7 +28784,24 @@
 					"seed": 3847789,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Fire",
+							"__grid": [20,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 117, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#F77622",
+							"iid": "f9b01820-b0a0-11ee-bbde-cb957a805210",
+							"width": 16,
+							"height": 16,
+							"defUid": 118,
+							"px": [320,96],
+							"fieldInstances": [],
+							"__worldX": 960,
+							"__worldY": -2016
+						}
+					]
 				},
 				{
 					"__identifier": "Props",
