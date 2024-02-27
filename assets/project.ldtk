@@ -1591,6 +1591,7 @@
 		{ "identifier": "ChestType", "uid": 90, "values": [
 			{ "id": "FireEdge", "tileRect": null, "color": 12470831 },
 			{ "id": "EarthEdge", "tileRect": null, "color": 4073265 },
+			{ "id": "WaterEdge", "tileRect": null, "color": 1199753 },
 			{ "id": "LongSword", "tileRect": null, "color": 14120515 },
 			{ "id": "ChainVest", "tileRect": null, "color": 15389866 },
 			{ "id": "DuelistSword", "tileRect": null, "color": 14984818 },
@@ -23832,6 +23833,25 @@
 							"px": [576,192],
 							"fieldInstances": [],
 							"__worldX": 896,
+							"__worldY": -1216
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [23,12],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "7fdc36c0-b0a0-11ee-ad39-a9f784ad2896",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [368,192],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "WaterEdge", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["WaterEdge"]
+							}] }],
+							"__worldX": 688,
 							"__worldY": -1216
 						}
 					]

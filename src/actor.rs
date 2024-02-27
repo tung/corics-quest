@@ -39,6 +39,7 @@ pub enum ActorType {
 pub enum ChestType {
     FireEdge,
     EarthEdge,
+    WaterEdge,
     LongSword,
     ChainVest,
     DuelistSword,
@@ -163,6 +164,7 @@ impl From<&str> for ChestType {
         match s {
             "FireEdge" => Self::FireEdge,
             "EarthEdge" => Self::EarthEdge,
+            "WaterEdge" => Self::WaterEdge,
             "LongSword" => Self::LongSword,
             "ChainVest" => Self::ChainVest,
             "DuelistSword" => Self::DuelistSword,

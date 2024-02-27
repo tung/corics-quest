@@ -261,6 +261,12 @@ pub async fn script_main(mut sctx: ScriptContext) {
                                     true
                                 }
 
+                                ChestType::WaterEdge => {
+                                    sctx.actors[actor].start_animation("open");
+                                    learn_magic(&mut sctx, Magic::WaterEdge).await;
+                                    true
+                                }
+
                                 ChestType::LongSword => {
                                     chest_with_weapon(&mut sctx, actor, "Long Sword", 2).await
                                 }
