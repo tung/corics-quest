@@ -1594,7 +1594,9 @@
 			{ "id": "LongSword", "tileRect": null, "color": 14120515 },
 			{ "id": "ChainVest", "tileRect": null, "color": 15389866 },
 			{ "id": "DuelistSword", "tileRect": null, "color": 14984818 },
-			{ "id": "SteelArmor", "tileRect": null, "color": 7552569 }
+			{ "id": "SteelArmor", "tileRect": null, "color": 7552569 },
+			{ "id": "ValorBlade", "tileRect": null, "color": 16690740 },
+			{ "id": "MythicPlate", "tileRect": null, "color": 16705377 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
@@ -25931,6 +25933,25 @@
 							"fieldInstances": [],
 							"__worldX": 288,
 							"__worldY": -1600
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [25,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "d33171c0-b0a0-11ee-b5a1-a700c58a09f0",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [400,240],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "ValorBlade", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["ValorBlade"]
+							}] }],
+							"__worldX": 400,
+							"__worldY": -1520
 						}
 					]
 				},
@@ -27263,6 +27284,25 @@
 							"fieldInstances": [],
 							"__worldX": 1488,
 							"__worldY": -1680
+						},
+						{
+							"__identifier": "Chest",
+							"__grid": [36,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 88, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#733E39",
+							"iid": "d9b4c5b0-b0a0-11ee-b5a1-998184eaed4a",
+							"width": 16,
+							"height": 16,
+							"defUid": 89,
+							"px": [576,48],
+							"fieldInstances": [{ "__identifier": "ChestType", "__type": "LocalEnum.ChestType", "__value": "MythicPlate", "__tile": null, "defUid": 91, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["MythicPlate"]
+							}] }],
+							"__worldX": 1536,
+							"__worldY": -1712
 						}
 					]
 				},

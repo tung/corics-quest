@@ -276,6 +276,14 @@ pub async fn script_main(mut sctx: ScriptContext) {
                                 ChestType::SteelArmor => {
                                     chest_with_armor(&mut sctx, actor, "Steel Armor", 3).await
                                 }
+
+                                ChestType::ValorBlade => {
+                                    chest_with_weapon(&mut sctx, actor, "Valor Blade", 4).await
+                                }
+
+                                ChestType::MythicPlate => {
+                                    chest_with_armor(&mut sctx, actor, "Mythic Plate", 4).await
+                                }
                             };
 
                         if chest_opened {

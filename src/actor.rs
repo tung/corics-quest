@@ -43,6 +43,8 @@ pub enum ChestType {
     ChainVest,
     DuelistSword,
     SteelArmor,
+    ValorBlade,
+    MythicPlate,
 }
 
 impl Actor {
@@ -165,6 +167,8 @@ impl From<&str> for ChestType {
             "ChainVest" => Self::ChainVest,
             "DuelistSword" => Self::DuelistSword,
             "SteelArmor" => Self::SteelArmor,
+            "ValorBlade" => Self::ValorBlade,
+            "MythicPlate" => Self::MythicPlate,
             _ => panic!("unknown chest type: {s}"),
         }
     }
