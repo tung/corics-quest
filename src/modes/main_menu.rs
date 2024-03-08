@@ -1,6 +1,7 @@
 use crate::async_utils::wait_once;
 use crate::contexts::*;
 use crate::input::*;
+use crate::meter::*;
 use crate::progress::*;
 use crate::resources::*;
 use crate::text::*;
@@ -8,13 +9,33 @@ use crate::window::*;
 
 use miniquad::graphics::GraphicsContext;
 
+const TOP_X: i32 = 47;
+const TOP_Y: i32 = 25;
+const TOP_WIDTH: i32 = 25 * 6 + 16;
+const TOP_HEIGHT: i32 = 3 * 8 + 5 + 16;
+const BOTTOM_X: i32 = TOP_X;
+const BOTTOM_Y: i32 = TOP_Y + TOP_HEIGHT;
+const BOTTOM_WIDTH: i32 = TOP_WIDTH;
+const BOTTOM_HEIGHT: i32 = 8 * 8 + 16;
+const MENU_X: i32 = TOP_X + TOP_WIDTH;
+const MENU_Y: i32 = TOP_Y;
+const MENU_WIDTH: i32 = 60;
+const MENU_HEIGHT: i32 = 56;
+
 pub struct MainMenu {
-    status_window: Window,
-    status_text: Text,
+    top_window: Window,
+    name_text: Text,
+    level_text: Text,
+    exp_meter: Meter,
+    hp_text: Text,
+    hp_meter: Meter,
+    mp_text: Text,
+    mp_meter: Meter,
+    bottom_window: Window,
+    bottom_text: Text,
     menu_window: Window,
     menu_text: Text,
     menu_cursor: Text,
-    selection: i32,
 }
 
 pub enum MainMenuEvent {
@@ -23,89 +44,200 @@ pub enum MainMenuEvent {
 
 impl MainMenu {
     pub fn new(gctx: &mut GraphicsContext, res: &Resources, progress: &Progress) -> Self {
-        let status_window = Window::new(gctx, res, 44, 36, 180, 106);
-        let status_text = Text::from_str(
+        let top_window = Window::new(gctx, res, TOP_X, TOP_Y, TOP_WIDTH, TOP_HEIGHT);
+        let name_text = Text::from_str(
             gctx,
             res,
-            52,
-            44,
+            TOP_X + 8,
+            TOP_Y + 8,
             &format!(
-                "Coric\n\
-                 \n\
-                 Level: {}\n\
-                 HP: {} / {}\n\
-                 MP: {} / {}\n\
-                 Attack: {}\n\
-                 Defense: {}\n\
-                 Experience: {}\n\
-                 Next Level: {}\n\
-                 {}\n\
-                 {}",
-                progress.level,
-                progress.hp,
-                progress.max_hp,
-                progress.mp,
-                progress.max_mp,
-                progress.attack,
-                progress.defense,
-                progress.exp,
-                progress.next_exp,
-                progress
-                    .weapon
-                    .as_ref()
-                    .map(|w| w.name.as_str())
-                    .unwrap_or(""),
-                progress
-                    .armor
-                    .as_ref()
-                    .map(|a| a.name.as_str())
-                    .unwrap_or(""),
+                "Coric\n {:^11}",
+                if progress.level <= 7 {
+                    "Fighter"
+                } else if progress.level <= 14 {
+                    "Warrior"
+                } else if progress.level <= 21 {
+                    "Knight"
+                } else if progress.level <= 29 {
+                    "Valor Guard"
+                } else {
+                    "Blademaster"
+                },
             ),
         );
-        let menu_window = Window::new(gctx, res, 234, 36, 60, 56);
-        let menu_text = Text::from_str(gctx, res, 248, 44, "RETURN\n\nMAGIC\n\nITEM");
-        let menu_cursor = Text::from_str(gctx, res, 240, 44, "►");
+        let level_text = Text::from_str(
+            gctx,
+            res,
+            TOP_X + 8,
+            TOP_Y + 8 + 2 * 8,
+            &format!("Level {}", progress.level),
+        );
+        // TODO: Show experience progress towards next level.
+        let exp_meter = Meter::new(
+            gctx,
+            res,
+            TOP_X + 8,
+            TOP_Y + 8 + 3 * 8 + 1,
+            12 * 6,
+            [255, 128, 50],
+            1,
+        );
+        let hp_text = Text::from_str(
+            gctx,
+            res,
+            TOP_X + 8 + 13 * 6,
+            TOP_Y + 8,
+            &format!("HP {:>3} / {:>3}", progress.hp, progress.max_hp),
+        );
+        let hp_meter = Meter::new(
+            gctx,
+            res,
+            TOP_X + 8 + 13 * 6,
+            TOP_Y + 8 + 8 + 1,
+            12 * 6,
+            [0, 192, 0],
+            progress.max_hp,
+        );
+        let mp_text = Text::from_str(
+            gctx,
+            res,
+            TOP_X + 8 + 13 * 6,
+            TOP_Y + 8 + 2 * 8,
+            &format!("MP {:>3} / {:>3}", progress.mp, progress.max_mp),
+        );
+        let mp_meter = Meter::new(
+            gctx,
+            res,
+            TOP_X + 8 + 13 * 6,
+            TOP_Y + 8 + 3 * 8 + 1,
+            12 * 6,
+            [0, 192, 192],
+            progress.max_mp,
+        );
+
+        let bottom_window = Window::new(gctx, res, BOTTOM_X, BOTTOM_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT);
+        let bottom_text = Text::new(res, BOTTOM_X + 8, BOTTOM_Y + 8);
+
+        let menu_window = Window::new(gctx, res, MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT);
+        let menu_text = Text::from_str(
+            gctx,
+            res,
+            MENU_X + 14,
+            MENU_Y + 8,
+            "Return\n\nMagic\n\nItem",
+        );
+        let menu_cursor = Text::from_str(gctx, res, MENU_X + 8, MENU_Y + 8, "►");
 
         Self {
-            status_window,
-            status_text,
+            top_window,
+            name_text,
+            level_text,
+            exp_meter,
+            hp_text,
+            hp_meter,
+            mp_text,
+            mp_meter,
+            bottom_window,
+            bottom_text,
             menu_window,
             menu_text,
             menu_cursor,
-            selection: 0,
         }
     }
 
     pub fn draw(&self, dctx: &mut DrawContext) {
-        self.status_window.draw(dctx.gctx);
-        self.status_text.draw(dctx.gctx);
+        self.top_window.draw(dctx.gctx);
+        self.name_text.draw(dctx.gctx);
+        self.level_text.draw(dctx.gctx);
+        self.exp_meter.draw(dctx.gctx);
+        self.hp_text.draw(dctx.gctx);
+        self.hp_meter.draw(dctx.gctx);
+        self.mp_text.draw(dctx.gctx);
+        self.mp_meter.draw(dctx.gctx);
+
+        self.bottom_window.draw(dctx.gctx);
+        self.bottom_text.draw(dctx.gctx);
+
         self.menu_window.draw(dctx.gctx);
         self.menu_text.draw(dctx.gctx);
         self.menu_cursor.draw(dctx.gctx);
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> MainMenuEvent {
+        self.update_hp_and_mp(mctx);
+        self.update_bottom_text_for_status(mctx);
+
+        let mut selection = 0;
+
         loop {
             wait_once().await;
 
-            if (mctx.input.is_key_pressed(GameKey::Confirm) && self.selection == 0)
-                || mctx.input.is_key_pressed(GameKey::Cancel)
-            {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
                 return MainMenuEvent::Done;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if selection == 0 {
+                    return MainMenuEvent::Done;
+                }
+                self.update_bottom_text_for_status(mctx);
             } else if mctx.input.is_key_pressed(GameKey::Up) {
-                if self.selection == 0 {
-                    self.selection = 2;
+                if selection == 0 {
+                    selection = 2;
                 } else {
-                    self.selection -= 1;
+                    selection -= 1;
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
-                if self.selection == 2 {
-                    self.selection = 0;
+                if selection == 2 {
+                    selection = 0;
                 } else {
-                    self.selection += 1;
+                    selection += 1;
                 }
             }
-            self.menu_cursor.set_offset(240, 44 + 16 * self.selection);
+            self.menu_cursor
+                .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * selection);
         }
+    }
+
+    fn update_bottom_text_for_status(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.bottom_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!(
+                "    Weapon:{:>14}\
+               \n    Attack:{:>14}\
+             \n\n     Armor:{:>14}\
+               \n   Defense:{:>14}\
+             \n\nExperience:{:>14}\
+               \nNext Level:{:>14}",
+                mctx.progress
+                    .weapon
+                    .as_ref()
+                    .map(|w| w.name.as_str())
+                    .unwrap_or("(none)"),
+                mctx.progress.attack,
+                mctx.progress
+                    .armor
+                    .as_ref()
+                    .map(|a| a.name.as_str())
+                    .unwrap_or("(none)"),
+                mctx.progress.defense,
+                mctx.progress.exp,
+                mctx.progress.next_exp,
+            ),
+        );
+    }
+
+    fn update_hp_and_mp(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.hp_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!("HP {:>3} / {:>3}", mctx.progress.hp, mctx.progress.max_hp),
+        );
+        self.hp_meter.set_value(mctx.gctx, mctx.progress.hp);
+        self.mp_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!("MP {:>3} / {:>3}", mctx.progress.mp, mctx.progress.max_mp),
+        );
+        self.mp_meter.set_value(mctx.gctx, mctx.progress.mp);
     }
 }
