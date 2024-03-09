@@ -33,6 +33,9 @@ pub struct MainMenu {
     mp_meter: Meter,
     bottom_window: Window,
     bottom_text: Text,
+    bottom_line: Text,
+    bottom_cursor: Text,
+    bottom_cursor_visible: bool,
     menu_window: Window,
     menu_text: Text,
     menu_cursor: Text,
@@ -117,6 +120,8 @@ impl MainMenu {
 
         let bottom_window = Window::new(gctx, res, BOTTOM_X, BOTTOM_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT);
         let bottom_text = Text::new(res, BOTTOM_X + 8, BOTTOM_Y + 8);
+        let bottom_line = Text::new(res, BOTTOM_X + 8 + 6, BOTTOM_Y + BOTTOM_HEIGHT - 8 - 8);
+        let bottom_cursor = Text::from_str(gctx, res, BOTTOM_X + 8, BOTTOM_Y + 8, "►");
 
         let menu_window = Window::new(gctx, res, MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT);
         let menu_text = Text::from_str(
@@ -139,6 +144,9 @@ impl MainMenu {
             mp_meter,
             bottom_window,
             bottom_text,
+            bottom_line,
+            bottom_cursor,
+            bottom_cursor_visible: false,
             menu_window,
             menu_text,
             menu_cursor,
@@ -157,10 +165,77 @@ impl MainMenu {
 
         self.bottom_window.draw(dctx.gctx);
         self.bottom_text.draw(dctx.gctx);
+        self.bottom_line.draw(dctx.gctx);
+        if self.bottom_cursor_visible {
+            self.bottom_cursor.draw(dctx.gctx);
+        }
 
         self.menu_window.draw(dctx.gctx);
         self.menu_text.draw(dctx.gctx);
         self.menu_cursor.draw(dctx.gctx);
+    }
+
+    async fn magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.update_bottom_text_for_magic_menu(mctx);
+
+        let mut selection = 0;
+
+        self.bottom_cursor_visible = true;
+        self.place_bottom_cursor(selection);
+
+        loop {
+            wait_once().await;
+
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                return;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if selection == 0 {
+                    return;
+                } else {
+                    let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
+                    let magic_slot = &mctx.progress.magic[choice];
+                    if magic_slot.known
+                        && matches!(magic_slot.magic, Magic::Heal)
+                        && mctx.progress.mp >= magic_slot.magic.mp_cost()
+                        && mctx.progress.hp < mctx.progress.max_hp
+                    {
+                        mctx.progress.mp -= magic_slot.magic.mp_cost();
+                        let heal_amount = (mctx.progress.max_hp + 1) / 2;
+                        mctx.progress.hp = mctx.progress.max_hp.min(mctx.progress.hp + heal_amount);
+                        self.update_hp_and_mp(mctx);
+                    }
+                }
+            } else if mctx.input.is_key_pressed(GameKey::Up) {
+                if selection == 0 {
+                    selection = 4;
+                } else {
+                    selection -= 1;
+                }
+                self.place_bottom_cursor(selection);
+                self.update_bottom_line_for_magic_menu(mctx, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Down) {
+                if selection == 4 {
+                    selection = 0;
+                } else {
+                    selection += 1;
+                }
+                self.place_bottom_cursor(selection);
+                self.update_bottom_line_for_magic_menu(mctx, selection);
+            }
+        }
+    }
+
+    fn place_bottom_cursor(&mut self, selection: i32) {
+        self.bottom_cursor.set_offset(
+            BOTTOM_X + 8,
+            BOTTOM_Y
+                + 8
+                + if selection == 0 {
+                    0
+                } else {
+                    (selection + 1) * 8
+                },
+        );
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> MainMenuEvent {
@@ -175,10 +250,15 @@ impl MainMenu {
             if mctx.input.is_key_pressed(GameKey::Cancel) {
                 return MainMenuEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
-                if selection == 0 {
-                    return MainMenuEvent::Done;
+                match selection {
+                    0 => return MainMenuEvent::Done,
+                    1 => self.magic_menu(mctx).await,
+                    2 => todo!("item menu"),
+                    _ => unreachable!(),
                 }
                 self.update_bottom_text_for_status(mctx);
+                self.bottom_line.set_text(mctx.gctx, mctx.res, "");
+                self.bottom_cursor_visible = false;
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 if selection == 0 {
                     selection = 2;
@@ -195,6 +275,37 @@ impl MainMenu {
             self.menu_cursor
                 .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * selection);
         }
+    }
+
+    fn update_bottom_line_for_magic_menu(
+        &mut self,
+        mctx: &mut ModeContext<'_, '_>,
+        selection: i32,
+    ) {
+        self.bottom_line.set_text(
+            mctx.gctx,
+            mctx.res,
+            if selection == 0 {
+                ""
+            } else {
+                let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
+                mctx.progress.magic[choice].description()
+            },
+        );
+    }
+
+    fn update_bottom_text_for_magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.bottom_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!(
+                " Back\n\n {:23.23}\n {:23.23}\n {:23.23}\n {:23.23}",
+                mctx.progress.magic[0].main_menu_entry(),
+                mctx.progress.magic[1].main_menu_entry(),
+                mctx.progress.magic[2].main_menu_entry(),
+                mctx.progress.magic[3].main_menu_entry(),
+            ),
+        );
     }
 
     fn update_bottom_text_for_status(&mut self, mctx: &mut ModeContext<'_, '_>) {

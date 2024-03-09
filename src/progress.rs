@@ -77,6 +77,15 @@ impl ItemSlot {
 }
 
 impl Magic {
+    fn description(self) -> &'static str {
+        match self {
+            Self::Heal => "Heals 50% of max HP.",
+            Self::EarthEdge => "Deals earth damage.",
+            Self::WaterEdge => "Deals water damage.",
+            Self::FireEdge => "Deals fire damage.",
+        }
+    }
+
     pub fn name(self) -> &'static str {
         match self {
             Self::Heal => "Heal",
@@ -100,6 +109,22 @@ impl MagicSlot {
     pub fn battle_menu_entry(&self) -> String {
         if self.known {
             format!("{:9.9}{:2}MP", self.magic.name(), self.magic.mp_cost())
+        } else {
+            String::new()
+        }
+    }
+
+    pub fn description(&self) -> &'static str {
+        if self.known {
+            self.magic.description()
+        } else {
+            ""
+        }
+    }
+
+    pub fn main_menu_entry(&self) -> String {
+        if self.known {
+            format!("{:18.18}{:2} MP", self.magic.name(), self.magic.mp_cost())
         } else {
             String::new()
         }
