@@ -175,6 +175,80 @@ impl MainMenu {
         self.menu_cursor.draw(dctx.gctx);
     }
 
+    async fn item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.update_bottom_text_for_item_menu(mctx);
+
+        let mut selection = 0;
+
+        self.bottom_cursor_visible = true;
+        self.place_bottom_cursor(selection);
+
+        loop {
+            wait_once().await;
+
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                return;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if selection == 0 {
+                    return;
+                } else {
+                    let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
+                    if mctx.progress.items[choice].amount > 0 {
+                        match mctx.progress.items[choice].item {
+                            Item::Salve => {
+                                if mctx.progress.hp < mctx.progress.max_hp {
+                                    mctx.progress.items[choice].amount -= 1;
+                                    let heal_hp = (mctx.progress.max_hp * 3 + 9) / 10;
+                                    mctx.progress.hp =
+                                        mctx.progress.max_hp.min(mctx.progress.hp + heal_hp);
+                                }
+                            }
+                            Item::XSalve => {
+                                if mctx.progress.hp < mctx.progress.max_hp {
+                                    mctx.progress.items[choice].amount -= 1;
+                                    mctx.progress.hp = mctx.progress.max_hp;
+                                }
+                            }
+                            Item::Tonic => {
+                                if mctx.progress.mp < mctx.progress.max_mp {
+                                    mctx.progress.items[choice].amount -= 1;
+                                    let heal_mp = (mctx.progress.max_mp * 3 + 9) / 10;
+                                    mctx.progress.mp =
+                                        mctx.progress.max_mp.min(mctx.progress.mp + heal_mp);
+                                }
+                            }
+                            Item::XTonic => {
+                                if mctx.progress.mp < mctx.progress.max_mp {
+                                    mctx.progress.items[choice].amount -= 1;
+                                    mctx.progress.mp = mctx.progress.max_mp;
+                                }
+                            }
+                        }
+                        self.update_hp_and_mp(mctx);
+                        self.update_bottom_text_for_item_menu(mctx);
+                        self.update_bottom_line_for_item_menu(mctx, selection);
+                    }
+                }
+            } else if mctx.input.is_key_pressed(GameKey::Up) {
+                if selection == 0 {
+                    selection = 4;
+                } else {
+                    selection -= 1;
+                }
+                self.place_bottom_cursor(selection);
+                self.update_bottom_line_for_item_menu(mctx, selection);
+            } else if mctx.input.is_key_pressed(GameKey::Down) {
+                if selection == 4 {
+                    selection = 0;
+                } else {
+                    selection += 1;
+                }
+                self.place_bottom_cursor(selection);
+                self.update_bottom_line_for_item_menu(mctx, selection);
+            }
+        }
+    }
+
     async fn magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
         self.update_bottom_text_for_magic_menu(mctx);
 
@@ -253,7 +327,7 @@ impl MainMenu {
                 match selection {
                     0 => return MainMenuEvent::Done,
                     1 => self.magic_menu(mctx).await,
-                    2 => todo!("item menu"),
+                    2 => self.item_menu(mctx).await,
                     _ => unreachable!(),
                 }
                 self.update_bottom_text_for_status(mctx);
@@ -277,6 +351,19 @@ impl MainMenu {
         }
     }
 
+    fn update_bottom_line_for_item_menu(&mut self, mctx: &mut ModeContext<'_, '_>, selection: i32) {
+        self.bottom_line.set_text(
+            mctx.gctx,
+            mctx.res,
+            if selection == 0 {
+                ""
+            } else {
+                let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
+                mctx.progress.items[choice].description()
+            },
+        );
+    }
+
     fn update_bottom_line_for_magic_menu(
         &mut self,
         mctx: &mut ModeContext<'_, '_>,
@@ -291,6 +378,20 @@ impl MainMenu {
                 let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
                 mctx.progress.magic[choice].description()
             },
+        );
+    }
+
+    fn update_bottom_text_for_item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        self.bottom_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            &format!(
+                " Back\n\n {:23.23}\n {:23.23}\n {:23.23}\n {:23.23}",
+                mctx.progress.items[0].main_menu_entry(),
+                mctx.progress.items[1].main_menu_entry(),
+                mctx.progress.items[2].main_menu_entry(),
+                mctx.progress.items[3].main_menu_entry(),
+            ),
         );
     }
 

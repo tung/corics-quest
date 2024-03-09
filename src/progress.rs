@@ -56,6 +56,15 @@ pub struct Progress {
 }
 
 impl Item {
+    fn description(self) -> &'static str {
+        match self {
+            Self::Salve => "Heals 30% of max HP.",
+            Self::XSalve => "Heals all HP.",
+            Self::Tonic => "Restores 30% of max MP.",
+            Self::XTonic => "Restores all MP.",
+        }
+    }
+
     pub fn name(self) -> &'static str {
         match self {
             Self::Salve => "Salve",
@@ -67,9 +76,25 @@ impl Item {
 }
 
 impl ItemSlot {
+    pub fn description(&self) -> &'static str {
+        if self.amount > 0 {
+            self.item.description()
+        } else {
+            ""
+        }
+    }
+
     pub fn battle_menu_entry(&self) -> String {
         if self.amount > 0 {
             format!("{:9.9}{:2}", self.item.name(), self.amount)
+        } else {
+            String::new()
+        }
+    }
+
+    pub fn main_menu_entry(&self) -> String {
+        if self.amount > 0 {
+            format!("{:16.16} {:2} / 9", self.item.name(), self.amount)
         } else {
             String::new()
         }
