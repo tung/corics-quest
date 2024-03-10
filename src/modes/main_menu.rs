@@ -75,16 +75,16 @@ impl MainMenu {
             TOP_Y + 8 + 2 * 8,
             &format!("Level {}", progress.level),
         );
-        // TODO: Show experience progress towards next level.
-        let exp_meter = Meter::new(
+        let mut exp_meter = Meter::new(
             gctx,
             res,
             TOP_X + 8,
             TOP_Y + 8 + 3 * 8 + 1,
             12 * 6,
             [255, 128, 50],
-            1,
+            progress.next_exp,
         );
+        exp_meter.set_value(gctx, progress.exp);
         let hp_text = Text::from_str(
             gctx,
             res,
