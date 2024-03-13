@@ -10,6 +10,7 @@ pub struct WalkAround;
 
 pub enum WalkAroundEvent {
     DebugQuit,
+    DebugLevelUp,
     Encounter,
     MainMenu,
     TalkActor(usize),
@@ -137,6 +138,8 @@ impl WalkAround {
                     return WalkAroundEvent::MainMenu;
                 } else if mctx.input.is_key_pressed(GameKey::DebugBattle) {
                     return WalkAroundEvent::Encounter;
+                } else if mctx.input.is_key_pressed(GameKey::DebugLevelUp) {
+                    return WalkAroundEvent::DebugLevelUp;
                 }
             }
         }

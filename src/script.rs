@@ -259,6 +259,20 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.pop_mode(); // WalkAround
                 return;
             }
+            WalkAroundEvent::DebugLevelUp => {
+                sctx.progress.level += 1;
+                sctx.progress.exp = 0;
+                sctx.progress.next_exp = sctx.progress.next_exp * 3 / 2;
+                sctx.progress.max_hp += 30;
+                sctx.progress.hp += 30;
+                sctx.progress.max_mp += 2;
+                sctx.progress.mp += 2;
+                sctx.progress.attack += 2;
+                sctx.progress.defense += 2;
+                sctx.push_text_box_mode(&format!("Coric is now level {}!", sctx.progress.level));
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+            }
             WalkAroundEvent::Encounter => {
                 if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
                     sctx.push_battle_mode(enemy, false);

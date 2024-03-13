@@ -4,6 +4,7 @@ use miniquad::KeyCode;
 pub enum GameKey {
     DebugQuit,
     DebugBattle,
+    DebugLevelUp,
     Up,
     Down,
     Left,
@@ -28,6 +29,7 @@ impl TryFrom<KeyCode> for GameKey {
         Ok(match value {
             KeyCode::Q => Self::DebugQuit,
             KeyCode::B => Self::DebugBattle,
+            KeyCode::L => Self::DebugLevelUp,
             KeyCode::Up => Self::Up,
             KeyCode::Down => Self::Down,
             KeyCode::Left => Self::Left,
