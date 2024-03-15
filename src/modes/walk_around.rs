@@ -11,6 +11,7 @@ pub struct WalkAround;
 pub enum WalkAroundEvent {
     DebugQuit,
     DebugLevelUp,
+    DebugSteps(i32),
     Encounter,
     MainMenu,
     TalkActor(usize),
@@ -95,6 +96,8 @@ impl WalkAround {
                     } else {
                         walk_player(&mut mctx.actors[..], dir, None).await;
 
+                        **mctx.steps += 1;
+
                         // slide over ice tiles until level or blocking tile edge is reached
                         loop {
                             let Actor { grid_x, grid_y, .. } = mctx.actors[0];
@@ -140,6 +143,10 @@ impl WalkAround {
                     return WalkAroundEvent::Encounter;
                 } else if mctx.input.is_key_pressed(GameKey::DebugLevelUp) {
                     return WalkAroundEvent::DebugLevelUp;
+                } else if mctx.input.is_key_pressed(GameKey::DebugSteps) {
+                    let steps = **mctx.steps;
+                    **mctx.steps = 0;
+                    return WalkAroundEvent::DebugSteps(steps);
                 }
             }
         }

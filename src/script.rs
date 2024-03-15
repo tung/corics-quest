@@ -273,6 +273,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
             }
+            WalkAroundEvent::DebugSteps(steps) => {
+                sctx.push_text_box_mode(&format!("Coric has taken {steps} steps."));
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+            }
             WalkAroundEvent::Encounter => {
                 if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
                     sctx.push_battle_mode(enemy, false);

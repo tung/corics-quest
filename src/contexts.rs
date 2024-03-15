@@ -23,6 +23,7 @@ macro_rules! update_mode {
                     level: &mut self.level,
                     actors: &mut self.actors,
                     fade: &mut self.fade,
+                    steps: &mut self.steps,
                 })
                 .await
         }
@@ -43,6 +44,7 @@ pub struct ModeContext<'a, 'g> {
     pub level: &'a mut SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
     pub fade: &'a mut SharedMut<[f32; 4]>,
+    pub steps: &'a mut SharedMut<i32>,
 }
 
 /// Code that polls async code should use this by moving a clone of it into the async code.
@@ -56,6 +58,7 @@ pub struct ScriptContext {
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
     pub fade: SharedMut<[f32; 4]>,
+    pub steps: SharedMut<i32>,
 }
 
 impl ScriptContext {
@@ -74,6 +77,7 @@ impl ScriptContext {
             level: SharedMut::new(level),
             actors: SharedMut::new(actors),
             fade: SharedMut::new([0.0; 4]),
+            steps: SharedMut::new(0),
         }
     }
 
@@ -91,6 +95,7 @@ impl ScriptContext {
             level: SharedMut::clone(&this.level),
             actors: SharedMut::clone(&this.actors),
             fade: SharedMut::clone(&this.fade),
+            steps: SharedMut::clone(&this.steps),
         }
     }
 
