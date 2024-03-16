@@ -52,7 +52,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     sctx.push_text_box_mode("Julis:\nHi Coric!");
                     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                     sctx.pop_mode();
-                    if sctx.progress.maybe_upgrade_armor("Leather Armor", 1) {
+                    if sctx.progress.maybe_upgrade_armor("Leather Armor", 2) {
                         sctx.push_text_box_mode("Julis:\nHere's your Leather Armor.");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
@@ -67,7 +67,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     sctx.push_text_box_mode("Matero:\nNice cape!");
                     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                     sctx.pop_mode();
-                    if sctx.progress.maybe_upgrade_weapon("Short Sword", 1) {
+                    if sctx.progress.maybe_upgrade_weapon("Short Sword", 2) {
                         sctx.push_text_box_mode("Matero:\nHere's your Short Sword.");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
@@ -342,27 +342,27 @@ pub async fn script_main(mut sctx: ScriptContext) {
                                 }
 
                                 ChestType::LongSword => {
-                                    chest_with_weapon(&mut sctx, actor, "Long Sword", 2).await
+                                    chest_with_weapon(&mut sctx, actor, "Long Sword", 7).await
                                 }
 
                                 ChestType::ChainVest => {
-                                    chest_with_armor(&mut sctx, actor, "Chain Vest", 2).await
+                                    chest_with_armor(&mut sctx, actor, "Chain Vest", 7).await
                                 }
 
                                 ChestType::DuelistSword => {
-                                    chest_with_weapon(&mut sctx, actor, "Duelist Sword", 3).await
+                                    chest_with_weapon(&mut sctx, actor, "Duelist Sword", 13).await
                                 }
 
                                 ChestType::SteelArmor => {
-                                    chest_with_armor(&mut sctx, actor, "Steel Armor", 3).await
+                                    chest_with_armor(&mut sctx, actor, "Steel Armor", 13).await
                                 }
 
                                 ChestType::ValorBlade => {
-                                    chest_with_weapon(&mut sctx, actor, "Valor Blade", 4).await
+                                    chest_with_weapon(&mut sctx, actor, "Valor Blade", 25).await
                                 }
 
                                 ChestType::MythicPlate => {
-                                    chest_with_armor(&mut sctx, actor, "Mythic Plate", 4).await
+                                    chest_with_armor(&mut sctx, actor, "Mythic Plate", 25).await
                                 }
                             };
 
