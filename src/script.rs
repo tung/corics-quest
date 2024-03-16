@@ -285,11 +285,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     sctx.push_battle_mode(
                         Enemy {
                             name: "Debug Foe",
-                            sprite_path: "water.png",
-                            hp: 3280,
-                            attack: 41,
-                            defense: 38,
-                            weakness: Some(Magic::FireEdge),
+                            sprite_path: "fire.png",
+                            hp: 10000,
+                            attack: 77,
+                            defense: 74,
+                            weakness: Some(Magic::WaterEdge),
                             exp: 5,
                         },
                         false,
