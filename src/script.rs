@@ -265,10 +265,10 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.progress.next_exp = sctx.progress.next_exp * 3 / 2;
                 sctx.progress.max_hp += 30;
                 sctx.progress.hp += 30;
-                sctx.progress.max_mp += 2;
-                sctx.progress.mp += 2;
-                sctx.progress.attack += 2;
-                sctx.progress.defense += 2;
+                sctx.progress.max_mp += 1;
+                sctx.progress.mp += 1;
+                sctx.progress.attack += 3;
+                sctx.progress.defense += 3;
                 sctx.push_text_box_mode(&format!("Coric is now level {}!", sctx.progress.level));
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
@@ -284,11 +284,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 } else {
                     sctx.push_battle_mode(
                         Enemy {
-                            name: "Debug Rat",
-                            sprite_path: "rat.png",
-                            hp: 52,
-                            attack: 5,
-                            defense: 5,
+                            name: "Debug Foe",
+                            sprite_path: "earth.png",
+                            hp: 1150,
+                            attack: 23,
+                            defense: 20,
                             weakness: Some(Magic::FireEdge),
                             exp: 5,
                         },
