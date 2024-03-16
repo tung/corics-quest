@@ -122,10 +122,10 @@ impl Magic {
 
     pub fn mp_cost(self) -> i32 {
         match self {
-            Self::Heal => 5,
-            Self::EarthEdge => 2,
-            Self::WaterEdge => 2,
-            Self::FireEdge => 2,
+            Self::Heal => 4,
+            Self::EarthEdge => 1,
+            Self::WaterEdge => 1,
+            Self::FireEdge => 1,
         }
     }
 }
