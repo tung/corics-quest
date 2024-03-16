@@ -267,8 +267,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.progress.hp += 30;
                 sctx.progress.max_mp += 1;
                 sctx.progress.mp += 1;
-                sctx.progress.attack += 3;
-                sctx.progress.defense += 3;
+                sctx.progress.attack += 2;
+                sctx.progress.defense += 2;
                 sctx.push_text_box_mode(&format!("Coric is now level {}!", sctx.progress.level));
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
