@@ -482,6 +482,7 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
             run_level_on_enter(sctx).await;
 
             sctx.progress.hp = sctx.progress.max_hp;
+            sctx.progress.mp = sctx.progress.max_mp;
             sctx.fade_in(90).await;
 
             sctx.push_text_box_mode("Coric:\nOuch!");
