@@ -278,6 +278,69 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
             }
+            WalkAroundEvent::DebugEquip(equipment_set) => {
+                let weapon = match equipment_set {
+                    1 => Weapon {
+                        name: String::from("Short Sword"),
+                        attack: 2,
+                    },
+                    2 => Weapon {
+                        name: String::from("Long Sword"),
+                        attack: 7,
+                    },
+                    3 => Weapon {
+                        name: String::from("Duelist Sword"),
+                        attack: 13,
+                    },
+                    4 => Weapon {
+                        name: String::from("Valor Blade"),
+                        attack: 25,
+                    },
+                    _ => unreachable!(),
+                };
+                let armor = match equipment_set {
+                    1 => Armor {
+                        name: String::from("Leather Armor"),
+                        defense: 2,
+                    },
+                    2 => Armor {
+                        name: String::from("Chain Vest"),
+                        defense: 7,
+                    },
+                    3 => Armor {
+                        name: String::from("Steel Armor"),
+                        defense: 13,
+                    },
+                    4 => Armor {
+                        name: String::from("Mythic Plate"),
+                        defense: 25,
+                    },
+                    _ => unreachable!(),
+                };
+                sctx.progress.attack +=
+                    weapon.attack - sctx.progress.weapon.as_ref().map(|w| w.attack).unwrap_or(0);
+                sctx.progress.defense +=
+                    armor.defense - sctx.progress.armor.as_ref().map(|a| a.defense).unwrap_or(0);
+                sctx.progress.weapon = Some(weapon);
+                sctx.progress.armor = Some(armor);
+
+                sctx.push_text_box_mode(&format!("Coric uses equipment set {equipment_set}."));
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+            }
+            WalkAroundEvent::DebugBattle(encounter_group) => {
+                let group = match encounter_group {
+                    1 => EncounterGroup::Wilderness1,
+                    2 => EncounterGroup::EarthCastle,
+                    3 => EncounterGroup::Wilderness2,
+                    4 => EncounterGroup::WaterCastle,
+                    5 => EncounterGroup::Wilderness3,
+                    6 => EncounterGroup::FireCastle,
+                    _ => unreachable!(),
+                };
+                sctx.push_battle_mode(group.random_enemy(), false);
+                handle_battle(&mut sctx).await;
+            }
             WalkAroundEvent::Encounter => {
                 if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
                     sctx.push_battle_mode(enemy, false);

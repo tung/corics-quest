@@ -12,6 +12,8 @@ pub enum WalkAroundEvent {
     DebugQuit,
     DebugLevelUp,
     DebugSteps(i32),
+    DebugEquip(i32),
+    DebugBattle(i32),
     Encounter,
     MainMenu,
     TalkActor(usize),
@@ -147,6 +149,26 @@ impl WalkAround {
                     let steps = **mctx.steps;
                     **mctx.steps = 0;
                     return WalkAroundEvent::DebugSteps(steps);
+                } else if mctx.input.is_key_pressed(GameKey::DebugEquip1) {
+                    return WalkAroundEvent::DebugEquip(1);
+                } else if mctx.input.is_key_pressed(GameKey::DebugEquip2) {
+                    return WalkAroundEvent::DebugEquip(2);
+                } else if mctx.input.is_key_pressed(GameKey::DebugEquip3) {
+                    return WalkAroundEvent::DebugEquip(3);
+                } else if mctx.input.is_key_pressed(GameKey::DebugEquip4) {
+                    return WalkAroundEvent::DebugEquip(4);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle1) {
+                    return WalkAroundEvent::DebugBattle(1);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle2) {
+                    return WalkAroundEvent::DebugBattle(2);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle3) {
+                    return WalkAroundEvent::DebugBattle(3);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle4) {
+                    return WalkAroundEvent::DebugBattle(4);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle5) {
+                    return WalkAroundEvent::DebugBattle(5);
+                } else if mctx.input.is_key_pressed(GameKey::DebugBattle6) {
+                    return WalkAroundEvent::DebugBattle(6);
                 }
             }
         }
