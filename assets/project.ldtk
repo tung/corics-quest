@@ -1641,7 +1641,14 @@
 			{ "id": "South", "tileRect": null, "color": 39387 },
 			{ "id": "West", "tileRect": null, "color": 16705377 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "EncounterGroup", "uid": 83, "values": [{ "id": "Forest1", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "EncounterGroup", "uid": 83, "values": [
+			{ "id": "Wilderness1", "tileRect": null, "color": 6539085 },
+			{ "id": "Wilderness2", "tileRect": null, "color": 4098376 },
+			{ "id": "Wilderness3", "tileRect": null, "color": 2513986 },
+			{ "id": "EarthCastle", "tileRect": null, "color": 14984818 },
+			{ "id": "WaterCastle", "tileRect": null, "color": 1199753 },
+			{ "id": "FireCastle", "tileRect": null, "color": 16217634 }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "ChestType", "uid": 90, "values": [
 			{ "id": "FireEdge", "tileRect": null, "color": 12470831 },
 			{ "id": "EarthEdge", "tileRect": null, "color": 4073265 },
@@ -3614,9 +3621,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Forest1"]
+				"params": ["Wilderness1"]
 			}] }],
 			"layerInstances": [
 				{
@@ -5382,9 +5389,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Forest1"]
+				"params": ["Wilderness1"]
 			}] }],
 			"layerInstances": [
 				{
@@ -7500,9 +7507,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Forest1"]
+				"params": ["Wilderness1"]
 			}] }],
 			"layerInstances": [
 				{
@@ -8465,9 +8472,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Forest1"]
+				"params": ["Wilderness1"]
 			}] }],
 			"layerInstances": [
 				{
@@ -9288,9 +9295,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Forest1", "__tile": null, "defUid": 84, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Forest1"]
+				"params": ["EarthCastle"]
 			}] }],
 			"layerInstances": [
 				{
@@ -10053,7 +10060,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["EarthCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -11449,7 +11459,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["EarthCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -12876,7 +12889,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["EarthCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -14266,7 +14282,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Wilderness2"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -15809,7 +15828,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Wilderness2"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -17638,7 +17660,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["WaterCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -18265,7 +18290,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["WaterCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -19466,7 +19494,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["WaterCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -20631,7 +20662,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["WaterCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -21867,7 +21901,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Wilderness3"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -23265,7 +23302,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Wilderness3"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -24014,7 +24054,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Wilderness3"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -25407,7 +25450,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["FireCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -26132,7 +26178,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["FireCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -27488,7 +27537,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["FireCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -28930,7 +28982,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["FireCastle"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
