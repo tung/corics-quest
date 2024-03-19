@@ -26,18 +26,18 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
     Enemy {
         name: "Rat",
         sprite_path: "rat.png",
-        hp: 33,
-        attack: 8,
-        defense: 5,
+        hp: 41,
+        attack: 6,
+        defense: 3,
         weakness: Some(Magic::FireEdge),
         exp: 5,
     },
     Enemy {
         name: "Dog",
         sprite_path: "dog.png",
-        hp: 50,
-        attack: 10,
-        defense: 7,
+        hp: 51,
+        attack: 9,
+        defense: 6,
         weakness: Some(Magic::FireEdge),
         exp: 5,
     },
@@ -46,9 +46,9 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
 const ENEMIES_WILDERNESS2: &[Enemy] = &[Enemy {
     name: "Rat Lv8",
     sprite_path: "rat.png",
-    hp: 96,
-    attack: 25,
-    defense: 22,
+    hp: 97,
+    attack: 21,
+    defense: 18,
     weakness: Some(Magic::FireEdge),
     exp: 5,
 }];
@@ -56,9 +56,9 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[Enemy {
 const ENEMIES_WILDERNESS3: &[Enemy] = &[Enemy {
     name: "Rat Lv16",
     sprite_path: "rat.png",
-    hp: 162,
-    attack: 47,
-    defense: 44,
+    hp: 172,
+    attack: 41,
+    defense: 38,
     weakness: Some(Magic::FireEdge),
     exp: 5,
 }];
@@ -66,9 +66,9 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[Enemy {
 const ENEMIES_EARTH_CASTLE: &[Enemy] = &[Enemy {
     name: "Rat Lv5",
     sprite_path: "rat.png",
-    hp: 74,
-    attack: 19,
-    defense: 16,
+    hp: 70,
+    attack: 14,
+    defense: 11,
     weakness: Some(Magic::FireEdge),
     exp: 5,
 }];
@@ -76,9 +76,9 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[Enemy {
 const ENEMIES_WATER_CASTLE: &[Enemy] = &[Enemy {
     name: "Rat Lv10",
     sprite_path: "rat.png",
-    hp: 126,
-    attack: 35,
-    defense: 32,
+    hp: 116,
+    attack: 27,
+    defense: 24,
     weakness: Some(Magic::FireEdge),
     exp: 5,
 }];
@@ -86,9 +86,9 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[Enemy {
 const ENEMIES_FIRE_CASTLE: &[Enemy] = &[Enemy {
     name: "Rat Lv20",
     sprite_path: "rat.png",
-    hp: 222,
-    attack: 67,
-    defense: 64,
+    hp: 210,
+    attack: 52,
+    defense: 49,
     weakness: Some(Magic::FireEdge),
     exp: 5,
 }];
