@@ -610,6 +610,75 @@ impl Battle {
                     self.wait_for_confirmation(mctx).await;
                 }
 
+                // Chance for an item to drop.
+                if random(8) == 0 {
+                    let item_roll = random(18);
+
+                    if item_roll < 9 {
+                        let salves = mctx
+                            .progress
+                            .items
+                            .iter_mut()
+                            .find(|i| matches!(i.item, Item::Salve))
+                            .expect("salve item slot");
+                        if salves.amount < 9 {
+                            salves.amount += 1;
+                            self.message_text
+                                .set_text(mctx.gctx, mctx.res, "Coric found a Salve!");
+                            self.message_text.reveal().await;
+                            self.wait_for_confirmation(mctx).await;
+                        }
+                    } else if item_roll < 14 {
+                        let tonics = mctx
+                            .progress
+                            .items
+                            .iter_mut()
+                            .find(|i| matches!(i.item, Item::Tonic))
+                            .expect("tonic item slot");
+                        if tonics.amount < 9 {
+                            tonics.amount += 1;
+                            self.message_text
+                                .set_text(mctx.gctx, mctx.res, "Coric found a Tonic!");
+                            self.message_text.reveal().await;
+                            self.wait_for_confirmation(mctx).await;
+                        }
+                    } else if item_roll < 17 {
+                        let xsalves = mctx
+                            .progress
+                            .items
+                            .iter_mut()
+                            .find(|i| matches!(i.item, Item::XSalve))
+                            .expect("xsalve item slot");
+                        if xsalves.amount < 9 {
+                            xsalves.amount += 1;
+                            self.message_text.set_text(
+                                mctx.gctx,
+                                mctx.res,
+                                "Coric found an XSalve!",
+                            );
+                            self.message_text.reveal().await;
+                            self.wait_for_confirmation(mctx).await;
+                        }
+                    } else {
+                        let xtonics = mctx
+                            .progress
+                            .items
+                            .iter_mut()
+                            .find(|i| matches!(i.item, Item::XTonic))
+                            .expect("xtonic item slot");
+                        if xtonics.amount < 9 {
+                            xtonics.amount += 1;
+                            self.message_text.set_text(
+                                mctx.gctx,
+                                mctx.res,
+                                "Coric found an XTonic!",
+                            );
+                            self.message_text.reveal().await;
+                            self.wait_for_confirmation(mctx).await;
+                        }
+                    }
+                }
+
                 return BattleEvent::Victory;
             }
 
