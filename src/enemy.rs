@@ -23,22 +23,24 @@ pub struct Enemy {
 }
 
 const ENEMIES_WILDERNESS1: &[Enemy] = &[
+    // level 1
     Enemy {
         name: "Rat",
         sprite_path: "rat.png",
-        hp: 41,
-        attack: 6,
-        defense: 3,
-        weakness: Some(Magic::FireEdge),
+        hp: 32,
+        attack: 4,
+        defense: 1,
+        weakness: None,
         exp: 5,
     },
+    // level 2
     Enemy {
         name: "Dog",
         sprite_path: "dog.png",
-        hp: 51,
-        attack: 9,
-        defense: 6,
-        weakness: Some(Magic::FireEdge),
+        hp: 42,
+        attack: 6,
+        defense: 3,
+        weakness: None,
         exp: 5,
     },
 ];
