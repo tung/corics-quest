@@ -161,15 +161,48 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
     },
 ];
 
-const ENEMIES_WATER_CASTLE: &[Enemy] = &[Enemy {
-    name: "Rat Lv10",
-    sprite_path: "rat.png",
-    hp: 116,
-    attack: 27,
-    defense: 24,
-    weakness: Some(Magic::FireEdge),
-    exp: 5,
-}];
+const ENEMIES_WATER_CASTLE: &[Enemy] = &[
+    // level 9
+    Enemy {
+        name: "Jelly",
+        sprite_path: "jelly.png",
+        hp: 107,
+        attack: 24,
+        defense: 21,
+        weakness: None,
+        exp: 5,
+    },
+    // level 10
+    Enemy {
+        name: "Ghost",
+        sprite_path: "ghost.png",
+        hp: 116,
+        attack: 27,
+        defense: 23,
+        weakness: None,
+        exp: 5,
+    },
+    // level 11
+    Enemy {
+        name: "Turtle",
+        sprite_path: "turtle.png",
+        hp: 126,
+        attack: 29,
+        defense: 26,
+        weakness: None,
+        exp: 5,
+    },
+    // level 12
+    Enemy {
+        name: "Serpent",
+        sprite_path: "serpent.png",
+        hp: 135,
+        attack: 32,
+        defense: 28,
+        weakness: Some(Magic::EarthEdge),
+        exp: 5,
+    },
+];
 
 const ENEMIES_FIRE_CASTLE: &[Enemy] = &[Enemy {
     name: "Rat Lv20",
