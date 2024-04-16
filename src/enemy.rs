@@ -43,6 +43,26 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         weakness: None,
         exp: 5,
     },
+    // level 2.5
+    Enemy {
+        name: "Horn Beast",
+        sprite_path: "horn-beast.png",
+        hp: 46,
+        attack: 8,
+        defense: 5,
+        weakness: None,
+        exp: 5,
+    },
+    // level 3
+    Enemy {
+        name: "Cobra",
+        sprite_path: "cobra.png",
+        hp: 51,
+        attack: 9,
+        defense: 6,
+        weakness: None,
+        exp: 5,
+    },
 ];
 
 const ENEMIES_WILDERNESS2: &[Enemy] = &[Enemy {
