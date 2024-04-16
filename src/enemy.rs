@@ -65,15 +65,48 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
     },
 ];
 
-const ENEMIES_WILDERNESS2: &[Enemy] = &[Enemy {
-    name: "Rat Lv8",
-    sprite_path: "rat.png",
-    hp: 97,
-    attack: 21,
-    defense: 18,
-    weakness: Some(Magic::FireEdge),
-    exp: 5,
-}];
+const ENEMIES_WILDERNESS2: &[Enemy] = &[
+    // level 7
+    Enemy {
+        name: "Dragonfly",
+        sprite_path: "dragonfly.png",
+        hp: 88,
+        attack: 19,
+        defense: 16,
+        weakness: Some(Magic::FireEdge),
+        exp: 5,
+    },
+    // level 8
+    Enemy {
+        name: "Leech",
+        sprite_path: "leech.png",
+        hp: 98,
+        attack: 22,
+        defense: 18,
+        weakness: None,
+        exp: 5,
+    },
+    // level 9
+    Enemy {
+        name: "Shambler",
+        sprite_path: "shambler.png",
+        hp: 107,
+        attack: 24,
+        defense: 21,
+        weakness: None,
+        exp: 5,
+    },
+    // level 9.5
+    Enemy {
+        name: "Fang Frog",
+        sprite_path: "fang-frog.png",
+        hp: 112,
+        attack: 25,
+        defense: 22,
+        weakness: None,
+        exp: 5,
+    },
+];
 
 const ENEMIES_WILDERNESS3: &[Enemy] = &[Enemy {
     name: "Rat Lv16",
