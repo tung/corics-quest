@@ -9,6 +9,7 @@ use std::io::Cursor;
 use std::rc::Rc;
 
 const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
+    ("basilisk.png", include_str!("../assets/basilisk.json")),
     ("bat.png", include_str!("../assets/bat.json")),
     ("bed.png", include_str!("../assets/bed.json")),
     ("chest.png", include_str!("../assets/chest.json")),
@@ -35,6 +36,7 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
     ("leech.png", include_str!("../assets/leech.json")),
     ("lever.png", include_str!("../assets/lever.json")),
     ("matero.png", include_str!("../assets/matero.json")),
+    ("minotaur.png", include_str!("../assets/minotaur.json")),
     ("orc.png", include_str!("../assets/orc.json")),
     ("rat.png", include_str!("../assets/rat.json")),
     ("rogue.png", include_str!("../assets/rogue.json")),
@@ -43,6 +45,8 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
     ("shambler.png", include_str!("../assets/shambler.json")),
     ("troll.png", include_str!("../assets/troll.json")),
     ("turtle.png", include_str!("../assets/turtle.json")),
+    ("vampire.png", include_str!("../assets/vampire.json")),
+    ("warlock.png", include_str!("../assets/warlock.json")),
     ("war-tusk.png", include_str!("../assets/war-tusk.json")),
     ("water.png", include_str!("../assets/water.json")),
     (
@@ -53,6 +57,7 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
 
 const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("base.png", include_bytes!("../assets/base.png")),
+    ("basilisk.png", include_bytes!("../assets/basilisk.png")),
     ("bat.png", include_bytes!("../assets/bat.png")),
     ("bed.png", include_bytes!("../assets/bed.png")),
     ("chest.png", include_bytes!("../assets/chest.png")),
@@ -81,6 +86,7 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("leech.png", include_bytes!("../assets/leech.png")),
     ("lever.png", include_bytes!("../assets/lever.png")),
     ("matero.png", include_bytes!("../assets/matero.png")),
+    ("minotaur.png", include_bytes!("../assets/minotaur.png")),
     ("orc.png", include_bytes!("../assets/orc.png")),
     ("props.png", include_bytes!("../assets/props.png")),
     ("rat.png", include_bytes!("../assets/rat.png")),
@@ -90,6 +96,8 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("shambler.png", include_bytes!("../assets/shambler.png")),
     ("troll.png", include_bytes!("../assets/troll.png")),
     ("turtle.png", include_bytes!("../assets/turtle.png")),
+    ("vampire.png", include_bytes!("../assets/vampire.png")),
+    ("warlock.png", include_bytes!("../assets/warlock.png")),
     ("war-tusk.png", include_bytes!("../assets/war-tusk.png")),
     ("water.png", include_bytes!("../assets/water.png")),
     (

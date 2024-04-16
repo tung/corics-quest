@@ -237,15 +237,48 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
     },
 ];
 
-const ENEMIES_FIRE_CASTLE: &[Enemy] = &[Enemy {
-    name: "Rat Lv20",
-    sprite_path: "rat.png",
-    hp: 210,
-    attack: 52,
-    defense: 49,
-    weakness: Some(Magic::FireEdge),
-    exp: 5,
-}];
+const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
+    // level 19
+    Enemy {
+        name: "Basilisk",
+        sprite_path: "basilisk.png",
+        hp: 200,
+        attack: 49,
+        defense: 46,
+        weakness: None,
+        exp: 5,
+    },
+    // level 20
+    Enemy {
+        name: "Warlock",
+        sprite_path: "warlock.png",
+        hp: 210,
+        attack: 52,
+        defense: 48,
+        weakness: None,
+        exp: 5,
+    },
+    // level 22
+    Enemy {
+        name: "Minotaur",
+        sprite_path: "minotaur.png",
+        hp: 228,
+        attack: 57,
+        defense: 53,
+        weakness: None,
+        exp: 5,
+    },
+    // level 24
+    Enemy {
+        name: "Vampire",
+        sprite_path: "vampire.png",
+        hp: 247,
+        attack: 62,
+        defense: 58,
+        weakness: Some(Magic::WaterEdge),
+        exp: 5,
+    },
+];
 
 impl EncounterGroup {
     pub fn random_enemy(self) -> Enemy {
