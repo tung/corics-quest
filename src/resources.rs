@@ -9,6 +9,7 @@ use std::io::Cursor;
 use std::rc::Rc;
 
 const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
+    ("bat.png", include_str!("../assets/bat.json")),
     ("bed.png", include_str!("../assets/bed.json")),
     ("chest.png", include_str!("../assets/chest.json")),
     ("cobra.png", include_str!("../assets/cobra.json")),
@@ -22,12 +23,15 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
     ),
     ("fire.png", include_str!("../assets/fire.json")),
     ("fire-small.png", include_str!("../assets/fire-small.json")),
+    ("golem.png", include_str!("../assets/golem.json")),
     ("horn-beast.png", include_str!("../assets/horn-beast.json")),
     ("jace.png", include_str!("../assets/jace.json")),
     ("julis.png", include_str!("../assets/julis.json")),
     ("lever.png", include_str!("../assets/lever.json")),
     ("matero.png", include_str!("../assets/matero.json")),
     ("rat.png", include_str!("../assets/rat.json")),
+    ("rogue.png", include_str!("../assets/rogue.json")),
+    ("scorpion.png", include_str!("../assets/scorpion.json")),
     ("water.png", include_str!("../assets/water.json")),
     (
         "water-small.png",
@@ -37,6 +41,7 @@ const SPRITE_SHEETS_BY_PATH: &[(&str, &str)] = &[
 
 const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("base.png", include_bytes!("../assets/base.png")),
+    ("bat.png", include_bytes!("../assets/bat.png")),
     ("bed.png", include_bytes!("../assets/bed.png")),
     ("chest.png", include_bytes!("../assets/chest.png")),
     ("cobra.png", include_bytes!("../assets/cobra.png")),
@@ -52,6 +57,7 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("fire.png", include_bytes!("../assets/fire.png")),
     ("fire-small.png", include_bytes!("../assets/fire-small.png")),
     ("grassdirt.png", include_bytes!("../assets/grassdirt.png")),
+    ("golem.png", include_bytes!("../assets/golem.png")),
     ("horn-beast.png", include_bytes!("../assets/horn-beast.png")),
     ("jace.png", include_bytes!("../assets/jace.png")),
     ("julis.png", include_bytes!("../assets/julis.png")),
@@ -59,6 +65,8 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ("matero.png", include_bytes!("../assets/matero.png")),
     ("props.png", include_bytes!("../assets/props.png")),
     ("rat.png", include_bytes!("../assets/rat.png")),
+    ("rogue.png", include_bytes!("../assets/rogue.png")),
+    ("scorpion.png", include_bytes!("../assets/scorpion.png")),
     ("water.png", include_bytes!("../assets/water.png")),
     (
         "water-small.png",

@@ -85,15 +85,48 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[Enemy {
     exp: 5,
 }];
 
-const ENEMIES_EARTH_CASTLE: &[Enemy] = &[Enemy {
-    name: "Rat Lv5",
-    sprite_path: "rat.png",
-    hp: 70,
-    attack: 14,
-    defense: 11,
-    weakness: Some(Magic::FireEdge),
-    exp: 5,
-}];
+const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
+    // level 3.5
+    Enemy {
+        name: "Bat",
+        sprite_path: "bat.png",
+        hp: 56,
+        attack: 10,
+        defense: 7,
+        weakness: None,
+        exp: 5,
+    },
+    // level 4
+    Enemy {
+        name: "Scorpion",
+        sprite_path: "scorpion.png",
+        hp: 60,
+        attack: 12,
+        defense: 8,
+        weakness: None,
+        exp: 5,
+    },
+    // level 5
+    Enemy {
+        name: "Rogue",
+        sprite_path: "rogue.png",
+        hp: 70,
+        attack: 14,
+        defense: 11,
+        weakness: None,
+        exp: 5,
+    },
+    // level 6
+    Enemy {
+        name: "Golem",
+        sprite_path: "golem.png",
+        hp: 79,
+        attack: 16,
+        defense: 14,
+        weakness: Some(Magic::FireEdge),
+        exp: 5,
+    },
+];
 
 const ENEMIES_WATER_CASTLE: &[Enemy] = &[Enemy {
     name: "Rat Lv10",
