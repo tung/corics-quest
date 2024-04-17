@@ -31,7 +31,7 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         attack: 4,
         defense: 1,
         weakness: None,
-        exp: 5,
+        exp: 10,
     },
     // level 2
     Enemy {
@@ -41,7 +41,7 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         attack: 6,
         defense: 3,
         weakness: None,
-        exp: 5,
+        exp: 15,
     },
     // level 2.5
     Enemy {
@@ -51,7 +51,7 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         attack: 8,
         defense: 5,
         weakness: None,
-        exp: 5,
+        exp: 18,
     },
     // level 3
     Enemy {
@@ -61,7 +61,7 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         attack: 9,
         defense: 6,
         weakness: None,
-        exp: 5,
+        exp: 22,
     },
 ];
 
@@ -74,7 +74,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         attack: 19,
         defense: 16,
         weakness: Some(Magic::FireEdge),
-        exp: 5,
+        exp: 67,
     },
     // level 8
     Enemy {
@@ -84,7 +84,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         attack: 22,
         defense: 18,
         weakness: None,
-        exp: 5,
+        exp: 80,
     },
     // level 9
     Enemy {
@@ -94,7 +94,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         attack: 24,
         defense: 21,
         weakness: None,
-        exp: 5,
+        exp: 96,
     },
     // level 9.5
     Enemy {
@@ -104,7 +104,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         attack: 25,
         defense: 22,
         weakness: None,
-        exp: 5,
+        exp: 106,
     },
 ];
 
@@ -117,7 +117,7 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         attack: 34,
         defense: 31,
         weakness: Some(Magic::EarthEdge),
-        exp: 5,
+        exp: 199,
     },
     // level 14
     Enemy {
@@ -127,7 +127,7 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         attack: 37,
         defense: 33,
         weakness: None,
-        exp: 5,
+        exp: 239,
     },
     // level 16
     Enemy {
@@ -137,7 +137,7 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         attack: 42,
         defense: 38,
         weakness: Some(Magic::WaterEdge),
-        exp: 5,
+        exp: 345,
     },
     // level 18
     Enemy {
@@ -147,7 +147,7 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         attack: 46,
         defense: 44,
         weakness: None,
-        exp: 5,
+        exp: 496,
     },
 ];
 
@@ -160,7 +160,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         attack: 10,
         defense: 7,
         weakness: None,
-        exp: 5,
+        exp: 26,
     },
     // level 4
     Enemy {
@@ -170,7 +170,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         attack: 12,
         defense: 8,
         weakness: None,
-        exp: 5,
+        exp: 30,
     },
     // level 5
     Enemy {
@@ -180,7 +180,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         attack: 14,
         defense: 11,
         weakness: None,
-        exp: 5,
+        exp: 41,
     },
     // level 6
     Enemy {
@@ -190,7 +190,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         attack: 16,
         defense: 14,
         weakness: Some(Magic::FireEdge),
-        exp: 5,
+        exp: 53,
     },
 ];
 
@@ -203,7 +203,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         attack: 24,
         defense: 21,
         weakness: None,
-        exp: 5,
+        exp: 96,
     },
     // level 10
     Enemy {
@@ -213,7 +213,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         attack: 27,
         defense: 23,
         weakness: None,
-        exp: 5,
+        exp: 115,
     },
     // level 11
     Enemy {
@@ -223,7 +223,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         attack: 29,
         defense: 26,
         weakness: None,
-        exp: 5,
+        exp: 139,
     },
     // level 12
     Enemy {
@@ -233,7 +233,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         attack: 32,
         defense: 28,
         weakness: Some(Magic::EarthEdge),
-        exp: 5,
+        exp: 166,
     },
 ];
 
@@ -246,7 +246,7 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         attack: 49,
         defense: 46,
         weakness: None,
-        exp: 5,
+        exp: 596,
     },
     // level 20
     Enemy {
@@ -256,7 +256,7 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         attack: 52,
         defense: 48,
         weakness: None,
-        exp: 5,
+        exp: 715,
     },
     // level 22
     Enemy {
@@ -266,7 +266,7 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         attack: 57,
         defense: 53,
         weakness: None,
-        exp: 5,
+        exp: 1029,
     },
     // level 24
     Enemy {
@@ -276,7 +276,7 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         attack: 62,
         defense: 58,
         weakness: Some(Magic::WaterEdge),
-        exp: 5,
+        exp: 1482,
     },
 ];
 
