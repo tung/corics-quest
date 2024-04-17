@@ -260,15 +260,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 return;
             }
             WalkAroundEvent::DebugLevelUp => {
-                sctx.progress.level += 1;
                 sctx.progress.exp = 0;
-                sctx.progress.next_exp = sctx.progress.next_exp * 3 / 2;
-                sctx.progress.max_hp += 30;
-                sctx.progress.hp += 30;
-                sctx.progress.max_mp += 1;
-                sctx.progress.mp += 1;
-                sctx.progress.attack += 2;
-                sctx.progress.defense += 2;
+                sctx.progress.gain_level();
                 sctx.push_text_box_mode(&format!("Coric is now level {}!", sctx.progress.level));
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();

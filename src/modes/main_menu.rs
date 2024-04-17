@@ -84,7 +84,14 @@ impl MainMenu {
             [255, 128, 50],
             progress.next_exp,
         );
-        exp_meter.set_value(gctx, progress.exp);
+        exp_meter.set_value(
+            gctx,
+            if progress.next_exp > 0 {
+                progress.exp
+            } else {
+                1
+            },
+        );
         let hp_text = Text::from_str(
             gctx,
             res,

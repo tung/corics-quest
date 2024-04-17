@@ -55,6 +55,13 @@ pub struct Progress {
     pub fire_defeated: bool,
 }
 
+#[rustfmt::skip]
+const EXP_FOR_NEXT_LEVEL: [i32; 29] = [
+    10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
+    110, 120, 130, 140, 150, 160, 170, 180, 190, 200,
+    210, 220, 230, 240, 250, 260, 270, 280, 290,
+];
+
 impl Item {
     fn description(self) -> &'static str {
         match self {
@@ -167,7 +174,7 @@ impl Progress {
             defense: 3,
             level: 1,
             exp: 0,
-            next_exp: 20,
+            next_exp: EXP_FOR_NEXT_LEVEL[0],
             weapon: None,
             armor: None,
             items: vec![
@@ -211,6 +218,31 @@ impl Progress {
             earth_defeated: false,
             water_defeated: false,
             fire_defeated: false,
+        }
+    }
+
+    pub fn gain_level(&mut self) {
+        self.level += 1;
+        assert!(self.level >= 1);
+        self.next_exp = EXP_FOR_NEXT_LEVEL
+            .get(usize::try_from(self.level).expect("progress.level as usize") - 1)
+            .copied()
+            .unwrap_or(0);
+        self.max_hp += 30;
+        self.hp += 30;
+        self.max_mp += 2;
+        self.mp += 2;
+        self.attack += 2;
+        self.defense += 2;
+    }
+
+    pub fn gain_level_from_exp(&mut self) -> bool {
+        if self.level <= EXP_FOR_NEXT_LEVEL.len() as i32 && self.exp >= self.next_exp {
+            self.exp -= self.next_exp;
+            self.gain_level();
+            true
+        } else {
+            false
         }
     }
 

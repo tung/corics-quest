@@ -589,16 +589,7 @@ impl Battle {
                 self.wait_for_confirmation(mctx).await;
 
                 mctx.progress.exp += self.enemy.exp;
-                while mctx.progress.exp >= mctx.progress.next_exp {
-                    mctx.progress.level += 1;
-                    mctx.progress.exp -= mctx.progress.next_exp;
-                    mctx.progress.next_exp = mctx.progress.next_exp * 3 / 2;
-                    mctx.progress.max_hp += 30;
-                    mctx.progress.hp += 30;
-                    mctx.progress.max_mp += 2;
-                    mctx.progress.mp += 2;
-                    mctx.progress.attack += 2;
-                    mctx.progress.defense += 2;
+                while mctx.progress.gain_level_from_exp() {
                     self.update_status(mctx);
 
                     self.message_text.set_text(
