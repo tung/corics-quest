@@ -602,7 +602,7 @@ impl Battle {
                 }
 
                 // Chance for an item to drop.
-                if random(8) == 0 {
+                if random(10) == 0 {
                     let item_roll = random(18);
 
                     if item_roll < 9 {
