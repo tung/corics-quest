@@ -230,8 +230,8 @@ impl Progress {
             .unwrap_or(0);
         self.max_hp += 30;
         self.hp += 30;
-        self.max_mp += 2;
-        self.mp += 2;
+        self.max_mp += 1;
+        self.mp += 1;
         self.attack += 2;
         self.defense += 2;
     }
