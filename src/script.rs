@@ -100,9 +100,9 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     Enemy {
                         name: "Earth",
                         sprite_path: "earth.png",
-                        hp: 1150,
-                        attack: 23,
-                        defense: 20,
+                        hp: 1700,
+                        attack: 27,
+                        defense: 24,
                         weakness: Some(Magic::FireEdge),
                         exp: 50,
                     },
