@@ -432,8 +432,11 @@ impl MainMenu {
                     .map(|a| a.name.as_str())
                     .unwrap_or("(none)"),
                 mctx.progress.defense,
-                mctx.progress.exp,
-                mctx.progress.next_exp().unwrap_or(0),
+                mctx.progress.base_exp + mctx.progress.exp,
+                mctx.progress
+                    .next_exp()
+                    .map(|next_exp| next_exp - mctx.progress.exp)
+                    .unwrap_or(0),
             ),
         );
     }

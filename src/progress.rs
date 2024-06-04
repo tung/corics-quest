@@ -43,6 +43,7 @@ pub struct Progress {
     pub defense: i32,
     pub level: i32,
     pub exp: i32,
+    pub base_exp: i32,
     pub weapon: Option<Weapon>,
     pub armor: Option<Armor>,
     pub items: Vec<ItemSlot>,
@@ -173,6 +174,7 @@ impl Progress {
             defense: 3,
             level: 1,
             exp: 0,
+            base_exp: 0,
             weapon: None,
             armor: None,
             items: vec![
@@ -220,6 +222,9 @@ impl Progress {
     }
 
     pub fn gain_level(&mut self) {
+        if let Some(next_exp) = self.next_exp() {
+            self.base_exp += next_exp;
+        }
         self.level += 1;
         self.max_hp += 30;
         self.hp += 30;
