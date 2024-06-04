@@ -351,7 +351,7 @@ impl MainMenu {
         }
     }
 
-    fn update_bottom_line_for_item_menu(&mut self, mctx: &mut ModeContext<'_, '_>, selection: i32) {
+    fn update_bottom_line_for_item_menu(&mut self, mctx: &mut ModeContext, selection: i32) {
         self.bottom_line.set_text(
             mctx.gctx,
             mctx.res,
@@ -364,11 +364,7 @@ impl MainMenu {
         );
     }
 
-    fn update_bottom_line_for_magic_menu(
-        &mut self,
-        mctx: &mut ModeContext<'_, '_>,
-        selection: i32,
-    ) {
+    fn update_bottom_line_for_magic_menu(&mut self, mctx: &mut ModeContext, selection: i32) {
         self.bottom_line.set_text(
             mctx.gctx,
             mctx.res,
@@ -381,7 +377,7 @@ impl MainMenu {
         );
     }
 
-    fn update_bottom_text_for_item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+    fn update_bottom_text_for_item_menu(&mut self, mctx: &mut ModeContext) {
         self.bottom_text.set_text(
             mctx.gctx,
             mctx.res,
@@ -395,7 +391,7 @@ impl MainMenu {
         );
     }
 
-    fn update_bottom_text_for_magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+    fn update_bottom_text_for_magic_menu(&mut self, mctx: &mut ModeContext) {
         self.bottom_text.set_text(
             mctx.gctx,
             mctx.res,
@@ -409,7 +405,7 @@ impl MainMenu {
         );
     }
 
-    fn update_bottom_text_for_status(&mut self, mctx: &mut ModeContext<'_, '_>) {
+    fn update_bottom_text_for_status(&mut self, mctx: &mut ModeContext) {
         self.bottom_text.set_text(
             mctx.gctx,
             mctx.res,
@@ -441,7 +437,7 @@ impl MainMenu {
         );
     }
 
-    fn update_hp_and_mp(&mut self, mctx: &mut ModeContext<'_, '_>) {
+    fn update_hp_and_mp(&mut self, mctx: &mut ModeContext) {
         self.hp_text.set_text(
             mctx.gctx,
             mctx.res,

@@ -131,7 +131,7 @@ impl Battle {
         }
 
         fn set_all_text(
-            mctx: &mut ModeContext<'_, '_>,
+            mctx: &mut ModeContext,
             message_text: &mut Text,
             menu_text: &mut Text,
             enemy_name: &str,
@@ -404,7 +404,7 @@ impl Battle {
 
     fn show_change_text_at(
         &mut self,
-        mctx: &mut ModeContext<'_, '_>,
+        mctx: &mut ModeContext,
         middle_x: i32,
         bottom_y: i32,
         msg: &str,
@@ -423,7 +423,7 @@ impl Battle {
         self.change_visible = true;
     }
 
-    fn show_status_change(&mut self, mctx: &mut ModeContext<'_, '_>, msg: &str) {
+    fn show_status_change(&mut self, mctx: &mut ModeContext, msg: &str) {
         self.show_change_text_at(mctx, STATUS_X + 26, STATUS_Y + 6, msg);
     }
 
@@ -708,7 +708,7 @@ impl Battle {
         }
     }
 
-    fn update_status(&mut self, mctx: &mut ModeContext<'_, '_>) {
+    fn update_status(&mut self, mctx: &mut ModeContext) {
         self.hp_text
             .set_text(mctx.gctx, mctx.res, &format!("HP{:4}", mctx.progress.hp));
         self.mp_text

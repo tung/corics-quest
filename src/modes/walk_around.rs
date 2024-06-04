@@ -176,7 +176,7 @@ impl WalkAround {
 }
 
 fn npc_actor_at(
-    mctx: &ModeContext<'_, '_>,
+    mctx: &ModeContext,
     grid_x: i32,
     grid_y: i32,
     face_dir: Direction,
