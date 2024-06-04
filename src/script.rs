@@ -104,7 +104,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         attack: 27,
                         defense: 24,
                         weakness: Some(Magic::FireEdge),
-                        exp: 50,
+                        exp: 500,
                     },
                     true,
                 );
@@ -161,7 +161,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         attack: 49,
                         defense: 46,
                         weakness: Some(Magic::EarthEdge),
-                        exp: 50,
+                        exp: 2000,
                     },
                     true,
                 );
@@ -218,7 +218,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         attack: 77,
                         defense: 74,
                         weakness: Some(Magic::WaterEdge),
-                        exp: 50,
+                        exp: 9000,
                     },
                     true,
                 );
