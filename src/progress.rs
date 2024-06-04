@@ -43,7 +43,6 @@ pub struct Progress {
     pub defense: i32,
     pub level: i32,
     pub exp: i32,
-    pub next_exp: i32,
     pub weapon: Option<Weapon>,
     pub armor: Option<Armor>,
     pub items: Vec<ItemSlot>,
@@ -174,7 +173,6 @@ impl Progress {
             defense: 3,
             level: 1,
             exp: 0,
-            next_exp: EXP_FOR_NEXT_LEVEL[0],
             weapon: None,
             armor: None,
             items: vec![
@@ -223,11 +221,6 @@ impl Progress {
 
     pub fn gain_level(&mut self) {
         self.level += 1;
-        assert!(self.level >= 1);
-        self.next_exp = EXP_FOR_NEXT_LEVEL
-            .get(usize::try_from(self.level).expect("progress.level as usize") - 1)
-            .copied()
-            .unwrap_or(0);
         self.max_hp += 30;
         self.hp += 30;
         self.max_mp += 1;
@@ -237,13 +230,15 @@ impl Progress {
     }
 
     pub fn gain_level_from_exp(&mut self) -> bool {
-        if self.level <= EXP_FOR_NEXT_LEVEL.len() as i32 && self.exp >= self.next_exp {
-            self.exp -= self.next_exp;
-            self.gain_level();
-            true
-        } else {
-            false
+        let Some(next_exp) = self.next_exp() else {
+            return false;
+        };
+        if self.exp < next_exp {
+            return false;
         }
+        self.exp -= next_exp;
+        self.gain_level();
+        true
     }
 
     pub fn maybe_upgrade_armor(&mut self, name: &str, defense: i32) -> bool {
@@ -272,5 +267,11 @@ impl Progress {
             });
             true
         }
+    }
+
+    pub fn next_exp(&self) -> Option<i32> {
+        assert!(self.level >= 1);
+        let index = usize::try_from(self.level).expect("progress.level as usize") - 1;
+        EXP_FOR_NEXT_LEVEL.get(index).copied()
     }
 }

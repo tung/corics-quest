@@ -82,16 +82,9 @@ impl MainMenu {
             TOP_Y + 8 + 3 * 8 + 1,
             12 * 6,
             [255, 128, 50],
-            progress.next_exp,
+            progress.next_exp().unwrap_or(1),
         );
-        exp_meter.set_value(
-            gctx,
-            if progress.next_exp > 0 {
-                progress.exp
-            } else {
-                1
-            },
-        );
+        exp_meter.set_value(gctx, progress.next_exp().map(|_| progress.exp).unwrap_or(1));
         let hp_text = Text::from_str(
             gctx,
             res,
@@ -440,7 +433,7 @@ impl MainMenu {
                     .unwrap_or("(none)"),
                 mctx.progress.defense,
                 mctx.progress.exp,
-                mctx.progress.next_exp,
+                mctx.progress.next_exp().unwrap_or(0),
             ),
         );
     }
