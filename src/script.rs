@@ -331,11 +331,12 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     6 => EncounterGroup::FireCastle,
                     _ => unreachable!(),
                 };
-                sctx.push_battle_mode(group.random_enemy(), false);
+                let enemy = group.random_enemy(&mut sctx.rng);
+                sctx.push_battle_mode(enemy, false);
                 handle_battle(&mut sctx).await;
             }
             WalkAroundEvent::Encounter => {
-                if let Some(enemy) = sctx.level.encounters.map(EncounterGroup::random_enemy) {
+                if let Some(enemy) = sctx.level.encounters.map(|g| g.random_enemy(&mut sctx.rng)) {
                     sctx.push_battle_mode(enemy, false);
                 } else {
                     sctx.push_battle_mode(

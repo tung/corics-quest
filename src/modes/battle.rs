@@ -444,6 +444,7 @@ impl Battle {
             match self.action_menu(mctx, follow_up.is_some()).await {
                 PlayerChoice::Fight => {
                     let damage = calc_magic_damage(
+                        mctx.rng,
                         mctx.progress.attack,
                         self.enemy.defense,
                         follow_up,
@@ -483,6 +484,7 @@ impl Battle {
                         magic @ (Magic::EarthEdge | Magic::WaterEdge | Magic::FireEdge) => {
                             follow_up = Some((magic, 1));
                             let damage = calc_magic_damage(
+                                mctx.rng,
                                 mctx.progress.attack,
                                 self.enemy.defense,
                                 follow_up,
@@ -602,8 +604,8 @@ impl Battle {
                 }
 
                 // Chance for an item to drop.
-                if random(10) == 0 {
-                    let item_roll = random(18);
+                if mctx.rng.random(10) == 0 {
+                    let item_roll = mctx.rng.random(18);
 
                     if item_roll < 9 {
                         let salves = mctx
@@ -675,7 +677,7 @@ impl Battle {
 
             let base_damage = calc_base_damage(self.enemy.attack, mctx.progress.defense);
             let damage = base_damage.trunc() as i32
-                + if (random(100) as f32) < base_damage.fract() * 100.0 {
+                + if (mctx.rng.random(100) as f32) < base_damage.fract() * 100.0 {
                     1
                 } else {
                     0
@@ -741,6 +743,7 @@ fn calc_base_damage(attack: i32, defense: i32) -> f32 {
 }
 
 fn calc_magic_damage(
+    rng: &mut Rng,
     attack: i32,
     defense: i32,
     follow_up: Option<(Magic, usize)>,
@@ -757,7 +760,7 @@ fn calc_magic_damage(
     };
     let damage = base_damage * (1.0 + bonus);
     damage.trunc() as i32
-        + if (random(100) as f32) < damage.fract() * 100.0 {
+        + if (rng.random(100) as f32) < damage.fract() * 100.0 {
             1
         } else {
             0

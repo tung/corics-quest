@@ -281,7 +281,7 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
 ];
 
 impl EncounterGroup {
-    pub fn random_enemy(self) -> Enemy {
+    pub fn random_enemy(self, rng: &mut Rng) -> Enemy {
         let group = match self {
             Self::Wilderness1 => ENEMIES_WILDERNESS1,
             Self::Wilderness2 => ENEMIES_WILDERNESS2,
@@ -292,7 +292,7 @@ impl EncounterGroup {
         };
         assert!(!group.is_empty());
         let i = u32::try_from(group.len()).expect("u32 enemy group length");
-        group[random(i) as usize].clone()
+        group[rng.random(i) as usize].clone()
     }
 }
 

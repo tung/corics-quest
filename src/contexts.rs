@@ -6,6 +6,7 @@ use crate::input::*;
 use crate::levels::*;
 use crate::modes::*;
 use crate::progress::*;
+use crate::random::*;
 use crate::resources::*;
 
 use miniquad::graphics::GraphicsContext;
@@ -19,6 +20,7 @@ macro_rules! update_mode {
                     gctx,
                     res: &self.res,
                     input: &mut self.input,
+                    rng: &mut self.rng,
                     progress: &mut self.progress,
                     level: &mut self.level,
                     actors: &mut self.actors,
@@ -40,6 +42,7 @@ pub struct ModeContext<'a, 'g> {
     pub gctx: &'g mut GraphicsContext,
     pub res: &'a Resources,
     pub input: &'a mut SharedMut<Input>,
+    pub rng: &'a mut SharedMut<Rng>,
     pub progress: &'a mut SharedMut<Progress>,
     pub level: &'a mut SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
@@ -54,6 +57,7 @@ pub struct ScriptContext {
     pub modes: SharedMut<ModeStack>,
     pub input: SharedMut<Input>,
     pub res: Resources,
+    pub rng: SharedMut<Rng>,
     pub progress: SharedMut<Progress>,
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
@@ -73,6 +77,7 @@ impl ScriptContext {
             modes: SharedMut::new(ModeStack::new()),
             input: SharedMut::new(Input::new()),
             res,
+            rng: SharedMut::new(Rng::new(miniquad::date::now() as _)),
             progress: SharedMut::new(Progress::new()),
             level: SharedMut::new(level),
             actors: SharedMut::new(actors),
@@ -91,6 +96,7 @@ impl ScriptContext {
             modes: SharedMut::clone(&this.modes),
             input: SharedMut::clone(&this.input),
             res: this.res.clone(),
+            rng: SharedMut::clone(&this.rng),
             progress: SharedMut::clone(&this.progress),
             level: SharedMut::clone(&this.level),
             actors: SharedMut::clone(&this.actors),
