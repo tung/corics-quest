@@ -53,20 +53,7 @@ impl MainMenu {
             res,
             TOP_X + 8,
             TOP_Y + 8,
-            &format!(
-                "Coric\n {:^11}",
-                if progress.level <= 7 {
-                    "Fighter"
-                } else if progress.level <= 14 {
-                    "Warrior"
-                } else if progress.level <= 21 {
-                    "Knight"
-                } else if progress.level <= 29 {
-                    "Valor Guard"
-                } else {
-                    "Blademaster"
-                },
-            ),
+            &format!("Coric\n {:^11}", player_rank(progress.level)),
         );
         let level_text = Text::from_str(
             gctx,

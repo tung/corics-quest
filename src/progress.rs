@@ -280,3 +280,13 @@ impl Progress {
         EXP_FOR_NEXT_LEVEL.get(index).copied()
     }
 }
+
+pub fn player_rank(level: i32) -> &'static str {
+    match level {
+        ..=7 => "Fighter",
+        8..=15 => "Warrior",
+        16..=23 => "Knight",
+        24..=29 => "Valor Guard",
+        30.. => "Blademaster",
+    }
+}

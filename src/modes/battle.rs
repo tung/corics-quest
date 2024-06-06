@@ -594,11 +594,15 @@ impl Battle {
                 while mctx.progress.gain_level_from_exp() {
                     self.update_status(mctx);
 
-                    self.message_text.set_text(
-                        mctx.gctx,
-                        mctx.res,
-                        &format!("Coric is now level {}!", mctx.progress.level),
-                    );
+                    let mut msg = format!("Coric is now level {}!", mctx.progress.level);
+                    let new_rank = player_rank(mctx.progress.level);
+                    if new_rank != player_rank(mctx.progress.level - 1) {
+                        msg.push_str("\nCoric becomes a ");
+                        msg.push_str(new_rank);
+                        msg.push('!');
+                    }
+
+                    self.message_text.set_text(mctx.gctx, mctx.res, &msg);
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
                 }
