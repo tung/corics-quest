@@ -19,12 +19,12 @@ macro_rules! update_mode {
                 .$name(&mut ModeContext {
                     gctx,
                     res: &self.res,
-                    input: &mut self.input,
+                    input: &self.input,
                     rng: &mut self.rng,
                     progress: &mut self.progress,
-                    level: &mut self.level,
+                    level: &self.level,
                     actors: &mut self.actors,
-                    fade: &mut self.fade,
+                    fade: &self.fade,
                     steps: &mut self.steps,
                 })
                 .await
@@ -41,75 +41,53 @@ pub struct DrawContext<'a, 'g> {
 pub struct ModeContext<'a, 'g> {
     pub gctx: &'g mut GraphicsContext,
     pub res: &'a Resources,
-    pub input: &'a mut SharedMut<Input>,
-    pub rng: &'a mut SharedMut<Rng>,
-    pub progress: &'a mut SharedMut<Progress>,
-    pub level: &'a mut SharedMut<Level>,
+    pub input: &'a SharedMut<Input>,
+    pub rng: &'a mut Rng,
+    pub progress: &'a mut Progress,
+    pub level: &'a SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
-    pub fade: &'a mut SharedMut<[f32; 4]>,
-    pub steps: &'a mut SharedMut<i32>,
+    pub fade: &'a SharedMut<[f32; 4]>,
+    pub steps: &'a mut i32,
 }
 
-/// Code that polls async code should use this by moving a clone of it into the async code.
-/// The polling code and async code can then communicate by accessing the data within.
 pub struct ScriptContext {
     gctx_ptr: SharedMut<*mut GraphicsContext>,
-    pub modes: SharedMut<ModeStack>,
-    pub input: SharedMut<Input>,
     pub res: Resources,
-    pub rng: SharedMut<Rng>,
-    pub progress: SharedMut<Progress>,
+    pub input: SharedMut<Input>,
+    pub modes: SharedMut<ModeStack>,
+    pub rng: Rng,
+    pub progress: Progress,
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
     pub fade: SharedMut<[f32; 4]>,
-    pub steps: SharedMut<i32>,
+    pub steps: i32,
 }
 
 impl ScriptContext {
-    pub fn new(gctx: &mut GraphicsContext, res: Resources) -> Self {
-        let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");
-        let mut player = Actor::new(gctx, &res, ActorType::Player, 6, 3, "coric.png");
-        player.start_animation("face_s");
-        actors.insert(0, player);
-
-        Self {
-            gctx_ptr: SharedMut::new(std::ptr::null_mut()),
-            modes: SharedMut::new(ModeStack::new()),
-            input: SharedMut::new(Input::new()),
-            res,
-            rng: SharedMut::new(Rng::new(miniquad::date::now() as _)),
-            progress: SharedMut::new(Progress::new()),
-            level: SharedMut::new(level),
-            actors: SharedMut::new(actors),
-            fade: SharedMut::new([0.0; 4]),
-            steps: SharedMut::new(0),
-        }
-    }
-
-    /// # Safety
-    ///
-    /// Use this only to send a clone into async code to communicate with it.
-    /// Any other use is probably unsound.
-    pub unsafe fn clone(this: &Self) -> Self {
-        Self {
-            gctx_ptr: SharedMut::clone(&this.gctx_ptr),
-            modes: SharedMut::clone(&this.modes),
-            input: SharedMut::clone(&this.input),
-            res: this.res.clone(),
-            rng: SharedMut::clone(&this.rng),
-            progress: SharedMut::clone(&this.progress),
-            level: SharedMut::clone(&this.level),
-            actors: SharedMut::clone(&this.actors),
-            fade: SharedMut::clone(&this.fade),
-            steps: SharedMut::clone(&this.steps),
-        }
-    }
-
-    pub fn draw_context<'a, 'g>(&'a self, gctx: &'g mut GraphicsContext) -> DrawContext<'a, 'g> {
-        DrawContext {
-            gctx,
-            level: &self.level,
-            actors: &self.actors,
+    pub fn new(
+        gctx_ptr: &SharedMut<*mut GraphicsContext>,
+        res: Resources,
+        input: &SharedMut<Input>,
+        modes: &SharedMut<ModeStack>,
+        level: &SharedMut<Level>,
+        actors: &SharedMut<Vec<Actor>>,
+        fade: &SharedMut<[f32; 4]>,
+    ) -> Self {
+        // SAFETY: This is immediately sent into the async script function.
+        // Access from outside that async function never goes through this.
+        unsafe {
+            Self {
+                gctx_ptr: SharedMut::clone(gctx_ptr),
+                res,
+                input: SharedMut::clone(input),
+                modes: SharedMut::clone(modes),
+                rng: Rng::new(miniquad::date::now() as _),
+                progress: Progress::new(),
+                level: SharedMut::clone(level),
+                actors: SharedMut::clone(actors),
+                fade: SharedMut::clone(fade),
+                steps: 0,
+            }
         }
     }
 
@@ -122,14 +100,6 @@ impl ScriptContext {
         // ergononmics; it's not safe to hold across await points in the async script, but
         // we'll avoid that problem by just never doing that.
         unsafe { self.gctx_ptr.as_mut().unwrap() }
-    }
-
-    pub fn set_gctx(&mut self, gctx: &mut GraphicsContext) {
-        *self.gctx_ptr = gctx as *mut GraphicsContext;
-    }
-
-    pub fn unset_gctx(&mut self) {
-        *self.gctx_ptr = std::ptr::null_mut();
     }
 
     pub async fn fade_in(&mut self, frames: u16) {

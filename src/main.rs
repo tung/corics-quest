@@ -18,7 +18,12 @@ mod sprite;
 mod text;
 mod window;
 
+use actor::*;
+use async_utils::*;
 use contexts::*;
+use input::*;
+use levels::*;
+use modes::*;
 use resources::*;
 use shaders::*;
 
@@ -38,7 +43,6 @@ const FRAME_TIME: f64 = 1.0 / 60.0;
 const MAX_FRAME_TIME: f64 = FRAME_TIME * 4.0;
 
 struct App {
-    sctx: ScriptContext,
     script: Pin<Box<dyn Future<Output = ()>>>,
     dummy_waker: Waker,
     last_time: f64,
@@ -48,6 +52,12 @@ struct App {
     screen_bindings: Bindings,
     window_width: f32,
     window_height: f32,
+    gctx_ptr: SharedMut<*mut GraphicsContext>,
+    input: SharedMut<Input>,
+    modes: SharedMut<ModeStack>,
+    level: SharedMut<Level>,
+    actors: SharedMut<Vec<Actor>>,
+    fade: SharedMut<[f32; 4]>,
 }
 
 impl App {
@@ -78,14 +88,22 @@ impl App {
         };
 
         let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
-        let sctx = ScriptContext::new(gctx, res);
 
-        // SAFETY: This is immediately sent into [script::script_main].
-        let sctx_for_script = unsafe { ScriptContext::clone(&sctx) };
+        let gctx_ptr = SharedMut::new(std::ptr::null_mut());
+        let input = SharedMut::new(Input::new());
+        let modes = SharedMut::new(ModeStack::new());
+        let (level, actors) = {
+            let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");
+            let mut player = Actor::new(gctx, &res, ActorType::Player, 6, 3, "coric.png");
+            player.start_animation("face_s");
+            actors.insert(0, player);
+            (SharedMut::new(level), SharedMut::new(actors))
+        };
+        let fade = SharedMut::new([0.0; 4]);
+        let sctx = ScriptContext::new(&gctx_ptr, res, &input, &modes, &level, &actors, &fade);
 
         Self {
-            sctx,
-            script: Box::pin(script::script_main(sctx_for_script)),
+            script: Box::pin(script::script_main(sctx)),
             dummy_waker: async_utils::new_dummy_waker(),
             last_time: 0.0,
             time_bank: 0.0,
@@ -94,6 +112,12 @@ impl App {
             screen_bindings,
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
+            gctx_ptr,
+            input,
+            modes,
+            level,
+            actors,
+            fade,
         }
     }
 
@@ -111,7 +135,11 @@ impl App {
 impl EventHandler for App {
     fn draw(&mut self, gctx: &mut GraphicsContext) {
         gctx.begin_pass(self.offscreen_pass, Default::default());
-        self.sctx.modes.draw(&mut self.sctx.draw_context(gctx));
+        self.modes.draw(&mut DrawContext {
+            gctx,
+            level: &self.level,
+            actors: &self.actors,
+        });
         gctx.end_render_pass();
 
         gctx.begin_default_pass(Default::default());
@@ -119,7 +147,7 @@ impl EventHandler for App {
         gctx.apply_bindings(&self.screen_bindings);
         gctx.apply_uniforms(&screen_shader::Uniforms {
             scale: self.window_scale(),
-            fade: *self.sctx.fade,
+            fade: *self.fade,
         });
         gctx.draw(0, 6, 1);
         gctx.end_render_pass();
@@ -137,12 +165,12 @@ impl EventHandler for App {
         if keycode == KeyCode::Escape {
             gctx.request_quit();
         } else {
-            self.sctx.input.handle_key_down_event(keycode);
+            self.input.handle_key_down_event(keycode);
         }
     }
 
     fn key_up_event(&mut self, _gctx: &mut GraphicsContext, keycode: KeyCode, _keymods: KeyMods) {
-        self.sctx.input.handle_key_up_event(keycode);
+        self.input.handle_key_up_event(keycode);
     }
 
     fn resize_event(&mut self, _ctx: &mut GraphicsContext, width: f32, height: f32) {
@@ -158,7 +186,7 @@ impl EventHandler for App {
             FRAME_TIME
         };
         self.last_time = current_time;
-        self.sctx.set_gctx(gctx);
+        *self.gctx_ptr = gctx as *mut GraphicsContext;
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
             let mut dummy_context = Context::from_waker(&self.dummy_waker);
@@ -166,9 +194,9 @@ impl EventHandler for App {
                 gctx.order_quit();
                 break;
             }
-            self.sctx.input.reset_keys_pressed();
+            self.input.reset_keys_pressed();
         }
-        self.sctx.unset_gctx();
+        *self.gctx_ptr = std::ptr::null_mut();
     }
 }
 

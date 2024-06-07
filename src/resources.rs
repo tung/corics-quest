@@ -106,17 +106,16 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
     ),
 ];
 
-#[derive(Clone)]
 pub struct Resources {
     pub quad_vbuf: Buffer,
     pub quad_ibuf: Buffer,
     pub layer_pipeline: Pipeline,
     pub quad_pipeline: Pipeline,
-    pub levels: Rc<LevelSet>,
+    pub levels: LevelSet,
     pub font: Texture,
     pub window_textures: WindowTextures,
-    pub textures_by_path: Rc<HashMap<&'static str, Texture>>,
-    pub sprite_sheets_by_path: Rc<HashMap<&'static str, Rc<aseprite::SpriteSheet>>>,
+    pub textures_by_path: HashMap<&'static str, Texture>,
+    pub sprite_sheets_by_path: HashMap<&'static str, Rc<aseprite::SpriteSheet>>,
 }
 
 #[derive(Clone)]
@@ -156,11 +155,11 @@ impl Resources {
             quad_ibuf,
             layer_pipeline,
             quad_pipeline,
-            levels: Rc::new(LevelSet::new()),
+            levels: LevelSet::new(),
             font,
             window_textures,
-            textures_by_path: Rc::new(textures_by_path),
-            sprite_sheets_by_path: Rc::new(sprite_sheets_by_path),
+            textures_by_path,
+            sprite_sheets_by_path,
         }
     }
 }

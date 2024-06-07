@@ -98,7 +98,7 @@ impl WalkAround {
                     } else {
                         walk_player(&mut mctx.actors[..], dir, None).await;
 
-                        **mctx.steps += 1;
+                        *mctx.steps += 1;
 
                         // slide over ice tiles until level or blocking tile edge is reached
                         loop {
@@ -146,8 +146,8 @@ impl WalkAround {
                 } else if mctx.input.is_key_pressed(GameKey::DebugLevelUp) {
                     return WalkAroundEvent::DebugLevelUp;
                 } else if mctx.input.is_key_pressed(GameKey::DebugSteps) {
-                    let steps = **mctx.steps;
-                    **mctx.steps = 0;
+                    let steps = *mctx.steps;
+                    *mctx.steps = 0;
                     return WalkAroundEvent::DebugSteps(steps);
                 } else if mctx.input.is_key_pressed(GameKey::DebugEquip1) {
                     return WalkAroundEvent::DebugEquip(1);
