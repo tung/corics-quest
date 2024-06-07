@@ -105,6 +105,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         defense: 24,
                         weakness: Some(Magic::FireEdge),
                         exp: 500,
+                        actions: &[],
                     },
                     true,
                 );
@@ -162,6 +163,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         defense: 46,
                         weakness: Some(Magic::EarthEdge),
                         exp: 2000,
+                        actions: &[],
                     },
                     true,
                 );
@@ -219,6 +221,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         defense: 74,
                         weakness: Some(Magic::WaterEdge),
                         exp: 9000,
+                        actions: &[],
                     },
                     true,
                 );
@@ -348,6 +351,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                             defense: 74,
                             weakness: Some(Magic::WaterEdge),
                             exp: 5,
+                            actions: &[],
                         },
                         false,
                     );

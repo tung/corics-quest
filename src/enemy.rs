@@ -20,6 +20,14 @@ pub struct Enemy {
     pub defense: i32,
     pub weakness: Option<Magic>,
     pub exp: i32,
+    pub actions: &'static [EnemyAction],
+}
+
+#[derive(Clone)]
+pub struct EnemyAction {
+    pub chance: u32,
+    pub msg: &'static str,
+    pub damage_factor: Option<f32>,
 }
 
 const ENEMIES_WILDERNESS1: &[Enemy] = &[
@@ -32,6 +40,11 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         defense: 1,
         weakness: None,
         exp: 10,
+        actions: &[EnemyAction {
+            chance: 20,
+            msg: "twitches its whiskers.",
+            damage_factor: None,
+        }],
     },
     // level 2
     Enemy {
@@ -42,6 +55,11 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         defense: 3,
         weakness: None,
         exp: 15,
+        actions: &[EnemyAction {
+            chance: 20,
+            msg: "growls at Coric.",
+            damage_factor: None,
+        }],
     },
     // level 3
     Enemy {
@@ -52,6 +70,18 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         defense: 6,
         weakness: None,
         exp: 22,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "charges at Coric!",
+                damage_factor: Some(1.3),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "charges at Coric!\nCoric steps aside!",
+                damage_factor: None,
+            },
+        ],
     },
     // level 4
     Enemy {
@@ -62,6 +92,11 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         defense: 8,
         weakness: None,
         exp: 30,
+        actions: &[EnemyAction {
+            chance: 20,
+            msg: "hisses at Coric.",
+            damage_factor: None,
+        }],
     },
 ];
 
@@ -75,6 +110,18 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         defense: 21,
         weakness: Some(Magic::FireEdge),
         exp: 96,
+        actions: &[
+            EnemyAction {
+                chance: 10,
+                msg: "swoops forward and bites!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 20,
+                msg: "hovers to and fro.",
+                damage_factor: None,
+            },
+        ],
     },
     // level 10
     Enemy {
@@ -85,6 +132,11 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         defense: 23,
         weakness: None,
         exp: 115,
+        actions: &[EnemyAction {
+            chance: 20,
+            msg: "bites Coric!",
+            damage_factor: Some(1.3),
+        }],
     },
     // level 11
     Enemy {
@@ -95,6 +147,11 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         defense: 26,
         weakness: None,
         exp: 139,
+        actions: &[EnemyAction {
+            chance: 15,
+            msg: "spits a stinger at Coric!",
+            damage_factor: Some(1.5),
+        }],
     },
     // level 12
     Enemy {
@@ -105,6 +162,18 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         defense: 28,
         weakness: None,
         exp: 166,
+        actions: &[
+            EnemyAction {
+                chance: 20,
+                msg: "lunges and bites Coric!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "lunges at Coric!\nCoric narrowly dodges!",
+                damage_factor: None,
+            },
+        ],
     },
 ];
 
@@ -118,6 +187,11 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         defense: 41,
         weakness: Some(Magic::EarthEdge),
         exp: 414,
+        actions: &[EnemyAction {
+            chance: 30,
+            msg: "swoops with its claws bared!",
+            damage_factor: Some(1.3),
+        }],
     },
     // level 18
     Enemy {
@@ -128,6 +202,18 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         defense: 43,
         weakness: None,
         exp: 496,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "stabs Coric with its dagger!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "thrusts its dagger!\nCoric deflects the attack!",
+                damage_factor: None,
+            },
+        ],
     },
     // level 19
     Enemy {
@@ -138,6 +224,18 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         defense: 46,
         weakness: Some(Magic::WaterEdge),
         exp: 596,
+        actions: &[
+            EnemyAction {
+                chance: 20,
+                msg: "swipes Coric with its claws!",
+                damage_factor: Some(1.3),
+            },
+            EnemyAction {
+                chance: 20,
+                msg: "swings its claws wildly!\nCoric blocks some strikes.",
+                damage_factor: Some(0.5),
+            },
+        ],
     },
     // level 20
     Enemy {
@@ -148,6 +246,18 @@ const ENEMIES_WILDERNESS3: &[Enemy] = &[
         defense: 49,
         weakness: None,
         exp: 715,
+        actions: &[
+            EnemyAction {
+                chance: 10,
+                msg: "charges and gouges Coric!",
+                damage_factor: Some(1.8),
+            },
+            EnemyAction {
+                chance: 20,
+                msg: "charges at Coric!\nCoric leaps aside!",
+                damage_factor: None,
+            },
+        ],
     },
 ];
 
@@ -161,6 +271,18 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         defense: 11,
         weakness: None,
         exp: 41,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "bites Coric!",
+                damage_factor: Some(1.3),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "screeches and flutters about.",
+                damage_factor: None,
+            },
+        ],
     },
     // level 6
     Enemy {
@@ -171,6 +293,11 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         defense: 14,
         weakness: None,
         exp: 53,
+        actions: &[EnemyAction {
+            chance: 20,
+            msg: "thrusts its stinger!",
+            damage_factor: Some(1.4),
+        }],
     },
     // level 7
     Enemy {
@@ -181,6 +308,18 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         defense: 16,
         weakness: None,
         exp: 67,
+        actions: &[
+            EnemyAction {
+                chance: 20,
+                msg: "throws a knife at Coric!",
+                damage_factor: Some(1.3),
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "tosses a knife!\nIt barely grazes Coric!",
+                damage_factor: Some(0.3),
+            },
+        ],
     },
     // level 8
     Enemy {
@@ -191,6 +330,11 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         defense: 19,
         weakness: Some(Magic::FireEdge),
         exp: 80,
+        actions: &[EnemyAction {
+            chance: 15,
+            msg: "swings its stony fist!",
+            damage_factor: Some(1.4),
+        }],
     },
 ];
 
@@ -204,6 +348,11 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         defense: 31,
         weakness: None,
         exp: 199,
+        actions: &[EnemyAction {
+            chance: 10,
+            msg: "quivers in place.",
+            damage_factor: None,
+        }],
     },
     // level 14
     Enemy {
@@ -214,6 +363,18 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         defense: 33,
         weakness: None,
         exp: 239,
+        actions: &[
+            EnemyAction {
+                chance: 20,
+                msg: "extends its ethereal touch!",
+                damage_factor: Some(1.3),
+            },
+            EnemyAction {
+                chance: 20,
+                msg: "emits a chilling breeze!",
+                damage_factor: Some(0.7),
+            },
+        ],
     },
     // level 15
     Enemy {
@@ -224,6 +385,18 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         defense: 66,
         weakness: None,
         exp: 287,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "extends its neck and bites!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "slowly advances on Coric.",
+                damage_factor: None,
+            },
+        ],
     },
     // level 16
     Enemy {
@@ -234,6 +407,23 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         defense: 39,
         weakness: Some(Magic::EarthEdge),
         exp: 345,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "fires a jet of water!",
+                damage_factor: Some(1.7),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "fires a jet of water!\nCoric dodges some of it!",
+                damage_factor: Some(0.5),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "roars in anger!",
+                damage_factor: None,
+            },
+        ],
     },
 ];
 
@@ -247,6 +437,18 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         defense: 51,
         weakness: None,
         exp: 858,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "casts its burning gaze!",
+                damage_factor: Some(1.4),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "casts its burning gaze!\nCoric narrowly averts his eyes!",
+                damage_factor: None,
+            },
+        ],
     },
     // level 22
     Enemy {
@@ -257,6 +459,18 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         defense: 53,
         weakness: None,
         exp: 1029,
+        actions: &[
+            EnemyAction {
+                chance: 20,
+                msg: "conjures infernal bolts!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "mutters incoherent curses.",
+                damage_factor: None,
+            },
+        ],
     },
     // level 23
     Enemy {
@@ -267,6 +481,23 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         defense: 56,
         weakness: None,
         exp: 1235,
+        actions: &[
+            EnemyAction {
+                chance: 15,
+                msg: "swings its huge axe!",
+                damage_factor: Some(1.5),
+            },
+            EnemyAction {
+                chance: 15,
+                msg: "swings its huge axe!\nCoric blocks the strike!",
+                damage_factor: None,
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "grunts in anger.",
+                damage_factor: None,
+            },
+        ],
     },
     // level 24
     Enemy {
@@ -277,6 +508,23 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
         defense: 59,
         weakness: Some(Magic::WaterEdge),
         exp: 1482,
+        actions: &[
+            EnemyAction {
+                chance: 25,
+                msg: "sinks its fangs into Coric!",
+                damage_factor: Some(1.7),
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "lunges at Coric!\nCoric barely dodges!",
+                damage_factor: None,
+            },
+            EnemyAction {
+                chance: 10,
+                msg: "bares its fangs.",
+                damage_factor: None,
+            },
+        ],
     },
 ];
 

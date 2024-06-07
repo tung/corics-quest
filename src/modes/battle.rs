@@ -679,32 +679,51 @@ impl Battle {
                 return BattleEvent::Victory;
             }
 
-            let base_damage = calc_base_damage(self.enemy.attack, mctx.progress.defense);
-            let damage = base_damage.trunc() as i32
-                + if (mctx.rng.random(100) as f32) < base_damage.fract() * 100.0 {
-                    1
-                } else {
-                    0
-                };
+            let mut enemy_action = EnemyAction {
+                chance: 100,
+                msg: "attacks!",
+                damage_factor: Some(1.0),
+            };
 
-            for _ in 0..5 {
-                self.status_visible = false;
-                wait_once().await;
-                wait_once().await;
-                self.status_visible = true;
-                wait_once().await;
-                wait_once().await;
+            let mut enemy_roll = mctx.rng.random(100);
+            for action in self.enemy.actions {
+                if enemy_roll < action.chance {
+                    enemy_action = action.clone();
+                    break;
+                } else {
+                    enemy_roll -= action.chance;
+                }
             }
 
-            self.show_status_change(mctx, &format!("{damage}"));
-            mctx.progress.hp -= damage.min(mctx.progress.hp);
-            self.update_status(mctx);
+            let mut enemy_msg = format!("{} {}", self.enemy.name, enemy_action.msg);
 
-            self.message_text.set_text(
-                mctx.gctx,
-                mctx.res,
-                &format!("{} attacks!\n{damage} HP damage to Coric.", self.enemy.name),
-            );
+            if let Some(damage_factor) = enemy_action.damage_factor {
+                let base_damage =
+                    calc_base_damage(self.enemy.attack, mctx.progress.defense) * damage_factor;
+                let damage = base_damage.trunc() as i32
+                    + if (mctx.rng.random(100) as f32) < base_damage.fract() * 100.0 {
+                        1
+                    } else {
+                        0
+                    };
+
+                for _ in 0..5 {
+                    self.status_visible = false;
+                    wait_once().await;
+                    wait_once().await;
+                    self.status_visible = true;
+                    wait_once().await;
+                    wait_once().await;
+                }
+
+                self.show_status_change(mctx, &format!("{damage}"));
+                mctx.progress.hp -= damage.min(mctx.progress.hp);
+                self.update_status(mctx);
+
+                enemy_msg.push_str(&format!("\n{damage} HP damage to Coric."));
+            }
+
+            self.message_text.set_text(mctx.gctx, mctx.res, &enemy_msg);
             self.message_text.reveal().await;
             self.wait_for_confirmation(mctx).await;
 
