@@ -92,7 +92,9 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
         }),
         on_talk: &[(ActorType::Earth, |sctx| {
             Box::pin(async {
-                sctx.push_text_box_mode("Earth:\nI am the Earth Spirit.\nPrepare to die!");
+                sctx.push_text_box_mode(
+                    "Earth:\nI will return you to the dust\nwhence you came, mortal!",
+                );
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
@@ -176,7 +178,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
         }),
         on_talk: &[(ActorType::Water, |sctx| {
             Box::pin(async {
-                sctx.push_text_box_mode("Water:\nI am the Water Spirit.\nPrepare to die!");
+                sctx.push_text_box_mode("Water:\nThe Water of Life claims all souls!");
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
@@ -260,7 +262,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
         }),
         on_talk: &[(ActorType::Fire, |sctx| {
             Box::pin(async {
-                sctx.push_text_box_mode("Fire:\nI am the Fire Spirit.\nPrepare to die!");
+                sctx.push_text_box_mode("Fire:\nYour flame of life will be\nextinguished here!");
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
