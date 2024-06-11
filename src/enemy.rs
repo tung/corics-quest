@@ -41,7 +41,7 @@ const ENEMIES_WILDERNESS1: &[Enemy] = &[
         weakness: None,
         exp: 10,
         actions: &[EnemyAction {
-            chance: 20,
+            chance: 25,
             msg: "twitches its whiskers.",
             damage_factor: None,
         }],
@@ -133,7 +133,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         weakness: None,
         exp: 115,
         actions: &[EnemyAction {
-            chance: 20,
+            chance: 30,
             msg: "bites Coric!",
             damage_factor: Some(1.3),
         }],
@@ -148,7 +148,7 @@ const ENEMIES_WILDERNESS2: &[Enemy] = &[
         weakness: None,
         exp: 139,
         actions: &[EnemyAction {
-            chance: 15,
+            chance: 20,
             msg: "spits a stinger at Coric!",
             damage_factor: Some(1.5),
         }],
@@ -294,7 +294,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         weakness: None,
         exp: 53,
         actions: &[EnemyAction {
-            chance: 20,
+            chance: 25,
             msg: "thrusts its stinger!",
             damage_factor: Some(1.4),
         }],
@@ -331,7 +331,7 @@ const ENEMIES_EARTH_CASTLE: &[Enemy] = &[
         weakness: Some(Magic::FireEdge),
         exp: 80,
         actions: &[EnemyAction {
-            chance: 15,
+            chance: 20,
             msg: "swings its stony fist!",
             damage_factor: Some(1.4),
         }],
@@ -349,7 +349,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         weakness: None,
         exp: 199,
         actions: &[EnemyAction {
-            chance: 10,
+            chance: 15,
             msg: "quivers in place.",
             damage_factor: None,
         }],
@@ -387,7 +387,7 @@ const ENEMIES_WATER_CASTLE: &[Enemy] = &[
         exp: 287,
         actions: &[
             EnemyAction {
-                chance: 15,
+                chance: 20,
                 msg: "extends its neck and bites!",
                 damage_factor: Some(1.5),
             },
