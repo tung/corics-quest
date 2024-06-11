@@ -3,7 +3,7 @@ pub struct Armor {
     pub defense: i32,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Item {
     Salve,
     XSalve,
@@ -244,6 +244,20 @@ impl Progress {
         self.exp -= next_exp;
         self.gain_level();
         true
+    }
+
+    pub fn maybe_give_items(&mut self, item: Item, min_amount: i32) -> i32 {
+        let item_slot = match self.items.iter_mut().find(|s| s.item == item) {
+            Some(s) => s,
+            None => panic!("progress item slot for {:?}", item),
+        };
+        if item_slot.amount < min_amount {
+            let given = min_amount - item_slot.amount;
+            item_slot.amount = min_amount;
+            given
+        } else {
+            0
+        }
     }
 
     pub fn maybe_upgrade_armor(&mut self, name: &str, defense: i32) -> bool {

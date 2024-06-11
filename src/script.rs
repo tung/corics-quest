@@ -35,25 +35,133 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Ducille, |sctx| {
                 Box::pin(async {
-                    sctx.push_text_box_mode("Ducille:\nHi Coric!");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
+                    let (salves, xsalves, tonics) = if !sctx.progress.earth_defeated {
+                        (1, 0, 1)
+                    } else if !sctx.progress.water_defeated {
+                        (2, 0, 2)
+                    } else {
+                        (1, 1, 2)
+                    };
+                    let salves_given = sctx.progress.maybe_give_items(Item::Salve, salves);
+                    let xsalves_given = sctx.progress.maybe_give_items(Item::XSalve, xsalves);
+                    let tonics_given = sctx.progress.maybe_give_items(Item::Tonic, tonics);
+                    if salves_given + xsalves_given + tonics_given > 0 {
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             You need items, Coric?\n\
+                             Let's see what I can find...",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    if salves_given > 0 {
+                        if salves_given == 1 {
+                            sctx.push_text_box_mode("Coric got a Salve!");
+                        } else {
+                            sctx.push_text_box_mode(&format!("Coric got {salves_given} Salves!"));
+                        }
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    if xsalves_given > 0 {
+                        if xsalves_given == 1 {
+                            sctx.push_text_box_mode("Coric got an XSalve!");
+                        } else {
+                            sctx.push_text_box_mode(&format!("Coric got {xsalves_given} XSalves!"));
+                        }
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    if tonics_given > 0 {
+                        if tonics_given == 1 {
+                            sctx.push_text_box_mode("Coric got a Tonic!");
+                        } else {
+                            sctx.push_text_box_mode(&format!("Coric got {tonics_given} Tonics!"));
+                        }
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+
+                    if !sctx.progress.earth_defeated {
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             You can rest in your bed\n\
+                             to recover and save.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.water_defeated {
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             If you fall in battle,\n\
+                             we'll bring you back home.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.fire_defeated {
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             The spirits were possessed, you say?\n\
+                             I wonder how that came to be...",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
                 })
             }),
             (ActorType::Jace, |sctx| {
                 Box::pin(async {
-                    sctx.push_text_box_mode("Jace:\nHey Coric.");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
+                    if !sctx.progress.earth_defeated {
+                        sctx.push_text_box_mode(
+                            "Jace:\n\
+                             The spirits reside in three castles.\n\
+                             The Earth Castle lies to the east.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.water_defeated {
+                        sctx.push_text_box_mode(
+                            "Jace:\n\
+                             Head to the Water Castle, across\n\
+                             the lakes and forests to the west.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.fire_defeated {
+                        sctx.push_text_box_mode(
+                            "Jace:\n\
+                             Across the chasms and cliffs\n\
+                             to the north lies the Fire Castle.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
                 })
             }),
             (ActorType::Julis, |sctx| {
                 Box::pin(async {
-                    sctx.push_text_box_mode("Julis:\nHi Coric!");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
-                    if sctx.progress.maybe_upgrade_armor("Leather Armor", 2) {
-                        sctx.push_text_box_mode("Julis:\nHere's your Leather Armor.");
+                    if !sctx.progress.earth_defeated {
+                        sctx.push_text_box_mode(
+                            "Julis:\n\
+                             Talk to us when you make progress;\n\
+                             we'll have more to tell you.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.water_defeated {
+                        sctx.push_text_box_mode(
+                            "Julis:\n\
+                             Ducille tends to the apocathery;\n\
+                             Jace knows the lay of the land.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.fire_defeated {
+                        sctx.push_text_box_mode(
+                            "Julis:\n\
+                             We have records of vampires\n\
+                             bested by water.",
+                        );
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
@@ -61,14 +169,50 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Matero, |sctx| {
                 Box::pin(async {
-                    sctx.push_text_box_mode("Matero:\nHey Coric.");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
-                    sctx.push_text_box_mode("Matero:\nNice cape!");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
-                    if sctx.progress.maybe_upgrade_weapon("Short Sword", 2) {
-                        sctx.push_text_box_mode("Matero:\nHere's your Short Sword.");
+                    let weapon_given = sctx.progress.maybe_upgrade_weapon("Short Sword", 2);
+                    let armor_given = sctx.progress.maybe_upgrade_armor("Leather Armor", 2);
+                    if weapon_given || armor_given {
+                        sctx.push_text_box_mode(
+                            "Matero:\n\
+                             Going on a quest?\n\
+                             I have some gear you can use.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    if weapon_given {
+                        sctx.push_text_box_mode("Coric got a Short Sword!");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    if armor_given {
+                        sctx.push_text_box_mode("Coric got a Leather Armor!");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+
+                    if !sctx.progress.earth_defeated {
+                        sctx.push_text_box_mode(
+                            "Matero:\n\
+                             If you use magic on a foe, you can\n\
+                             follow up next turn for more damage.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.water_defeated {
+                        sctx.push_text_box_mode(
+                            "Matero:\n\
+                             Rumor has it that each castle has\n\
+                             a weapon and an armor to find.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    } else if !sctx.progress.fire_defeated {
+                        sctx.push_text_box_mode(
+                            "Matero:\n\
+                             If spikes block your path, you can\n\
+                             pull a lever to retract them.",
+                        );
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
