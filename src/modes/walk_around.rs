@@ -9,11 +9,6 @@ use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 pub struct WalkAround;
 
 pub enum WalkAroundEvent {
-    DebugQuit,
-    DebugLevelUp,
-    DebugSteps(i32),
-    DebugEquip(i32),
-    DebugBattle(i32),
     DebugMenu,
     Encounter,
     MainMenu,
@@ -127,9 +122,7 @@ impl WalkAround {
             } else {
                 mctx.actors[0].stop_walk_animation();
 
-                if mctx.input.is_key_pressed(GameKey::DebugQuit) {
-                    return WalkAroundEvent::DebugQuit;
-                } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                if mctx.input.is_key_pressed(GameKey::Confirm) {
                     let Actor {
                         grid_x,
                         grid_y,
@@ -144,32 +137,6 @@ impl WalkAround {
                     return WalkAroundEvent::MainMenu;
                 } else if mctx.input.is_key_pressed(GameKey::DebugBattle) {
                     return WalkAroundEvent::Encounter;
-                } else if mctx.input.is_key_pressed(GameKey::DebugLevelUp) {
-                    return WalkAroundEvent::DebugLevelUp;
-                } else if mctx.input.is_key_pressed(GameKey::DebugSteps) {
-                    let steps = *mctx.steps;
-                    *mctx.steps = 0;
-                    return WalkAroundEvent::DebugSteps(steps);
-                } else if mctx.input.is_key_pressed(GameKey::DebugEquip1) {
-                    return WalkAroundEvent::DebugEquip(1);
-                } else if mctx.input.is_key_pressed(GameKey::DebugEquip2) {
-                    return WalkAroundEvent::DebugEquip(2);
-                } else if mctx.input.is_key_pressed(GameKey::DebugEquip3) {
-                    return WalkAroundEvent::DebugEquip(3);
-                } else if mctx.input.is_key_pressed(GameKey::DebugEquip4) {
-                    return WalkAroundEvent::DebugEquip(4);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle1) {
-                    return WalkAroundEvent::DebugBattle(1);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle2) {
-                    return WalkAroundEvent::DebugBattle(2);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle3) {
-                    return WalkAroundEvent::DebugBattle(3);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle4) {
-                    return WalkAroundEvent::DebugBattle(4);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle5) {
-                    return WalkAroundEvent::DebugBattle(5);
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle6) {
-                    return WalkAroundEvent::DebugBattle(6);
                 } else if mctx.input.is_key_pressed(GameKey::DebugMenu) {
                     return WalkAroundEvent::DebugMenu;
                 }
