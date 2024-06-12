@@ -242,45 +242,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
-                sctx.push_battle_mode(
-                    Enemy {
-                        name: "Earth",
-                        sprite_path: "earth.png",
-                        hp: 1700,
-                        attack: 27,
-                        defense: 24,
-                        weakness: Some(Magic::FireEdge),
-                        exp: 500,
-                        actions: &[
-                            EnemyAction {
-                                chance: 10,
-                                msg: "hurls a massive boulder!",
-                                damage_factor: Some(2.0),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "hurls a massive boulder!\nCoric deftly leaps aside!",
-                                damage_factor: None,
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "slams its fist the ground!\nCoric is pummeled by debris!",
-                                damage_factor: Some(1.5),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "throws debris at Coric!\nCoric deflects some of it!",
-                                damage_factor: Some(0.5),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "roars with a bitter rage!",
-                                damage_factor: None,
-                            },
-                        ],
-                    },
-                    true,
-                );
+                sctx.push_battle_mode(Enemy::earth_spirit(), true);
 
                 let earth = sctx
                     .actors
@@ -326,45 +288,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
-                sctx.push_battle_mode(
-                    Enemy {
-                        name: "Water",
-                        sprite_path: "water.png",
-                        hp: 5000,
-                        attack: 49,
-                        defense: 46,
-                        weakness: Some(Magic::EarthEdge),
-                        exp: 2000,
-                        actions: &[
-                            EnemyAction {
-                                chance: 10,
-                                msg: "throws columns of ice!\nOne of them hits Coric!",
-                                damage_factor: Some(1.6),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "throws columns of ice!\nCoric narrowly dodges them!",
-                                damage_factor: None,
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "summons a huge wave!\nCoric is slammed!",
-                                damage_factor: Some(1.3),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "fires a torrent of water!",
-                                damage_factor: Some(1.1),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "emits a hollow wail!",
-                                damage_factor: None,
-                            },
-                        ],
-                    },
-                    true,
-                );
+                sctx.push_battle_mode(Enemy::water_spirit(), true);
 
                 let water = sctx
                     .actors
@@ -410,45 +334,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
-                sctx.push_battle_mode(
-                    Enemy {
-                        name: "Fire",
-                        sprite_path: "fire.png",
-                        hp: 10000,
-                        attack: 77,
-                        defense: 74,
-                        weakness: Some(Magic::WaterEdge),
-                        exp: 9000,
-                        actions: &[
-                            EnemyAction {
-                                chance: 10,
-                                msg: "summons roaring flames!\nCoric is roasted!",
-                                damage_factor: Some(1.8),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "shoots infernal bolts!\nOne of them hits Coric!",
-                                damage_factor: Some(1.5),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "shoots infernal bolts!\nCoric weaves between them!",
-                                damage_factor: None,
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "whips up glowing embers!\nCoric is burned!",
-                                damage_factor: Some(0.7),
-                            },
-                            EnemyAction {
-                                chance: 10,
-                                msg: "lets out a piercing cry!",
-                                damage_factor: None,
-                            },
-                        ],
-                    },
-                    true,
-                );
+                sctx.push_battle_mode(Enemy::fire_spirit(), true);
 
                 let fire = sctx
                     .actors
@@ -561,6 +447,124 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 let enemy = group.random_enemy(&mut sctx.rng);
                 sctx.push_battle_mode(enemy, false);
                 handle_battle(&mut sctx).await;
+            }
+            WalkAroundEvent::DebugMenu => {
+                sctx.push_debug_menu_mode();
+                let debug_menu_event = sctx.update_debug_menu_mode().await;
+                sctx.pop_mode();
+                match debug_menu_event {
+                    DebugMenuEvent::Cancel => {}
+                    DebugMenuEvent::GainLevel => {
+                        sctx.progress.exp = 0;
+                        sctx.progress.gain_level();
+                        sctx.push_text_box_mode(&format!(
+                            "Coric is now level {}!",
+                            sctx.progress.level,
+                        ));
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    DebugMenuEvent::Battle(battle) => {
+                        let (enemy, boss_fight) = if battle < 6 {
+                            let group = match battle {
+                                0 => EncounterGroup::Wilderness1,
+                                1 => EncounterGroup::Wilderness2,
+                                2 => EncounterGroup::Wilderness3,
+                                3 => EncounterGroup::EarthCastle,
+                                4 => EncounterGroup::WaterCastle,
+                                5 => EncounterGroup::FireCastle,
+                                _ => unreachable!(),
+                            };
+                            (group.random_enemy(&mut sctx.rng), false)
+                        } else {
+                            (
+                                match battle {
+                                    6 => Enemy::earth_spirit(),
+                                    7 => Enemy::water_spirit(),
+                                    8 => Enemy::fire_spirit(),
+                                    b => panic!("invalid battle number: {b}"),
+                                },
+                                true,
+                            )
+                        };
+                        sctx.push_battle_mode(enemy, boss_fight);
+                        handle_battle(&mut sctx).await;
+                    }
+                    DebugMenuEvent::SetWeapon(weapon) => {
+                        sctx.progress.attack += weapon.as_ref().map(|w| w.attack).unwrap_or(0)
+                            - sctx.progress.weapon.as_ref().map(|w| w.attack).unwrap_or(0);
+                        sctx.progress.weapon = weapon;
+
+                        sctx.push_text_box_mode(&format!(
+                            "Coric's weapon is now {}.",
+                            sctx.progress
+                                .weapon
+                                .as_ref()
+                                .map(|w| w.name.as_str())
+                                .unwrap_or("(none)"),
+                        ));
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    DebugMenuEvent::SetArmor(armor) => {
+                        sctx.progress.defense += armor.as_ref().map(|a| a.defense).unwrap_or(0)
+                            - sctx.progress.armor.as_ref().map(|a| a.defense).unwrap_or(0);
+                        sctx.progress.armor = armor;
+
+                        sctx.push_text_box_mode(&format!(
+                            "Coric's armor is now {}.",
+                            sctx.progress
+                                .armor
+                                .as_ref()
+                                .map(|a| a.name.as_str())
+                                .unwrap_or("(none)"),
+                        ));
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    DebugMenuEvent::GetItems => {
+                        sctx.progress.maybe_give_items(Item::Salve, 2);
+                        sctx.progress.maybe_give_items(Item::XSalve, 2);
+                        sctx.progress.maybe_give_items(Item::Tonic, 2);
+                        sctx.progress.maybe_give_items(Item::XTonic, 2);
+                    }
+                    DebugMenuEvent::LearnAllMagic => {
+                        learn_magic(&mut sctx, Magic::Heal).await;
+                        learn_magic(&mut sctx, Magic::FireEdge).await;
+                        learn_magic(&mut sctx, Magic::EarthEdge).await;
+                        learn_magic(&mut sctx, Magic::WaterEdge).await;
+                    }
+                    DebugMenuEvent::ResetStepCounts => {
+                        sctx.steps = 0;
+                        sctx.push_text_box_mode("Step counts reset.");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    DebugMenuEvent::ChangeFlag(flag) => {
+                        let (name, new_value) = match flag {
+                            0 => {
+                                sctx.progress.earth_defeated ^= true;
+                                ("earth_defeated", sctx.progress.earth_defeated)
+                            }
+                            1 => {
+                                sctx.progress.water_defeated ^= true;
+                                ("water_defeated", sctx.progress.water_defeated)
+                            }
+                            2 => {
+                                sctx.progress.fire_defeated ^= true;
+                                ("fire_defeated", sctx.progress.fire_defeated)
+                            }
+                            f => panic!("unknown flag number: {f}"),
+                        };
+                        sctx.push_text_box_mode(&format!("{name} is now {new_value}."));
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+                    DebugMenuEvent::Warp { level_id, x, y } => {
+                        warp_to_level(&mut sctx, level_id, x, y).await;
+                    }
+                    DebugMenuEvent::Quit => return,
+                }
             }
             WalkAroundEvent::Encounter => {
                 if let Some(enemy) = sctx.level.encounters.map(|g| g.random_enemy(&mut sctx.rng)) {
@@ -742,6 +746,20 @@ async fn run_level_on_enter(sctx: &mut ScriptContext) {
     }
 }
 
+async fn warp_to_level(sctx: &mut ScriptContext, level_id: &'static str, x: i32, y: i32) {
+    let (level, mut actors) = sctx.level_by_identifier(level_id);
+    sctx.actors.truncate(1);
+    let mut player = sctx.actors.pop().expect("player actor");
+    player.grid_x = x;
+    player.grid_y = y;
+    player.start_animation("face_s");
+    actors.insert(0, player);
+    *sctx.level = level;
+    *sctx.actors = actors;
+
+    run_level_on_enter(sctx).await;
+}
+
 async fn handle_battle(sctx: &mut ScriptContext) -> bool {
     sctx.actors[0].visible = false;
     let event = sctx.update_battle_mode().await;
@@ -754,17 +772,7 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
             sctx.fade_out(90).await;
 
             // warp player back to town
-            let (level, mut actors) = sctx.level_by_identifier("Start");
-            sctx.actors.truncate(1);
-            let mut player = sctx.actors.pop().expect("player actor");
-            player.grid_x = 6;
-            player.grid_y = 3;
-            player.start_animation("face_s");
-            actors.insert(0, player);
-            *sctx.level = level;
-            *sctx.actors = actors;
-
-            run_level_on_enter(sctx).await;
+            warp_to_level(sctx, "Start", 6, 3).await;
 
             sctx.progress.hp = sctx.progress.max_hp;
             sctx.progress.mp = sctx.progress.max_mp;

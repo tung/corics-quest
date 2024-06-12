@@ -14,6 +14,7 @@ pub enum WalkAroundEvent {
     DebugSteps(i32),
     DebugEquip(i32),
     DebugBattle(i32),
+    DebugMenu,
     Encounter,
     MainMenu,
     TalkActor(usize),
@@ -169,6 +170,8 @@ impl WalkAround {
                     return WalkAroundEvent::DebugBattle(5);
                 } else if mctx.input.is_key_pressed(GameKey::DebugBattle6) {
                     return WalkAroundEvent::DebugBattle(6);
+                } else if mctx.input.is_key_pressed(GameKey::DebugMenu) {
+                    return WalkAroundEvent::DebugMenu;
                 }
             }
         }

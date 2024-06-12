@@ -528,6 +528,125 @@ const ENEMIES_FIRE_CASTLE: &[Enemy] = &[
     },
 ];
 
+impl Enemy {
+    pub fn earth_spirit() -> Self {
+        Self {
+            name: "Earth",
+            sprite_path: "earth.png",
+            hp: 1700,
+            attack: 27,
+            defense: 24,
+            weakness: Some(Magic::FireEdge),
+            exp: 500,
+            actions: &[
+                EnemyAction {
+                    chance: 10,
+                    msg: "hurls a massive boulder!",
+                    damage_factor: Some(2.0),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "hurls a massive boulder!\nCoric deftly leaps aside!",
+                    damage_factor: None,
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "slams its fist the ground!\nCoric is pummeled by debris!",
+                    damage_factor: Some(1.5),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "throws debris at Coric!\nCoric deflects some of it!",
+                    damage_factor: Some(0.5),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "roars with a bitter rage!",
+                    damage_factor: None,
+                },
+            ],
+        }
+    }
+
+    pub fn fire_spirit() -> Self {
+        Self {
+            name: "Fire",
+            sprite_path: "fire.png",
+            hp: 10000,
+            attack: 77,
+            defense: 74,
+            weakness: Some(Magic::WaterEdge),
+            exp: 9000,
+            actions: &[
+                EnemyAction {
+                    chance: 10,
+                    msg: "summons roaring flames!\nCoric is roasted!",
+                    damage_factor: Some(1.8),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "shoots infernal bolts!\nOne of them hits Coric!",
+                    damage_factor: Some(1.5),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "shoots infernal bolts!\nCoric weaves between them!",
+                    damage_factor: None,
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "whips up glowing embers!\nCoric is burned!",
+                    damage_factor: Some(0.7),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "lets out a piercing cry!",
+                    damage_factor: None,
+                },
+            ],
+        }
+    }
+
+    pub fn water_spirit() -> Self {
+        Self {
+            name: "Water",
+            sprite_path: "water.png",
+            hp: 5000,
+            attack: 49,
+            defense: 46,
+            weakness: Some(Magic::EarthEdge),
+            exp: 2000,
+            actions: &[
+                EnemyAction {
+                    chance: 10,
+                    msg: "throws columns of ice!\nOne of them hits Coric!",
+                    damage_factor: Some(1.6),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "throws columns of ice!\nCoric narrowly dodges them!",
+                    damage_factor: None,
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "summons a huge wave!\nCoric is slammed!",
+                    damage_factor: Some(1.3),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "fires a torrent of water!",
+                    damage_factor: Some(1.1),
+                },
+                EnemyAction {
+                    chance: 10,
+                    msg: "emits a hollow wail!",
+                    damage_factor: None,
+                },
+            ],
+        }
+    }
+}
+
 impl EncounterGroup {
     pub fn random_enemy(self, rng: &mut Rng) -> Enemy {
         let group = match self {

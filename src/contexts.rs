@@ -220,6 +220,11 @@ impl ScriptContext {
         ));
     }
 
+    pub fn push_debug_menu_mode(&mut self) {
+        let gctx = self.gctx();
+        self.modes.push(DebugMenu::new(gctx, &self.res));
+    }
+
     pub fn push_main_menu_mode(&mut self) {
         let gctx = self.gctx();
         self.modes
@@ -236,6 +241,7 @@ impl ScriptContext {
     }
 
     update_mode!(update_battle_mode, BattleEvent);
+    update_mode!(update_debug_menu_mode, DebugMenuEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
