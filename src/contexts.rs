@@ -204,6 +204,11 @@ impl ScriptContext {
         );
     }
 
+    pub fn place_gates(&mut self, tile_x: i32, tile_y: i32) {
+        let gctx = self.gctx();
+        self.level.place_gates(gctx, tile_x, tile_y);
+    }
+
     pub fn pop_mode(&mut self) {
         self.modes.pop();
     }

@@ -221,6 +221,17 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
         ],
     },
     LevelScripts {
+        level_name: "Level_10",
+        on_enter: Some(|sctx| {
+            Box::pin(async {
+                if !sctx.progress.earth_defeated {
+                    sctx.place_gates(9, 10);
+                }
+            })
+        }),
+        on_talk: &[],
+    },
+    LevelScripts {
         level_name: "Earth_4",
         on_enter: Some(|sctx| {
             Box::pin(async {
@@ -267,6 +278,17 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                 sctx.progress.earth_defeated = true;
             })
         })],
+    },
+    LevelScripts {
+        level_name: "Level_17",
+        on_enter: Some(|sctx| {
+            Box::pin(async {
+                if !sctx.progress.water_defeated {
+                    sctx.place_gates(29, 12);
+                }
+            })
+        }),
+        on_talk: &[],
     },
     LevelScripts {
         level_name: "Water_4",

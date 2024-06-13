@@ -177,6 +177,22 @@ impl Layer {
         self.tile_data[offset..offset + 2] == ICE_TILE
     }
 
+    fn place_gates(&mut self, gctx: &mut GraphicsContext, tile_x: i32, tile_y: i32) {
+        assert!(self.identifier == "Props");
+
+        let offset = 4 * (tile_y as usize * self.c_wid as usize + tile_x as usize);
+
+        // gate at the tile
+        self.tile_data[offset] = 2;
+        self.tile_data[offset + 1] = 0;
+
+        // gate one tile to the right
+        self.tile_data[offset + 4] = 2;
+        self.tile_data[offset + 5] = 0;
+
+        self.bindings.images[0].update(gctx, &self.tile_data[..]);
+    }
+
     fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
         assert!(self.identifier == "Props");
 
@@ -316,6 +332,14 @@ impl Level {
             .find(|l| l.identifier == "Base")
             .expect("Base layer")
             .is_ice_tile(tile_x, tile_y)
+    }
+
+    pub fn place_gates(&mut self, gctx: &mut GraphicsContext, tile_x: i32, tile_y: i32) {
+        self.layers
+            .iter_mut()
+            .find(|l| l.identifier == "Props")
+            .expect("Props layer")
+            .place_gates(gctx, tile_x, tile_y);
     }
 
     pub fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
