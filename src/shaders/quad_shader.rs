@@ -1,7 +1,7 @@
-use miniquad::graphics::{
-    BlendFactor, BlendState, BlendValue, BufferLayout, Equation, GraphicsContext, Pipeline,
-    PipelineParams, Shader, ShaderMeta, UniformBlockLayout, UniformDesc, UniformType,
-    VertexAttribute, VertexFormat, VertexStep,
+use miniquad::{
+    BlendFactor, BlendState, BlendValue, BufferLayout, Equation, GlContext, Pipeline,
+    PipelineParams, RenderingBackend, ShaderMeta, ShaderSource, UniformBlockLayout, UniformDesc,
+    UniformType, VertexAttribute, VertexFormat, VertexStep,
 };
 
 const VERTEX: &str = r#"#version 100
@@ -49,27 +49,28 @@ pub struct Uniforms {
     pub px_texture_size: [f32; 2],
 }
 
-pub fn pipeline(gctx: &mut GraphicsContext) -> Pipeline {
-    let shader = Shader::new(
-        gctx,
-        VERTEX,
-        FRAGMENT,
-        ShaderMeta {
-            images: vec!["tex".to_string()],
-            uniforms: UniformBlockLayout {
-                uniforms: vec![
-                    UniformDesc::new("px_src_offset", UniformType::Float2),
-                    UniformDesc::new("px_dest_offset", UniformType::Float2),
-                    UniformDesc::new("px_framebuffer_size", UniformType::Float2),
-                    UniformDesc::new("px_texture_size", UniformType::Float2),
-                ],
+pub fn pipeline(gctx: &mut GlContext) -> Pipeline {
+    let shader = gctx
+        .new_shader(
+            ShaderSource::Glsl {
+                vertex: VERTEX,
+                fragment: FRAGMENT,
             },
-        },
-    )
-    .unwrap();
+            ShaderMeta {
+                images: vec!["tex".to_string()],
+                uniforms: UniformBlockLayout {
+                    uniforms: vec![
+                        UniformDesc::new("px_src_offset", UniformType::Float2),
+                        UniformDesc::new("px_dest_offset", UniformType::Float2),
+                        UniformDesc::new("px_framebuffer_size", UniformType::Float2),
+                        UniformDesc::new("px_texture_size", UniformType::Float2),
+                    ],
+                },
+            },
+        )
+        .unwrap();
 
-    Pipeline::with_params(
-        gctx,
+    gctx.new_pipeline(
         &[
             BufferLayout::default(),
             BufferLayout {

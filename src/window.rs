@@ -2,7 +2,10 @@ use crate::resources::*;
 use crate::shaders::quad_shader;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline, Texture};
+use miniquad::{
+    Bindings, BufferSource, BufferType, BufferUsage, GlContext, Pipeline, RenderingBackend,
+    UniformsSource,
+};
 
 pub struct Window {
     x: f32,
@@ -20,13 +23,14 @@ pub struct Window {
 struct WindowPart<const N: usize> {
     inst_data: [[[f32; 2]; 3]; N],
     len: usize,
+    px_texture_size: [f32; 2],
     bindings: Bindings,
     quad_pipeline: Pipeline,
 }
 
 impl Window {
     pub fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         x: i32,
         y: i32,
@@ -54,7 +58,7 @@ impl Window {
         window
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext) {
+    pub fn draw(&self, gctx: &mut GlContext) {
         self.center.draw(
             gctx,
             self.x + self.px_wid_left as f32,
@@ -67,7 +71,7 @@ impl Window {
         self.corners.draw(gctx, self.x, self.y);
     }
 
-    pub fn resize(&mut self, gctx: &mut GraphicsContext, width: i32, height: i32) {
+    pub fn resize(&mut self, gctx: &mut GlContext, width: i32, height: i32) {
         let width = width.max(0) as f32;
         let height = height.max(0) as f32;
         let widths = [
@@ -91,7 +95,10 @@ impl Window {
             let new_len = 1;
             self.center.len = new_len;
             if self.center.inst_data[..new_len] != new_inst_data[..new_len] {
-                self.center.bindings.vertex_buffers[1].update(gctx, &new_inst_data[..new_len]);
+                gctx.buffer_update(
+                    self.center.bindings.vertex_buffers[1],
+                    BufferSource::slice(&new_inst_data[..new_len]),
+                );
                 self.center.inst_data = new_inst_data;
             }
         } else {
@@ -111,7 +118,10 @@ impl Window {
             let new_len = if widths[2] > 0.0 { 2 } else { 1 };
             self.v_edges.len = new_len;
             if self.v_edges.inst_data[..new_len] != new_inst_data[..new_len] {
-                self.v_edges.bindings.vertex_buffers[1].update(gctx, &new_inst_data[..new_len]);
+                gctx.buffer_update(
+                    self.v_edges.bindings.vertex_buffers[1],
+                    BufferSource::slice(&new_inst_data[..new_len]),
+                );
                 self.v_edges.inst_data = new_inst_data;
             }
         } else {
@@ -131,7 +141,10 @@ impl Window {
             let new_len = if heights[2] > 0.0 { 2 } else { 1 };
             self.h_edges.len = new_len;
             if self.h_edges.inst_data[..new_len] != new_inst_data[..new_len] {
-                self.h_edges.bindings.vertex_buffers[1].update(gctx, &new_inst_data[..new_len]);
+                gctx.buffer_update(
+                    self.h_edges.bindings.vertex_buffers[1],
+                    BufferSource::slice(&new_inst_data[..new_len]),
+                );
                 self.h_edges.inst_data = new_inst_data;
             }
         } else {
@@ -177,7 +190,10 @@ impl Window {
             }
             self.corners.len = new_len;
             if self.corners.inst_data[..new_len] != new_inst_data[..new_len] {
-                self.corners.bindings.vertex_buffers[1].update(gctx, &new_inst_data[..new_len]);
+                gctx.buffer_update(
+                    self.corners.bindings.vertex_buffers[1],
+                    BufferSource::slice(&new_inst_data[..new_len]),
+                );
                 self.corners.inst_data = new_inst_data;
             }
         } else {
@@ -192,41 +208,39 @@ impl Window {
 }
 
 impl<const N: usize> WindowPart<N> {
-    fn new(gctx: &mut GraphicsContext, texture: Texture, res: &Resources) -> Self {
-        let inst_buf = Buffer::stream(
-            gctx,
+    fn new(gctx: &mut GlContext, texture: Texture, res: &Resources) -> Self {
+        let inst_buf = gctx.new_buffer(
             BufferType::VertexBuffer,
-            N * std::mem::size_of::<[[f32; 2]; 3]>(),
+            BufferUsage::Dynamic,
+            BufferSource::empty::<[[f32; 2]; 3]>(N),
         );
 
         Self {
             inst_data: [[[0.0f32; 2]; 3]; N],
             len: 0,
+            px_texture_size: [texture.width as f32, texture.height as f32],
             bindings: Bindings {
                 vertex_buffers: vec![res.quad_vbuf, inst_buf],
                 index_buffer: res.quad_ibuf,
-                images: vec![texture],
+                images: vec![texture.tex_id],
             },
             quad_pipeline: res.quad_pipeline,
         }
     }
 
-    fn draw(&self, gctx: &mut GraphicsContext, x: f32, y: f32) {
+    fn draw(&self, gctx: &mut GlContext, x: f32, y: f32) {
         if self.len == 0 {
             return;
         }
 
         gctx.apply_pipeline(&self.quad_pipeline);
         gctx.apply_bindings(&self.bindings);
-        gctx.apply_uniforms(&quad_shader::Uniforms {
+        gctx.apply_uniforms(UniformsSource::table(&quad_shader::Uniforms {
             px_src_offset: [0.0, 0.0],
             px_dest_offset: [x, y],
             px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
-            px_texture_size: [
-                self.bindings.images[0].width as f32,
-                self.bindings.images[0].height as f32,
-            ],
-        });
+            px_texture_size: self.px_texture_size,
+        }));
         gctx.draw(0, 6, self.len as i32);
     }
 }

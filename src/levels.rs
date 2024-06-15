@@ -2,9 +2,11 @@ use crate::actor::*;
 use crate::direction::*;
 use crate::enemy::*;
 use crate::resources::*;
-use crate::{layer_shader, ldtk, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::{get_gctx, layer_shader, ldtk, SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::{Bindings, FilterMode, GraphicsContext, Pipeline, Texture};
+use miniquad::{
+    Bindings, FilterMode, GlContext, MipmapFilterMode, Pipeline, RenderingBackend, UniformsSource,
+};
 use miniserde::json;
 
 use std::cell::RefCell;
@@ -58,7 +60,7 @@ struct TilesetLoader(RefCell<HashMap<i64, Weak<Tileset>>>);
 
 impl Layer {
     fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         tilesets: &TilesetLoader,
         tileset_defs_json: &[ldtk::TilesetDefinition],
@@ -93,13 +95,17 @@ impl Layer {
             tile_data[i + 1] = c_src_y.try_into().expect("c_src_y as u8");
         }
 
-        let tile_data_texture = Texture::from_rgba8(gctx, c_wid, c_hei, &tile_data[..]);
-        tile_data_texture.set_filter(gctx, FilterMode::Nearest);
+        let tile_data_tex_id = gctx.new_texture_from_rgba8(c_wid, c_hei, &tile_data[..]);
+        gctx.texture_set_filter(
+            tile_data_tex_id,
+            FilterMode::Nearest,
+            MipmapFilterMode::None,
+        );
 
         let bindings = Bindings {
             vertex_buffers: vec![res.quad_vbuf],
             index_buffer: res.quad_ibuf,
-            images: vec![tile_data_texture, tileset.texture],
+            images: vec![tile_data_tex_id, tileset.texture.tex_id],
         };
 
         Some(Self {
@@ -113,10 +119,10 @@ impl Layer {
         })
     }
 
-    fn draw(&self, gctx: &mut GraphicsContext, camera_x: f32, camera_y: f32) {
+    fn draw(&self, gctx: &mut GlContext, camera_x: f32, camera_y: f32) {
         gctx.apply_pipeline(&self.layer_pipeline);
         gctx.apply_bindings(&self.bindings);
-        gctx.apply_uniforms(&layer_shader::Uniforms {
+        gctx.apply_uniforms(UniformsSource::table(&layer_shader::Uniforms {
             px_tile_grid_size: self.tileset.tile_grid_size as f32,
             c_layer_size: [self.c_wid as f32, self.c_hei as f32],
             px_offset: [
@@ -128,7 +134,7 @@ impl Layer {
                 self.tileset.tile_grid_size as f32 / self.tileset.texture.width as f32,
                 self.tileset.tile_grid_size as f32 / self.tileset.texture.height as f32,
             ],
-        });
+        }));
         gctx.draw(0, 6, 1);
     }
 
@@ -177,7 +183,7 @@ impl Layer {
         self.tile_data[offset..offset + 2] == ICE_TILE
     }
 
-    fn place_gates(&mut self, gctx: &mut GraphicsContext, tile_x: i32, tile_y: i32) {
+    fn place_gates(&mut self, gctx: &mut GlContext, tile_x: i32, tile_y: i32) {
         assert!(self.identifier == "Props");
 
         let offset = 4 * (tile_y as usize * self.c_wid as usize + tile_x as usize);
@@ -190,10 +196,10 @@ impl Layer {
         self.tile_data[offset + 4] = 2;
         self.tile_data[offset + 5] = 0;
 
-        self.bindings.images[0].update(gctx, &self.tile_data[..]);
+        gctx.texture_update(self.bindings.images[0], &self.tile_data[..]);
     }
 
-    fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
+    fn sync_props_with_lever(&mut self, gctx: &mut GlContext, lever_turned: bool) {
         assert!(self.identifier == "Props");
 
         if lever_turned {
@@ -230,20 +236,22 @@ impl Layer {
             }
         }
 
-        self.bindings.images[0].update(gctx, &self.tile_data[..]);
+        gctx.texture_update(self.bindings.images[0], &self.tile_data[..]);
     }
 }
 
 impl Drop for Layer {
     fn drop(&mut self) {
+        let gctx = get_gctx();
+
         // drop tile data texture
-        self.bindings.images[0].delete();
+        gctx.delete_texture(self.bindings.images[0]);
     }
 }
 
 impl Level {
     fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         tilesets: &TilesetLoader,
         tileset_defs_json: &[ldtk::TilesetDefinition],
@@ -312,7 +320,7 @@ impl Level {
         )
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext, camera_x: i32, camera_y: i32) {
+    pub fn draw(&self, gctx: &mut GlContext, camera_x: i32, camera_y: i32) {
         let camera_x = camera_x as f32;
         let camera_y = camera_y as f32;
         for layer in self.layers.iter().rev() {
@@ -334,7 +342,7 @@ impl Level {
             .is_ice_tile(tile_x, tile_y)
     }
 
-    pub fn place_gates(&mut self, gctx: &mut GraphicsContext, tile_x: i32, tile_y: i32) {
+    pub fn place_gates(&mut self, gctx: &mut GlContext, tile_x: i32, tile_y: i32) {
         self.layers
             .iter_mut()
             .find(|l| l.identifier == "Props")
@@ -342,7 +350,7 @@ impl Level {
             .place_gates(gctx, tile_x, tile_y);
     }
 
-    pub fn sync_props_with_lever(&mut self, gctx: &mut GraphicsContext, lever_turned: bool) {
+    pub fn sync_props_with_lever(&mut self, gctx: &mut GlContext, lever_turned: bool) {
         self.layers
             .iter_mut()
             .find(|l| l.identifier == "Props")
@@ -388,7 +396,7 @@ impl LevelSet {
 
     pub fn level_by_identifier(
         &self,
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         identifier: &str,
     ) -> (Level, Vec<Actor>) {
@@ -405,7 +413,7 @@ impl LevelSet {
 
     pub fn level_by_neighbour(
         &self,
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         neighbours: &[NeighbourLevel],
         px_world_x: i32,

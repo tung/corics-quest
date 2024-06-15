@@ -1,9 +1,12 @@
 use crate::async_utils::wait_once;
 use crate::resources::*;
 use crate::shaders::quad_shader;
-use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::{get_gctx, SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline, Texture};
+use miniquad::{
+    Bindings, BufferSource, BufferType, BufferUsage, GlContext, Pipeline, RenderingBackend,
+    UniformsSource,
+};
 
 pub struct Text {
     offset: [f32; 2],
@@ -12,6 +15,7 @@ pub struct Text {
     shown_chars: i32,
     font: Texture,
     local_buf: Vec<[[f32; 2]; 3]>,
+    inst_buf_len: usize,
     bindings: Option<Bindings>,
     quad_pipeline: Pipeline,
 }
@@ -25,12 +29,13 @@ impl Text {
             font: res.font,
             shown_chars: 0,
             local_buf: Vec::new(),
+            inst_buf_len: 0,
             bindings: None,
             quad_pipeline: res.quad_pipeline,
         }
     }
 
-    pub fn from_str(gctx: &mut GraphicsContext, res: &Resources, x: i32, y: i32, s: &str) -> Self {
+    pub fn from_str(gctx: &mut GlContext, res: &Resources, x: i32, y: i32, s: &str) -> Self {
         let mut text = Self::new(res, x, y);
         text.set_text(gctx, res, s);
         text
@@ -40,7 +45,7 @@ impl Text {
         self.shown_chars >= self.local_buf.len() as i32
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext) {
+    pub fn draw(&self, gctx: &mut GlContext) {
         if self.shown_chars <= 0 {
             return;
         }
@@ -48,12 +53,12 @@ impl Text {
         if let Some(bindings) = &self.bindings {
             gctx.apply_pipeline(&self.quad_pipeline);
             gctx.apply_bindings(bindings);
-            gctx.apply_uniforms(&quad_shader::Uniforms {
+            gctx.apply_uniforms(UniformsSource::table(&quad_shader::Uniforms {
                 px_src_offset: [0.0, 0.0],
                 px_dest_offset: self.offset,
                 px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
                 px_texture_size: [self.font.width as f32, self.font.height as f32],
-            });
+            }));
             gctx.draw(0, 6, self.shown_chars);
         }
     }
@@ -78,7 +83,7 @@ impl Text {
         self.offset = [x as f32, y as f32];
     }
 
-    pub fn set_text(&mut self, gctx: &mut GraphicsContext, res: &Resources, s: &str) {
+    pub fn set_text(&mut self, gctx: &mut GlContext, res: &Resources, s: &str) {
         const FONT_COLUMNS: u32 = 16;
         const FONT_ROWS: u32 = 16;
         let char_width = self.font.width / FONT_COLUMNS;
@@ -122,24 +127,37 @@ impl Text {
 
         if self.local_buf.is_empty() {
             if let Some(bindings) = self.bindings.take() {
-                bindings.vertex_buffers[1].delete();
+                gctx.delete_buffer(bindings.vertex_buffers[1]);
+                self.inst_buf_len = 0;
             }
         } else {
-            let needed_size = self.local_buf.len() * std::mem::size_of::<[[f32; 2]; 3]>();
+            let needed_len = self.local_buf.len();
             let bindings = self.bindings.get_or_insert_with(|| {
-                let inst_buf = Buffer::stream(gctx, BufferType::VertexBuffer, needed_size);
+                let inst_buf = gctx.new_buffer(
+                    BufferType::VertexBuffer,
+                    BufferUsage::Dynamic,
+                    BufferSource::empty::<[[f32; 2]; 3]>(needed_len),
+                );
+                self.inst_buf_len = needed_len;
                 Bindings {
                     vertex_buffers: vec![res.quad_vbuf, inst_buf],
                     index_buffer: res.quad_ibuf,
-                    images: vec![self.font],
+                    images: vec![self.font.tex_id],
                 }
             });
-            let inst_buf = &mut bindings.vertex_buffers[1];
-            if inst_buf.size() < needed_size {
-                inst_buf.delete();
-                *inst_buf = Buffer::stream(gctx, BufferType::VertexBuffer, needed_size);
+            if self.inst_buf_len < needed_len {
+                gctx.delete_buffer(bindings.vertex_buffers[1]);
+                bindings.vertex_buffers[1] = gctx.new_buffer(
+                    BufferType::VertexBuffer,
+                    BufferUsage::Dynamic,
+                    BufferSource::empty::<[[f32; 2]; 3]>(needed_len),
+                );
+                self.inst_buf_len = needed_len;
             }
-            inst_buf.update(gctx, &self.local_buf[..]);
+            gctx.buffer_update(
+                bindings.vertex_buffers[1],
+                BufferSource::slice(&self.local_buf[..]),
+            );
         }
     }
 
@@ -156,8 +174,10 @@ impl Text {
 
 impl Drop for Text {
     fn drop(&mut self) {
+        let gctx = get_gctx();
+
         if let Some(bindings) = &self.bindings {
-            bindings.vertex_buffers[1].delete();
+            gctx.delete_buffer(bindings.vertex_buffers[1]);
         }
     }
 }

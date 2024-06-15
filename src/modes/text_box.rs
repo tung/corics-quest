@@ -5,7 +5,7 @@ use crate::resources::*;
 use crate::text::*;
 use crate::window::*;
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 
 pub struct TextBox {
     window: Window,
@@ -17,7 +17,7 @@ pub enum TextBoxEvent {
 }
 
 impl TextBox {
-    pub fn new(gctx: &mut GraphicsContext, res: &Resources, s: &str) -> Self {
+    pub fn new(gctx: &mut GlContext, res: &Resources, s: &str) -> Self {
         Self {
             window: Window::new(gctx, res, 44, 124, 232, 40),
             text: Text::from_str(gctx, res, 52, 132, s),

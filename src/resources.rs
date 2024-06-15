@@ -2,7 +2,10 @@ use crate::aseprite;
 use crate::levels::*;
 use crate::shaders::*;
 
-use miniquad::graphics::{Buffer, FilterMode, GraphicsContext, Pipeline, Texture, TextureWrap};
+use miniquad::{
+    BufferId, FilterMode, GlContext, MipmapFilterMode, Pipeline, RenderingBackend, TextureId,
+    TextureWrap,
+};
 
 use std::collections::HashMap;
 use std::io::Cursor;
@@ -107,8 +110,8 @@ const TEXTURES_BY_PATH: &[(&str, &[u8])] = &[
 ];
 
 pub struct Resources {
-    pub quad_vbuf: Buffer,
-    pub quad_ibuf: Buffer,
+    pub quad_vbuf: BufferId,
+    pub quad_ibuf: BufferId,
     pub layer_pipeline: Pipeline,
     pub quad_pipeline: Pipeline,
     pub levels: LevelSet,
@@ -116,6 +119,13 @@ pub struct Resources {
     pub window_textures: WindowTextures,
     pub textures_by_path: HashMap<&'static str, Texture>,
     pub sprite_sheets_by_path: HashMap<&'static str, Rc<aseprite::SpriteSheet>>,
+}
+
+#[derive(Clone, Copy)]
+pub struct Texture {
+    pub tex_id: TextureId,
+    pub width: u32,
+    pub height: u32,
 }
 
 #[derive(Clone)]
@@ -129,7 +139,7 @@ pub struct WindowTextures {
 }
 
 impl Resources {
-    pub fn new(gctx: &mut GraphicsContext, quad_vbuf: Buffer, quad_ibuf: Buffer) -> Self {
+    pub fn new(gctx: &mut GlContext, quad_vbuf: BufferId, quad_ibuf: BufferId) -> Self {
         let layer_pipeline = layer_shader::pipeline(gctx);
         let quad_pipeline = quad_shader::pipeline(gctx);
         let font = texture_from_png_bytes(gctx, &include_bytes!("../assets/hp-100lx-6x8.png")[..]);
@@ -165,7 +175,7 @@ impl Resources {
 }
 
 impl WindowTextures {
-    fn new(gctx: &mut GraphicsContext) -> Self {
+    fn new(gctx: &mut GlContext) -> Self {
         const PX_WID_LEFT: u32 = 4;
         const PX_HEI_TOP: u32 = 4;
 
@@ -183,9 +193,9 @@ impl WindowTextures {
         assert!(corners.width == v_edges.width);
         assert!(corners.height == h_edges.height);
 
-        center.set_wrap(gctx, TextureWrap::Repeat);
-        h_edges.set_wrap_xy(gctx, TextureWrap::Repeat, TextureWrap::Clamp);
-        v_edges.set_wrap_xy(gctx, TextureWrap::Clamp, TextureWrap::Repeat);
+        gctx.texture_set_wrap(center.tex_id, TextureWrap::Repeat, TextureWrap::Repeat);
+        gctx.texture_set_wrap(h_edges.tex_id, TextureWrap::Repeat, TextureWrap::Clamp);
+        gctx.texture_set_wrap(v_edges.tex_id, TextureWrap::Clamp, TextureWrap::Repeat);
 
         Self {
             center,
@@ -198,7 +208,7 @@ impl WindowTextures {
     }
 }
 
-pub fn texture_from_png_bytes(gctx: &mut GraphicsContext, png_bytes: &[u8]) -> Texture {
+pub fn texture_from_png_bytes(gctx: &mut GlContext, png_bytes: &[u8]) -> Texture {
     let mut decoder = png::Decoder::new(Cursor::new(png_bytes));
     decoder.set_transformations(png::Transformations::normalize_to_color8());
     let mut reader = decoder.read_info().expect("reader");
@@ -233,12 +243,16 @@ pub fn texture_from_png_bytes(gctx: &mut GraphicsContext, png_bytes: &[u8]) -> T
         _ => unreachable!("color type"),
     };
 
-    let texture = Texture::from_rgba8(
-        gctx,
+    let tex_id = gctx.new_texture_from_rgba8(
         info.width.try_into().expect("width"),
         info.height.try_into().expect("height"),
         &pixels[..],
     );
-    texture.set_filter(gctx, FilterMode::Nearest);
-    texture
+    gctx.texture_set_filter(tex_id, FilterMode::Nearest, MipmapFilterMode::None);
+
+    Texture {
+        tex_id,
+        width: info.width,
+        height: info.height,
+    }
 }

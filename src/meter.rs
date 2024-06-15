@@ -1,9 +1,10 @@
 use crate::resources::*;
 use crate::shaders::quad_shader;
-use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::{get_gctx, SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::{
-    Bindings, Buffer, BufferType, GraphicsContext, Pipeline, Texture, TextureWrap,
+use miniquad::{
+    Bindings, BufferSource, BufferType, BufferUsage, GlContext, Pipeline, RenderingBackend,
+    TextureWrap, UniformsSource,
 };
 
 pub struct Meter {
@@ -16,7 +17,7 @@ pub struct Meter {
 
 impl Meter {
     pub fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         x: i32,
         y: i32,
@@ -24,10 +25,10 @@ impl Meter {
         color: [u8; 3],
         max_value: i32,
     ) -> Self {
-        let inst_buf = Buffer::stream(
-            gctx,
+        let inst_buf = gctx.new_buffer(
             BufferType::VertexBuffer,
-            5 * std::mem::size_of::<[[f32; 2]; 3]>(),
+            BufferUsage::Dynamic,
+            BufferSource::empty::<[[f32; 2]; 3]>(5),
         );
 
         #[rustfmt::skip]
@@ -37,8 +38,8 @@ impl Meter {
             color[0], color[1], color[2], 255,
             color[0], color[1], color[2], 255,
         ];
-        let texture = Texture::from_rgba8(gctx, 1, 4, &texture_data[..]);
-        texture.set_wrap_xy(gctx, TextureWrap::Repeat, TextureWrap::Clamp);
+        let tex_id = gctx.new_texture_from_rgba8(1, 4, &texture_data[..]);
+        gctx.texture_set_wrap(tex_id, TextureWrap::Repeat, TextureWrap::Clamp);
 
         let mut meter = Self {
             offset: [x as f32, y as f32],
@@ -47,7 +48,7 @@ impl Meter {
             bindings: Bindings {
                 vertex_buffers: vec![res.quad_vbuf, inst_buf],
                 index_buffer: res.quad_ibuf,
-                images: vec![texture],
+                images: vec![tex_id],
             },
             quad_pipeline: res.quad_pipeline,
         };
@@ -55,15 +56,15 @@ impl Meter {
         meter
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext) {
+    pub fn draw(&self, gctx: &mut GlContext) {
         gctx.apply_pipeline(&self.quad_pipeline);
         gctx.apply_bindings(&self.bindings);
-        gctx.apply_uniforms(&quad_shader::Uniforms {
+        gctx.apply_uniforms(UniformsSource::table(&quad_shader::Uniforms {
             px_src_offset: [0.0, 0.0],
             px_dest_offset: self.offset,
             px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
             px_texture_size: [1.0, 4.0],
-        });
+        }));
         if self.width >= 3.0 {
             gctx.draw(0, 6, 5);
         } else if self.width >= 2.0 {
@@ -73,12 +74,12 @@ impl Meter {
         }
     }
 
-    pub fn set_value(&mut self, gctx: &mut GraphicsContext, value: i32) {
+    pub fn set_value(&mut self, gctx: &mut GlContext, value: i32) {
         let max_value = self.max_value;
         self.set_value_and_max(gctx, value, max_value);
     }
 
-    pub fn set_value_and_max(&mut self, gctx: &mut GraphicsContext, value: i32, max_value: i32) {
+    pub fn set_value_and_max(&mut self, gctx: &mut GlContext, value: i32, max_value: i32) {
         self.max_value = max_value.max(1);
         let value = value.max(0).min(self.max_value) as f32;
         let inst_data: [[[f32; 2]; 3]; 5] = [
@@ -100,13 +101,18 @@ impl Meter {
                 [1.0, 1.0],
             ],
         ];
-        self.bindings.vertex_buffers[1].update(gctx, &inst_data[..]);
+        gctx.buffer_update(
+            self.bindings.vertex_buffers[1],
+            BufferSource::slice(&inst_data[..]),
+        );
     }
 }
 
 impl Drop for Meter {
     fn drop(&mut self) {
-        self.bindings.vertex_buffers[1].delete();
-        self.bindings.images[0].delete();
+        let gctx = get_gctx();
+
+        gctx.delete_buffer(self.bindings.vertex_buffers[1]);
+        gctx.delete_texture(self.bindings.images[0]);
     }
 }

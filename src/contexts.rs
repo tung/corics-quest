@@ -2,6 +2,7 @@ use crate::actor::*;
 use crate::async_utils::*;
 use crate::direction::*;
 use crate::enemy::*;
+use crate::get_gctx;
 use crate::input::*;
 use crate::levels::*;
 use crate::modes::*;
@@ -9,12 +10,13 @@ use crate::progress::*;
 use crate::random::*;
 use crate::resources::*;
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 
 macro_rules! update_mode {
     ($name:ident, $event:ident) => {
         pub async fn $name(&mut self) -> $event {
-            let gctx = self.gctx();
+            let gctx = get_gctx();
+
             self.modes
                 .$name(&mut ModeContext {
                     gctx,
@@ -33,13 +35,13 @@ macro_rules! update_mode {
 }
 
 pub struct DrawContext<'a, 'g> {
-    pub gctx: &'g mut GraphicsContext,
+    pub gctx: &'g mut GlContext,
     pub level: &'a SharedMut<Level>,
     pub actors: &'a SharedMut<Vec<Actor>>,
 }
 
 pub struct ModeContext<'a, 'g> {
-    pub gctx: &'g mut GraphicsContext,
+    pub gctx: &'g mut GlContext,
     pub res: &'a Resources,
     pub input: &'a SharedMut<Input>,
     pub rng: &'a mut Rng,
@@ -51,7 +53,6 @@ pub struct ModeContext<'a, 'g> {
 }
 
 pub struct ScriptContext {
-    gctx_ptr: SharedMut<*mut GraphicsContext>,
     pub res: Resources,
     pub input: SharedMut<Input>,
     pub modes: SharedMut<ModeStack>,
@@ -65,7 +66,6 @@ pub struct ScriptContext {
 
 impl ScriptContext {
     pub fn new(
-        gctx_ptr: &SharedMut<*mut GraphicsContext>,
         res: Resources,
         input: &SharedMut<Input>,
         modes: &SharedMut<ModeStack>,
@@ -77,7 +77,6 @@ impl ScriptContext {
         // Access from outside that async function never goes through this.
         unsafe {
             Self {
-                gctx_ptr: SharedMut::clone(gctx_ptr),
                 res,
                 input: SharedMut::clone(input),
                 modes: SharedMut::clone(modes),
@@ -89,17 +88,6 @@ impl ScriptContext {
                 steps: 0,
             }
         }
-    }
-
-    fn gctx(&self) -> &'static mut GraphicsContext {
-        // SAFETY: This function is only ever called in the async script during [App::update],
-        // which sets `gctx` to its [miniquad::graphics::GraphicsContext] before polling the
-        // async script, and unsets it immediately afterwards.
-        //
-        // The `'static` lifetime of the return type is a big fat lie, but is needed for good
-        // ergononmics; it's not safe to hold across await points in the async script, but
-        // we'll avoid that problem by just never doing that.
-        unsafe { self.gctx_ptr.as_mut().unwrap() }
     }
 
     pub async fn fade_in(&mut self, frames: u16) {
@@ -119,6 +107,8 @@ impl ScriptContext {
     }
 
     fn prepare_level_and_actors(&self, level: &mut Level, actors: &mut [Actor]) {
+        let gctx = get_gctx();
+
         // display chest according to open/closed state in progress
         if let Some(chest) = actors.iter_mut().find(|a| a.identifier == ActorType::Chest) {
             let chest_opened = self
@@ -136,11 +126,12 @@ impl ScriptContext {
             .turned_levers
             .iter()
             .any(|l| l == level.identifier.as_str());
-        sync_level_and_actors_with_lever(self.gctx(), lever_turned, level, actors);
+        sync_level_and_actors_with_lever(gctx, lever_turned, level, actors);
     }
 
     pub fn level_by_identifier(&self, identifier: &str) -> (Level, Vec<Actor>) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         let (mut level, mut actors) = self
             .res
             .levels
@@ -150,13 +141,14 @@ impl ScriptContext {
     }
 
     pub fn level_by_neighbour(&self, dir: Direction) -> Option<(Level, Vec<Actor>)> {
+        let gctx = get_gctx();
+
         let Actor { grid_x, grid_y, .. } = self.actors[0];
         let Level {
             px_world_x,
             px_world_y,
             ..
         } = *self.level;
-        let gctx = self.gctx();
 
         self.res
             .levels
@@ -182,6 +174,8 @@ impl ScriptContext {
     }
 
     pub fn toggle_lever(&mut self) {
+        let gctx = get_gctx();
+
         if self.lever_is_turned() {
             let turned_lever_pos = self
                 .progress
@@ -197,7 +191,7 @@ impl ScriptContext {
         }
 
         sync_level_and_actors_with_lever(
-            self.gctx(),
+            gctx,
             self.lever_is_turned(),
             &mut self.level,
             &mut self.actors[..],
@@ -205,7 +199,8 @@ impl ScriptContext {
     }
 
     pub fn place_gates(&mut self, tile_x: i32, tile_y: i32) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         self.level.place_gates(gctx, tile_x, tile_y);
     }
 
@@ -214,7 +209,8 @@ impl ScriptContext {
     }
 
     pub fn push_battle_mode(&mut self, enemy: Enemy, boss_fight: bool) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         self.modes.push(Battle::new(
             gctx,
             &self.res,
@@ -226,18 +222,21 @@ impl ScriptContext {
     }
 
     pub fn push_debug_menu_mode(&mut self) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         self.modes.push(DebugMenu::new(gctx, &self.res));
     }
 
     pub fn push_main_menu_mode(&mut self) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         self.modes
             .push(MainMenu::new(gctx, &self.res, &self.progress));
     }
 
     pub fn push_text_box_mode(&mut self, s: &str) {
-        let gctx = self.gctx();
+        let gctx = get_gctx();
+
         self.modes.push(TextBox::new(gctx, &self.res, s));
     }
 
@@ -253,7 +252,7 @@ impl ScriptContext {
 }
 
 fn sync_level_and_actors_with_lever(
-    gctx: &mut GraphicsContext,
+    gctx: &mut GlContext,
     lever_turned: bool,
     level: &mut Level,
     actors: &mut [Actor],

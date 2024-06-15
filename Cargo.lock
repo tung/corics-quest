@@ -82,9 +82,9 @@ dependencies = [
 
 [[package]]
 name = "miniquad"
-version = "0.3.16"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1251d63dfea7109063b2cec354253e8bf150e7878837a6ac0f9185d6a2518b6"
+checksum = "48c400bb9a91100e475d6e71c6c0bbb24579b8bfa89583bae3f068d7d32b32a3"
 dependencies = [
  "libc",
  "ndk-sys",

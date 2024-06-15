@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-miniquad = "0.3.16"
+miniquad = "0.4.2"
 miniserde = "0.1.36"
 png = "0.17.11"
 

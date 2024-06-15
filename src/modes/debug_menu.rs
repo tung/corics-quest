@@ -6,7 +6,7 @@ use crate::resources::*;
 use crate::text::*;
 use crate::window::*;
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 
 pub struct DebugMenu {
     window: Window,
@@ -36,7 +36,7 @@ const CURSOR_X: i32 = 91;
 const CURSOR_Y: i32 = 44;
 
 impl DebugMenu {
-    pub fn new(gctx: &mut GraphicsContext, res: &Resources) -> Self {
+    pub fn new(gctx: &mut GlContext, res: &Resources) -> Self {
         Self {
             window: Window::new(gctx, res, 83, 36, 154, 104),
             text: Text::new(res, 97, 44),

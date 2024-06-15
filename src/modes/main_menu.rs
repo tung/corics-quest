@@ -7,7 +7,7 @@ use crate::resources::*;
 use crate::text::*;
 use crate::window::*;
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 
 const TOP_X: i32 = 47;
 const TOP_Y: i32 = 25;
@@ -46,7 +46,7 @@ pub enum MainMenuEvent {
 }
 
 impl MainMenu {
-    pub fn new(gctx: &mut GraphicsContext, res: &Resources, progress: &Progress) -> Self {
+    pub fn new(gctx: &mut GlContext, res: &Resources, progress: &Progress) -> Self {
         let top_window = Window::new(gctx, res, TOP_X, TOP_Y, TOP_WIDTH, TOP_HEIGHT);
         let name_text = Text::from_str(
             gctx,

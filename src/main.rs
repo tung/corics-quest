@@ -27,11 +27,10 @@ use modes::*;
 use resources::*;
 use shaders::*;
 
-use miniquad::graphics::{
-    Bindings, Buffer, BufferType, GraphicsContext, Pipeline, RenderPass, Texture, TextureFormat,
-    TextureParams,
+use miniquad::{
+    Bindings, BufferSource, BufferType, BufferUsage, EventHandler, GlContext, KeyCode, KeyMods,
+    Pipeline, RenderPass, RenderingBackend, TextureFormat, TextureParams, UniformsSource,
 };
-use miniquad::{EventHandler, KeyCode, KeyMods};
 
 use std::future::Future;
 use std::pin::Pin;
@@ -52,7 +51,6 @@ struct App {
     screen_bindings: Bindings,
     window_width: f32,
     window_height: f32,
-    gctx_ptr: SharedMut<*mut GraphicsContext>,
     input: SharedMut<Input>,
     modes: SharedMut<ModeStack>,
     level: SharedMut<Level>,
@@ -61,35 +59,37 @@ struct App {
 }
 
 impl App {
-    fn new(gctx: &mut GraphicsContext) -> Self {
-        let offscreen_texture = Texture::new_render_texture(
-            gctx,
-            TextureParams {
-                width: SCREEN_WIDTH,
-                height: SCREEN_HEIGHT,
-                format: TextureFormat::RGBA8,
-                ..Default::default()
-            },
-        );
-        let offscreen_pass = RenderPass::new(gctx, offscreen_texture, None);
+    fn new() -> Self {
+        let gctx = get_gctx();
+
+        let offscreen_tex_id = gctx.new_render_texture(TextureParams {
+            width: SCREEN_WIDTH,
+            height: SCREEN_HEIGHT,
+            format: TextureFormat::RGBA8,
+            ..Default::default()
+        });
+        let offscreen_pass = gctx.new_render_pass(offscreen_tex_id, None);
 
         let screen_pipeline = screen_shader::pipeline(gctx);
 
-        let quad_vbuf = Buffer::immutable(
-            gctx,
+        let quad_vbuf = gctx.new_buffer(
             BufferType::VertexBuffer,
-            &[[0.0f32, 1.0], [1.0, 1.0], [0.0, 0.0], [1.0, 0.0]],
+            BufferUsage::Immutable,
+            BufferSource::slice(&[[0.0f32, 1.0], [1.0, 1.0], [0.0, 0.0], [1.0, 0.0]]),
         );
-        let quad_ibuf = Buffer::immutable(gctx, BufferType::IndexBuffer, &[0u16, 2, 1, 1, 2, 3]);
+        let quad_ibuf = gctx.new_buffer(
+            BufferType::IndexBuffer,
+            BufferUsage::Immutable,
+            BufferSource::slice(&[0u16, 2, 1, 1, 2, 3]),
+        );
         let screen_bindings = Bindings {
             vertex_buffers: vec![quad_vbuf],
             index_buffer: quad_ibuf,
-            images: vec![offscreen_texture],
+            images: vec![offscreen_tex_id],
         };
 
         let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
 
-        let gctx_ptr = SharedMut::new(std::ptr::null_mut());
         let input = SharedMut::new(Input::new());
         let modes = SharedMut::new(ModeStack::new());
         let (level, actors) = {
@@ -100,7 +100,7 @@ impl App {
             (SharedMut::new(level), SharedMut::new(actors))
         };
         let fade = SharedMut::new([0.0; 4]);
-        let sctx = ScriptContext::new(&gctx_ptr, res, &input, &modes, &level, &actors, &fade);
+        let sctx = ScriptContext::new(res, &input, &modes, &level, &actors, &fade);
 
         Self {
             script: Box::pin(script::script_main(sctx)),
@@ -112,7 +112,6 @@ impl App {
             screen_bindings,
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
-            gctx_ptr,
             input,
             modes,
             level,
@@ -133,8 +132,10 @@ impl App {
 }
 
 impl EventHandler for App {
-    fn draw(&mut self, gctx: &mut GraphicsContext) {
-        gctx.begin_pass(self.offscreen_pass, Default::default());
+    fn draw(&mut self) {
+        let gctx = get_gctx();
+
+        gctx.begin_pass(Some(self.offscreen_pass), Default::default());
         self.modes.draw(&mut DrawContext {
             gctx,
             level: &self.level,
@@ -145,40 +146,34 @@ impl EventHandler for App {
         gctx.begin_default_pass(Default::default());
         gctx.apply_pipeline(&self.screen_pipeline);
         gctx.apply_bindings(&self.screen_bindings);
-        gctx.apply_uniforms(&screen_shader::Uniforms {
+        gctx.apply_uniforms(UniformsSource::table(&screen_shader::Uniforms {
             scale: self.window_scale(),
             fade: *self.fade,
-        });
+        }));
         gctx.draw(0, 6, 1);
         gctx.end_render_pass();
 
         gctx.commit_frame();
     }
 
-    fn key_down_event(
-        &mut self,
-        gctx: &mut GraphicsContext,
-        keycode: KeyCode,
-        _keymods: KeyMods,
-        _repeat: bool,
-    ) {
+    fn key_down_event(&mut self, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) {
         if keycode == KeyCode::Escape {
-            gctx.request_quit();
+            miniquad::window::request_quit();
         } else {
             self.input.handle_key_down_event(keycode);
         }
     }
 
-    fn key_up_event(&mut self, _gctx: &mut GraphicsContext, keycode: KeyCode, _keymods: KeyMods) {
+    fn key_up_event(&mut self, keycode: KeyCode, _keymods: KeyMods) {
         self.input.handle_key_up_event(keycode);
     }
 
-    fn resize_event(&mut self, _ctx: &mut GraphicsContext, width: f32, height: f32) {
+    fn resize_event(&mut self, width: f32, height: f32) {
         self.window_width = width;
         self.window_height = height;
     }
 
-    fn update(&mut self, gctx: &mut GraphicsContext) {
+    fn update(&mut self) {
         let current_time = miniquad::date::now();
         self.time_bank += if self.last_time != 0.0 {
             (current_time - self.last_time).min(MAX_FRAME_TIME)
@@ -186,18 +181,22 @@ impl EventHandler for App {
             FRAME_TIME
         };
         self.last_time = current_time;
-        *self.gctx_ptr = gctx as *mut GraphicsContext;
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
             let mut dummy_context = Context::from_waker(&self.dummy_waker);
             if let Poll::Ready(()) = self.script.as_mut().poll(&mut dummy_context) {
-                gctx.order_quit();
+                miniquad::window::order_quit();
                 break;
             }
             self.input.reset_keys_pressed();
         }
-        *self.gctx_ptr = std::ptr::null_mut();
     }
+}
+
+fn get_gctx() -> &'static mut GlContext {
+    static mut GCTX: Option<GlContext> = None;
+    // SAFETY: All graphics operations are single-threaded.
+    unsafe { GCTX.get_or_insert_with(GlContext::new) }
 }
 
 fn main() {
@@ -208,6 +207,6 @@ fn main() {
             window_height: 528,
             ..Default::default()
         },
-        |gctx| Box::new(App::new(gctx)),
+        || Box::new(App::new()),
     );
 }

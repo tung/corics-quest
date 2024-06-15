@@ -6,7 +6,7 @@ use crate::resources::*;
 use crate::sprite::*;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 use miniserde::json;
 
 pub struct Actor {
@@ -51,7 +51,7 @@ pub enum ChestType {
 
 impl Actor {
     pub fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         identifier: ActorType,
         grid_x: i32,
@@ -72,7 +72,7 @@ impl Actor {
     }
 
     pub fn new_by_json(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         tileset_defs_json: &[ldtk::TilesetDefinition],
         entity_json: &ldtk::EntityInstance,
@@ -119,7 +119,7 @@ impl Actor {
         self.sprite.animate();
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext, camera_x: i32, camera_y: i32) {
+    pub fn draw(&self, gctx: &mut GlContext, camera_x: i32, camera_y: i32) {
         if self.visible {
             self.sprite.draw(
                 gctx,

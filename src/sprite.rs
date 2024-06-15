@@ -1,8 +1,11 @@
 use crate::direction::*;
 use crate::resources::*;
-use crate::{aseprite, quad_shader, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::{aseprite, get_gctx, quad_shader, SCREEN_HEIGHT, SCREEN_WIDTH};
 
-use miniquad::graphics::{Bindings, Buffer, BufferType, GraphicsContext, Pipeline, Texture};
+use miniquad::{
+    Bindings, BufferSource, BufferType, BufferUsage, GlContext, Pipeline, RenderingBackend,
+    UniformsSource,
+};
 
 use std::rc::Rc;
 
@@ -12,25 +15,26 @@ pub struct Sprite {
     frame: usize,
     t: f32,
     next_frame_forward: bool,
+    px_texture_size: [f32; 2],
     quad_pipeline: Pipeline,
     bindings: Bindings,
 }
 
 impl Sprite {
-    pub fn new(gctx: &mut GraphicsContext, res: &Resources, texture_path: &str) -> Self {
+    pub fn new(gctx: &mut GlContext, res: &Resources, texture_path: &str) -> Self {
         let json = &res.sprite_sheets_by_path[texture_path];
 
         // At least one animation "tag" must be defined.
         assert!(!json.meta.frame_tags.is_empty());
 
-        let inst_buf = Buffer::immutable(
-            gctx,
+        let inst_buf = gctx.new_buffer(
             BufferType::VertexBuffer,
-            &[
+            BufferUsage::Immutable,
+            BufferSource::slice(&[
                 [json.frames[0].frame.w as f32, json.frames[0].frame.h as f32],
                 [0.0, 0.0],
                 [0.0, 0.0],
-            ],
+            ]),
         );
         let texture = res.textures_by_path[json.meta.image.as_str()];
 
@@ -41,10 +45,11 @@ impl Sprite {
             t: 0.0,
             next_frame_forward: true,
             quad_pipeline: res.quad_pipeline,
+            px_texture_size: [texture.width as f32, texture.height as f32],
             bindings: Bindings {
                 vertex_buffers: vec![res.quad_vbuf, inst_buf],
                 index_buffer: res.quad_ibuf,
-                images: vec![texture],
+                images: vec![texture.tex_id],
             },
         }
     }
@@ -84,24 +89,19 @@ impl Sprite {
         }
     }
 
-    pub fn draw(&self, gctx: &mut GraphicsContext, x: i32, y: i32) {
+    pub fn draw(&self, gctx: &mut GlContext, x: i32, y: i32) {
         let aseprite::Rect {
             x: src_x, y: src_y, ..
         } = self.json.frames[self.frame].frame;
-        let Texture {
-            width: px_texture_width,
-            height: px_texture_height,
-            ..
-        } = self.bindings.images[0];
 
         gctx.apply_pipeline(&self.quad_pipeline);
         gctx.apply_bindings(&self.bindings);
-        gctx.apply_uniforms(&quad_shader::Uniforms {
+        gctx.apply_uniforms(UniformsSource::table(&quad_shader::Uniforms {
             px_src_offset: [src_x as f32, src_y as f32],
             px_dest_offset: [x as f32, y as f32],
             px_framebuffer_size: [SCREEN_WIDTH as f32, SCREEN_HEIGHT as f32],
-            px_texture_size: [px_texture_width as f32, px_texture_height as f32],
-        });
+            px_texture_size: self.px_texture_size,
+        }));
         gctx.draw(0, 6, 1);
     }
 
@@ -148,6 +148,8 @@ impl Sprite {
 
 impl Drop for Sprite {
     fn drop(&mut self) {
-        self.bindings.vertex_buffers[1].delete();
+        let gctx = get_gctx();
+
+        gctx.delete_buffer(self.bindings.vertex_buffers[1]);
     }
 }

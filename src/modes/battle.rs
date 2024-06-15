@@ -10,7 +10,7 @@ use crate::sprite::*;
 use crate::text::*;
 use crate::window::*;
 
-use miniquad::graphics::GraphicsContext;
+use miniquad::GlContext;
 
 const ENEMY_X: i32 = 104;
 const ENEMY_Y: i32 = 32;
@@ -57,7 +57,7 @@ enum PlayerChoice {
 
 impl Battle {
     pub fn new(
-        gctx: &mut GraphicsContext,
+        gctx: &mut GlContext,
         res: &Resources,
         max_hp: i32,
         max_mp: i32,

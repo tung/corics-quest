@@ -1,6 +1,6 @@
-use miniquad::graphics::{
-    BufferLayout, GraphicsContext, Pipeline, Shader, ShaderMeta, UniformBlockLayout, UniformDesc,
-    UniformType, VertexAttribute, VertexFormat,
+use miniquad::{
+    BufferLayout, GlContext, Pipeline, RenderingBackend, ShaderMeta, ShaderSource,
+    UniformBlockLayout, UniformDesc, UniformType, VertexAttribute, VertexFormat,
 };
 
 const VERTEX: &str = r#"#version 100
@@ -40,27 +40,29 @@ pub struct Uniforms {
     pub fade: [f32; 4],
 }
 
-pub fn pipeline(gctx: &mut GraphicsContext) -> Pipeline {
-    let shader = Shader::new(
-        gctx,
-        VERTEX,
-        FRAGMENT,
-        ShaderMeta {
-            images: vec!["offscreen_texture".to_string()],
-            uniforms: UniformBlockLayout {
-                uniforms: vec![
-                    UniformDesc::new("scale", UniformType::Float2),
-                    UniformDesc::new("fade", UniformType::Float4),
-                ],
+pub fn pipeline(gctx: &mut GlContext) -> Pipeline {
+    let shader = gctx
+        .new_shader(
+            ShaderSource::Glsl {
+                vertex: VERTEX,
+                fragment: FRAGMENT,
             },
-        },
-    )
-    .unwrap();
+            ShaderMeta {
+                images: vec!["offscreen_texture".to_string()],
+                uniforms: UniformBlockLayout {
+                    uniforms: vec![
+                        UniformDesc::new("scale", UniformType::Float2),
+                        UniformDesc::new("fade", UniformType::Float4),
+                    ],
+                },
+            },
+        )
+        .unwrap();
 
-    Pipeline::new(
-        gctx,
+    gctx.new_pipeline(
         &[BufferLayout::default()],
         &[VertexAttribute::new("pos", VertexFormat::Float2)],
         shader,
+        Default::default(),
     )
 }
