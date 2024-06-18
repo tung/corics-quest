@@ -147,8 +147,6 @@ impl WalkAround {
                     }
                 } else if mctx.input.is_key_pressed(GameKey::Cancel) {
                     return WalkAroundEvent::MainMenu;
-                } else if mctx.input.is_key_pressed(GameKey::DebugBattle) {
-                    return WalkAroundEvent::Encounter;
                 } else if mctx.input.is_key_pressed(GameKey::DebugMenu) {
                     return WalkAroundEvent::DebugMenu;
                 }

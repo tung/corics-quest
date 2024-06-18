@@ -535,22 +535,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
             WalkAroundEvent::Encounter => {
                 if let Some(enemy) = sctx.level.encounters.map(|g| g.random_enemy(&mut sctx.rng)) {
                     sctx.push_battle_mode(enemy, false);
-                } else {
-                    sctx.push_battle_mode(
-                        Enemy {
-                            name: "Debug Foe",
-                            sprite_path: "fire.png",
-                            hp: 10000,
-                            attack: 77,
-                            defense: 74,
-                            weakness: Some(Magic::WaterEdge),
-                            exp: 5,
-                            actions: &[],
-                        },
-                        false,
-                    );
+                    handle_battle(&mut sctx).await;
                 }
-                handle_battle(&mut sctx).await;
                 sctx.encounter_steps = 20 + sctx.rng.random(31) as i32;
             }
             WalkAroundEvent::MainMenu => {
