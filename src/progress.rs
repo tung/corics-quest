@@ -183,37 +183,37 @@ impl Progress {
             items: vec![
                 ItemSlot {
                     item: Item::Salve,
-                    amount: 4,
+                    amount: 0,
                 },
                 ItemSlot {
                     item: Item::XSalve,
-                    amount: 3,
+                    amount: 0,
                 },
                 ItemSlot {
                     item: Item::Tonic,
-                    amount: 2,
+                    amount: 0,
                 },
                 ItemSlot {
                     item: Item::XTonic,
-                    amount: 1,
+                    amount: 0,
                 },
             ],
             magic: vec![
                 MagicSlot {
                     magic: Magic::Heal,
-                    known: true,
+                    known: false,
                 },
                 MagicSlot {
                     magic: Magic::FireEdge,
-                    known: true,
+                    known: false,
                 },
                 MagicSlot {
                     magic: Magic::EarthEdge,
-                    known: true,
+                    known: false,
                 },
                 MagicSlot {
                     magic: Magic::WaterEdge,
-                    known: true,
+                    known: false,
                 },
             ],
             collected_chests: Vec::new(),
