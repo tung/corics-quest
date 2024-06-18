@@ -42,7 +42,7 @@ const FRAME_TIME: f64 = 1.0 / 60.0;
 const MAX_FRAME_TIME: f64 = FRAME_TIME * 4.0;
 
 struct App {
-    script: Pin<Box<dyn Future<Output = ()>>>,
+    script: Option<Pin<Box<dyn Future<Output = ()>>>>,
     dummy_waker: Waker,
     last_time: f64,
     time_bank: f64,
@@ -103,7 +103,7 @@ impl App {
         let sctx = ScriptContext::new(res, &input, &modes, &level, &actors, &fade);
 
         Self {
-            script: Box::pin(script::script_main(sctx)),
+            script: Some(Box::pin(script::script_main(sctx))),
             dummy_waker: async_utils::new_dummy_waker(),
             last_time: 0.0,
             time_bank: 0.0,
@@ -184,9 +184,12 @@ impl EventHandler for App {
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
             let mut dummy_context = Context::from_waker(&self.dummy_waker);
-            if let Poll::Ready(()) = self.script.as_mut().poll(&mut dummy_context) {
-                miniquad::window::order_quit();
-                break;
+            if let Some(script) = &mut self.script {
+                if let Poll::Ready(()) = script.as_mut().poll(&mut dummy_context) {
+                    miniquad::window::order_quit();
+                    self.script = None;
+                    break;
+                }
             }
             self.input.reset_keys_pressed();
         }
