@@ -501,7 +501,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         learn_magic(&mut sctx, Magic::WaterEdge).await;
                     }
                     DebugMenuEvent::ResetStepCounts => {
-                        sctx.steps = 0;
+                        sctx.progress.steps.fill(0);
                         sctx.push_text_box_mode("Step counts reset.");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();

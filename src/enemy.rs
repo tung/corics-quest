@@ -648,6 +648,8 @@ impl Enemy {
 }
 
 impl EncounterGroup {
+    pub const NUM_GROUPS: usize = Self::FireCastle as usize + 1;
+
     pub fn random_enemy(self, rng: &mut Rng) -> Enemy {
         let group = match self {
             Self::Wilderness1 => ENEMIES_WILDERNESS1,

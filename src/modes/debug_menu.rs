@@ -1,5 +1,6 @@
 use crate::async_utils::wait_once;
 use crate::contexts::*;
+use crate::enemy::*;
 use crate::input::*;
 use crate::progress::*;
 use crate::resources::*;
@@ -278,13 +279,26 @@ impl DebugMenu {
             &format!(
                 "Back\n\
                  Reset steps:{:>9}\n\
-                 Wilderness 1: \n\
-                 Wilderness 2: \n\
-                 Wilderness 3: \n\
-                 Earth Castle: \n\
-                 Water Castle: \n\
-                 Fire Castle: ",
-                mctx.steps,
+                 Town:{:>16}\n\
+                 Wilderness 1:{:>8}\n\
+                 Wilderness 2:{:>8}\n\
+                 Wilderness 3:{:>8}\n\
+                 Earth Castle:{:>8}\n\
+                 Water Castle:{:>8}\n\
+                 Fire Castle:{:>9}",
+                mctx.progress
+                    .steps
+                    .iter()
+                    .copied()
+                    .reduce(i32::saturating_add)
+                    .unwrap_or(0),
+                mctx.progress.steps.last().copied().unwrap_or(0),
+                mctx.progress.steps[EncounterGroup::Wilderness1 as usize],
+                mctx.progress.steps[EncounterGroup::Wilderness2 as usize],
+                mctx.progress.steps[EncounterGroup::Wilderness3 as usize],
+                mctx.progress.steps[EncounterGroup::EarthCastle as usize],
+                mctx.progress.steps[EncounterGroup::WaterCastle as usize],
+                mctx.progress.steps[EncounterGroup::FireCastle as usize],
             ),
         );
 

@@ -94,7 +94,12 @@ impl WalkAround {
                     } else {
                         walk_player(&mut mctx.actors[..], dir, None).await;
 
-                        *mctx.steps += 1;
+                        if let Some(encounter_group) = mctx.level.encounters {
+                            let steps = &mut mctx.progress.steps[encounter_group as usize];
+                            *steps = steps.saturating_add(1);
+                        } else if let Some(town_steps) = mctx.progress.steps.last_mut() {
+                            *town_steps = town_steps.saturating_add(1);
+                        }
 
                         // slide over ice tiles until level or blocking tile edge is reached
                         loop {

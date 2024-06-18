@@ -1,3 +1,5 @@
+use crate::enemy::*;
+
 pub struct Armor {
     pub name: String,
     pub defense: i32,
@@ -50,6 +52,7 @@ pub struct Progress {
     pub magic: Vec<MagicSlot>,
     pub collected_chests: Vec<String>,
     pub turned_levers: Vec<String>,
+    pub steps: Vec<i32>,
     pub earth_defeated: bool,
     pub water_defeated: bool,
     pub fire_defeated: bool,
@@ -215,6 +218,7 @@ impl Progress {
             ],
             collected_chests: Vec::new(),
             turned_levers: Vec::new(),
+            steps: vec![0; EncounterGroup::NUM_GROUPS + 1],
             earth_defeated: false,
             water_defeated: false,
             fire_defeated: false,
