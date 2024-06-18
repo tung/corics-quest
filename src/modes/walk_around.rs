@@ -94,13 +94,6 @@ impl WalkAround {
                     } else {
                         walk_player(&mut mctx.actors[..], dir, None).await;
 
-                        if let Some(encounter_group) = mctx.level.encounters {
-                            let steps = &mut mctx.progress.steps[encounter_group as usize];
-                            *steps = steps.saturating_add(1);
-                        } else if let Some(town_steps) = mctx.progress.steps.last_mut() {
-                            *town_steps = town_steps.saturating_add(1);
-                        }
-
                         // slide over ice tiles until level or blocking tile edge is reached
                         loop {
                             let Actor { grid_x, grid_y, .. } = mctx.actors[0];
@@ -121,6 +114,20 @@ impl WalkAround {
 
                             mctx.actors[0].stop_walk_animation();
                             walk_player(&mut mctx.actors[..], dir, None).await;
+                        }
+
+                        // track steps
+                        if let Some(encounter_group) = mctx.level.encounters {
+                            let steps = &mut mctx.progress.steps[encounter_group as usize];
+                            *steps = steps.saturating_add(1);
+
+                            if *mctx.encounter_steps > 1 {
+                                *mctx.encounter_steps -= 1;
+                            } else {
+                                return WalkAroundEvent::Encounter;
+                            }
+                        } else if let Some(town_steps) = mctx.progress.steps.last_mut() {
+                            *town_steps = town_steps.saturating_add(1);
                         }
                     }
                 }

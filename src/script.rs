@@ -551,6 +551,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     );
                 }
                 handle_battle(&mut sctx).await;
+                sctx.encounter_steps = 20 + sctx.rng.random(31) as i32;
             }
             WalkAroundEvent::MainMenu => {
                 sctx.push_main_menu_mode();

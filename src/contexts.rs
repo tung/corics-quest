@@ -27,6 +27,7 @@ macro_rules! update_mode {
                     level: &self.level,
                     actors: &mut self.actors,
                     fade: &self.fade,
+                    encounter_steps: &mut self.encounter_steps,
                 })
                 .await
         }
@@ -48,6 +49,7 @@ pub struct ModeContext<'a, 'g> {
     pub level: &'a SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
     pub fade: &'a SharedMut<[f32; 4]>,
+    pub encounter_steps: &'a mut i32,
 }
 
 pub struct ScriptContext {
@@ -59,6 +61,7 @@ pub struct ScriptContext {
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
     pub fade: SharedMut<[f32; 4]>,
+    pub encounter_steps: i32,
 }
 
 impl ScriptContext {
@@ -70,6 +73,9 @@ impl ScriptContext {
         actors: &SharedMut<Vec<Actor>>,
         fade: &SharedMut<[f32; 4]>,
     ) -> Self {
+        let mut rng = Rng::new(miniquad::date::now() as _);
+        let encounter_steps = 20 + rng.random(31) as i32;
+
         // SAFETY: This is immediately sent into the async script function.
         // Access from outside that async function never goes through this.
         unsafe {
@@ -77,11 +83,12 @@ impl ScriptContext {
                 res,
                 input: SharedMut::clone(input),
                 modes: SharedMut::clone(modes),
-                rng: Rng::new(miniquad::date::now() as _),
+                rng,
                 progress: Progress::new(),
                 level: SharedMut::clone(level),
                 actors: SharedMut::clone(actors),
                 fade: SharedMut::clone(fade),
+                encounter_steps,
             }
         }
     }

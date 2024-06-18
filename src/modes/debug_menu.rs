@@ -285,7 +285,8 @@ impl DebugMenu {
                  Wilderness 3:{:>8}\n\
                  Earth Castle:{:>8}\n\
                  Water Castle:{:>8}\n\
-                 Fire Castle:{:>9}",
+                 Fire Castle:{:>9}\n\n\
+                 Next encounter:{:>6}",
                 mctx.progress
                     .steps
                     .iter()
@@ -299,6 +300,7 @@ impl DebugMenu {
                 mctx.progress.steps[EncounterGroup::EarthCastle as usize],
                 mctx.progress.steps[EncounterGroup::WaterCastle as usize],
                 mctx.progress.steps[EncounterGroup::FireCastle as usize],
+                mctx.encounter_steps,
             ),
         );
 
