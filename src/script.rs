@@ -35,6 +35,33 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Ducille, |sctx| {
                 Box::pin(async {
+                    if !sctx
+                        .progress
+                        .magic
+                        .iter()
+                        .find(|m| m.magic == Magic::Heal)
+                        .expect("Heal magic slot")
+                        .known
+                    {
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             It's dangerous out there;\n\
+                             I can teach you some magic.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+
+                        learn_magic(sctx, Magic::Heal).await;
+
+                        sctx.push_text_box_mode(
+                            "Ducille:\n\
+                             Don't hesitate to use it\n\
+                             if you get low on health.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+
                     let (salves, xsalves, tonics) = if !sctx.progress.earth_defeated {
                         (1, 0, 1)
                     } else if !sctx.progress.water_defeated {
