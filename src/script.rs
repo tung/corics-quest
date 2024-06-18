@@ -35,33 +35,6 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Ducille, |sctx| {
                 Box::pin(async {
-                    if !sctx
-                        .progress
-                        .magic
-                        .iter()
-                        .find(|m| m.magic == Magic::Heal)
-                        .expect("Heal magic slot")
-                        .known
-                    {
-                        sctx.push_text_box_mode(
-                            "Ducille:\n\
-                             It's dangerous out there;\n\
-                             I can teach you some magic.",
-                        );
-                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                        sctx.pop_mode();
-
-                        learn_magic(sctx, Magic::Heal).await;
-
-                        sctx.push_text_box_mode(
-                            "Ducille:\n\
-                             Don't hesitate to use it\n\
-                             if you get low on health.",
-                        );
-                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                        sctx.pop_mode();
-                    }
-
                     let (salves, xsalves, tonics) = if !sctx.progress.earth_defeated {
                         (1, 0, 1)
                     } else if !sctx.progress.water_defeated {
@@ -138,6 +111,33 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Jace, |sctx| {
                 Box::pin(async {
+                    if !sctx
+                        .progress
+                        .magic
+                        .iter()
+                        .find(|m| m.magic == Magic::Heal)
+                        .expect("Heal magic slot")
+                        .known
+                    {
+                        sctx.push_text_box_mode(
+                            "Jace:\n\
+                             If you're heading out, I can teach\n\
+                             you some magic to keep you safe.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+
+                        learn_magic(sctx, Magic::Heal).await;
+
+                        sctx.push_text_box_mode(
+                            "Jace:\n\
+                             Don't be shy with it.  I've never\n\
+                             seen the wildlife like this before.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
+
                     if !sctx.progress.earth_defeated {
                         sctx.push_text_box_mode(
                             "Jace:\n\
