@@ -243,6 +243,12 @@ impl ScriptContext {
         self.modes.push(TextBox::new(gctx, &self.res, s));
     }
 
+    pub fn push_title_mode(&mut self) {
+        let gctx = get_gctx();
+
+        self.modes.push(Title::new(gctx, &self.res));
+    }
+
     pub fn push_walk_around_mode(&mut self) {
         self.modes.push(WalkAround::new());
     }
@@ -251,6 +257,7 @@ impl ScriptContext {
     update_mode!(update_debug_menu_mode, DebugMenuEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
+    update_mode!(update_title_mode, TitleEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
 }
 

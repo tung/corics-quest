@@ -411,6 +411,11 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
 
 pub async fn script_main(mut sctx: ScriptContext) {
     validate_level_scripts(&mut sctx);
+
+    sctx.push_title_mode();
+    let TitleEvent::NewGame = sctx.update_title_mode().await;
+    sctx.pop_mode();
+
     sctx.push_walk_around_mode();
     loop {
         match sctx.update_walk_around_mode().await {

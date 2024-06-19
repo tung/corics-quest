@@ -2,12 +2,14 @@ mod battle;
 mod debug_menu;
 mod main_menu;
 mod text_box;
+mod title;
 mod walk_around;
 
 pub use battle::*;
 pub use debug_menu::*;
 pub use main_menu::*;
 pub use text_box::*;
+pub use title::*;
 pub use walk_around::*;
 
 use crate::contexts::*;
@@ -43,6 +45,7 @@ pub enum Mode {
     DebugMenu(Box<DebugMenu>),
     MainMenu(Box<MainMenu>),
     TextBox(Box<TextBox>),
+    Title(Box<Title>),
     WalkAround(Box<WalkAround>),
 }
 
@@ -50,6 +53,7 @@ impl_mode!(Battle, BattleEvent, update_battle_mode);
 impl_mode!(DebugMenu, DebugMenuEvent, update_debug_menu_mode);
 impl_mode!(MainMenu, MainMenuEvent, update_main_menu_mode);
 impl_mode!(TextBox, TextBoxEvent, update_text_box_mode);
+impl_mode!(Title, TitleEvent, update_title_mode);
 impl_mode!(WalkAround, WalkAroundEvent, update_walk_around_mode);
 
 pub struct ModeStack(Vec<Mode>);
@@ -63,6 +67,7 @@ impl Mode {
             DebugMenu(m) => m.draw(dctx),
             MainMenu(m) => m.draw(dctx),
             TextBox(m) => m.draw(dctx),
+            Title(m) => m.draw(dctx),
             WalkAround(m) => m.draw(dctx),
         }
     }
