@@ -4,6 +4,7 @@ mod main_menu;
 mod text_box;
 mod title;
 mod walk_around;
+mod yes_no_prompt;
 
 pub use battle::*;
 pub use debug_menu::*;
@@ -11,6 +12,7 @@ pub use main_menu::*;
 pub use text_box::*;
 pub use title::*;
 pub use walk_around::*;
+pub use yes_no_prompt::*;
 
 use crate::contexts::*;
 
@@ -47,6 +49,7 @@ pub enum Mode {
     TextBox(Box<TextBox>),
     Title(Box<Title>),
     WalkAround(Box<WalkAround>),
+    YesNoPrompt(Box<YesNoPrompt>),
 }
 
 impl_mode!(Battle, BattleEvent, update_battle_mode);
@@ -55,6 +58,7 @@ impl_mode!(MainMenu, MainMenuEvent, update_main_menu_mode);
 impl_mode!(TextBox, TextBoxEvent, update_text_box_mode);
 impl_mode!(Title, TitleEvent, update_title_mode);
 impl_mode!(WalkAround, WalkAroundEvent, update_walk_around_mode);
+impl_mode!(YesNoPrompt, YesNoPromptEvent, update_yes_no_prompt_mode);
 
 pub struct ModeStack(Vec<Mode>);
 
@@ -69,6 +73,7 @@ impl Mode {
             TextBox(m) => m.draw(dctx),
             Title(m) => m.draw(dctx),
             WalkAround(m) => m.draw(dctx),
+            YesNoPrompt(m) => m.draw(dctx),
         }
     }
 }

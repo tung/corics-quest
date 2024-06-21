@@ -28,9 +28,28 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     sctx.fade_in(60).await;
                     sctx.progress.hp = sctx.progress.max_hp;
                     sctx.progress.mp = sctx.progress.max_mp;
+
                     sctx.push_text_box_mode("HP and MP recovered!");
                     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                     sctx.pop_mode();
+
+                    sctx.push_yes_no_prompt_mode(
+                        "Save your progress?",
+                        "Save",
+                        "Don't save",
+                        false,
+                    );
+                    let save_prompt_event = sctx.update_yes_no_prompt_mode().await;
+                    sctx.pop_mode();
+
+                    if matches!(save_prompt_event, YesNoPromptEvent::Yes) {
+                        match sctx.progress.save() {
+                            Ok(()) => sctx.push_text_box_mode("Progress has been saved."),
+                            Err(e) => sctx.push_text_box_mode(&format!("Save error:\n{e}")),
+                        }
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
                 })
             }),
             (ActorType::Ducille, |sctx| {
@@ -413,8 +432,28 @@ pub async fn script_main(mut sctx: ScriptContext) {
     validate_level_scripts(&mut sctx);
 
     sctx.push_title_mode();
-    let TitleEvent::NewGame = sctx.update_title_mode().await;
-    sctx.pop_mode();
+    loop {
+        match sctx.update_title_mode().await {
+            TitleEvent::NewGame => {
+                sctx.pop_mode(); // Title
+                break;
+            }
+            TitleEvent::Continue => {
+                match Progress::load() {
+                    Ok(progress) => {
+                        sctx.progress = progress;
+                        sctx.pop_mode(); // Title
+                        break;
+                    }
+                    Err(e) => {
+                        sctx.push_text_box_mode(&format!("Load error:\n{e}"));
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode(); // TextBox
+                    }
+                }
+            }
+        }
+    }
 
     sctx.push_walk_around_mode();
     loop {

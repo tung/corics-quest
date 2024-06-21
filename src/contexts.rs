@@ -253,12 +253,32 @@ impl ScriptContext {
         self.modes.push(WalkAround::new());
     }
 
+    pub fn push_yes_no_prompt_mode(
+        &mut self,
+        prompt: &str,
+        yes_label: &str,
+        no_label: &str,
+        initial_choice: bool,
+    ) {
+        let gctx = get_gctx();
+
+        self.modes.push(YesNoPrompt::new(
+            gctx,
+            &self.res,
+            prompt,
+            yes_label,
+            no_label,
+            initial_choice,
+        ));
+    }
+
     update_mode!(update_battle_mode, BattleEvent);
     update_mode!(update_debug_menu_mode, DebugMenuEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_title_mode, TitleEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);
+    update_mode!(update_yes_no_prompt_mode, YesNoPromptEvent);
 }
 
 fn sync_level_and_actors_with_lever(
