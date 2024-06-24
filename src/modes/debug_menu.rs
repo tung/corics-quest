@@ -327,14 +327,14 @@ impl DebugMenu {
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> DebugMenuEvent {
         const DEBUG_MENU_TEXT: &str = "Return\n\
              Gain Level\n\
-             Battle...\n\
-             Set Weapon...\n\
-             Set Armor...\n\
+             Battle…\n\
+             Set Weapon…\n\
+             Set Armor…\n\
              Get Items\n\
              Learn All Magic\n\
-             Step Counts...\n\
-             Flags...\n\
-             Warp...\n\
+             Step Counts…\n\
+             Flags…\n\
+             Warp…\n\
              Quit Game";
 
         self.text.set_text(mctx.gctx, mctx.res, DEBUG_MENU_TEXT);

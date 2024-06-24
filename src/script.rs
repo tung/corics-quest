@@ -72,7 +72,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.push_text_box_mode(
                             "Ducille:\n\
                              You need items, Coric?\n\
-                             Let's see what I can find...",
+                             Let's see what I can find…",
                         );
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
@@ -125,7 +125,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.push_text_box_mode(
                             "Ducille:\n\
                              The spirits were possessed, you say?\n\
-                             I wonder how that came to be...",
+                             I wonder how that came to be…",
                         );
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
@@ -318,9 +318,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
 
                 sctx.actors[earth].visible = true;
 
-                sctx.push_text_box_mode(
-                    "Earth:\nI was... possessed... please...\nsave... the others...",
-                );
+                sctx.push_text_box_mode("Earth:\nI was… possessed… please…\nsave… the others…");
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
@@ -375,9 +373,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
 
                 sctx.actors[water].visible = true;
 
-                sctx.push_text_box_mode(
-                    "Water:\nI was... possessed... please...\nsave... the others...",
-                );
+                sctx.push_text_box_mode("Water:\nI was… possessed… please…\nsave… the others…");
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 
@@ -421,7 +417,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
 
                 sctx.actors[fire].visible = true;
 
-                sctx.push_text_box_mode("Fire:\nI was... possessed...\nThank you... Coric...");
+                sctx.push_text_box_mode("Fire:\nI was… possessed…\nThank you… Coric…");
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                 sctx.pop_mode();
 

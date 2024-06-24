@@ -104,6 +104,7 @@ impl Text {
                 let c = match c {
                     '!'..='~' => c,
                     '►' => 16 as char,
+                    '…' => 255 as char,
                     _ => '?',
                 };
                 let src_x = (c as u32 % FONT_COLUMNS * char_width) as f32;
