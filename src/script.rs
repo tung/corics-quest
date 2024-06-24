@@ -24,14 +24,18 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
         on_talk: &[
             (ActorType::Bed, |sctx| {
                 Box::pin(async {
-                    sctx.fade_out(60).await;
-                    sctx.fade_in(60).await;
-                    sctx.progress.hp = sctx.progress.max_hp;
-                    sctx.progress.mp = sctx.progress.max_mp;
+                    if sctx.progress.hp < sctx.progress.max_hp
+                        || sctx.progress.mp < sctx.progress.max_mp
+                    {
+                        sctx.fade_out(60).await;
+                        sctx.fade_in(60).await;
+                        sctx.progress.hp = sctx.progress.max_hp;
+                        sctx.progress.mp = sctx.progress.max_mp;
 
-                    sctx.push_text_box_mode("HP and MP recovered!");
-                    let TextBoxEvent::Done = sctx.update_text_box_mode().await;
-                    sctx.pop_mode();
+                        sctx.push_text_box_mode("HP and MP recovered!");
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+                    }
 
                     sctx.push_yes_no_prompt_mode(
                         "Save your progress?",
