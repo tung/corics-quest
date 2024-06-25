@@ -4,6 +4,7 @@ use crate::enemy::*;
 use crate::levels::TILE_SIZE;
 use crate::modes::*;
 use crate::progress::*;
+use crate::wait_once;
 
 use std::collections::HashSet;
 use std::future::Future;
@@ -599,6 +600,20 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     })
                 {
                     (talk_script)(&mut sctx).await;
+
+                    // Trigger the ending when defeating the final boss.
+                    if sctx.progress.fire_defeated {
+                        sctx.fade_color(180, [1.0, 1.0, 1.0, 1.0]).await;
+                        sctx.fade_color(180, [0.0, 0.0, 0.0, 1.0]).await;
+                        *sctx.fade = [0.0; 4];
+
+                        sctx.pop_mode(); // WalkAround
+                        sctx.push_ending_mode();
+                        let EndingEvent::Done = sctx.update_ending_mode().await;
+                        loop {
+                            wait_once().await;
+                        }
+                    }
                 } else if sctx.actors[actor].identifier == ActorType::Chest {
                     if !sctx
                         .progress

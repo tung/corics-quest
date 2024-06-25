@@ -1,5 +1,6 @@
 mod battle;
 mod debug_menu;
+mod ending;
 mod main_menu;
 mod text_box;
 mod title;
@@ -8,6 +9,7 @@ mod yes_no_prompt;
 
 pub use battle::*;
 pub use debug_menu::*;
+pub use ending::*;
 pub use main_menu::*;
 pub use text_box::*;
 pub use title::*;
@@ -45,6 +47,7 @@ macro_rules! impl_mode {
 pub enum Mode {
     Battle(Box<Battle>),
     DebugMenu(Box<DebugMenu>),
+    Ending(Box<Ending>),
     MainMenu(Box<MainMenu>),
     TextBox(Box<TextBox>),
     Title(Box<Title>),
@@ -54,6 +57,7 @@ pub enum Mode {
 
 impl_mode!(Battle, BattleEvent, update_battle_mode);
 impl_mode!(DebugMenu, DebugMenuEvent, update_debug_menu_mode);
+impl_mode!(Ending, EndingEvent, update_ending_mode);
 impl_mode!(MainMenu, MainMenuEvent, update_main_menu_mode);
 impl_mode!(TextBox, TextBoxEvent, update_text_box_mode);
 impl_mode!(Title, TitleEvent, update_title_mode);
@@ -69,6 +73,7 @@ impl Mode {
         match self {
             Battle(m) => m.draw(dctx),
             DebugMenu(m) => m.draw(dctx),
+            Ending(m) => m.draw(dctx),
             MainMenu(m) => m.draw(dctx),
             TextBox(m) => m.draw(dctx),
             Title(m) => m.draw(dctx),

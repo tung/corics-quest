@@ -93,20 +93,29 @@ impl ScriptContext {
         }
     }
 
-    pub async fn fade_in(&mut self, frames: u16) {
-        let step = self.fade[3] / if frames > 0 { frames as f32 } else { 1.0 };
-        while self.fade[3] > 0.0 {
-            self.fade[3] = (self.fade[3] - step).max(0.0);
+    pub async fn fade_color(&mut self, frames: u16, target: [f32; 4]) {
+        let start: [f32; 4] = *self.fade;
+        for frame in 1..frames {
+            let f = frame as f32 / frames as f32;
+            self.fade[0] = start[0] + (target[0] - start[0]) * f;
+            self.fade[1] = start[1] + (target[1] - start[1]) * f;
+            self.fade[2] = start[2] + (target[2] - start[2]) * f;
+            self.fade[3] = start[3] + (target[3] - start[3]) * f;
             wait_once().await;
         }
+        *self.fade = target;
+    }
+
+    pub async fn fade_in(&mut self, frames: u16) {
+        let target = [self.fade[0], self.fade[1], self.fade[2], 0.0];
+        self.fade[3] = 1.0;
+        self.fade_color(frames, target).await;
     }
 
     pub async fn fade_out(&mut self, frames: u16) {
-        let step = (1.0 - self.fade[3]) / if frames > 0 { frames as f32 } else { 1.0 };
-        while self.fade[3] < 1.0 {
-            self.fade[3] = (self.fade[3] + step).min(1.0);
-            wait_once().await;
-        }
+        let target = [self.fade[0], self.fade[1], self.fade[2], 1.0];
+        self.fade[3] = 0.0;
+        self.fade_color(frames, target).await;
     }
 
     fn prepare_level_and_actors(&self, level: &mut Level, actors: &mut [Actor]) {
@@ -230,6 +239,12 @@ impl ScriptContext {
         self.modes.push(DebugMenu::new(gctx, &self.res));
     }
 
+    pub fn push_ending_mode(&mut self) {
+        let gctx = get_gctx();
+
+        self.modes.push(Ending::new(gctx, &self.res));
+    }
+
     pub fn push_main_menu_mode(&mut self) {
         let gctx = get_gctx();
 
@@ -274,6 +289,7 @@ impl ScriptContext {
 
     update_mode!(update_battle_mode, BattleEvent);
     update_mode!(update_debug_menu_mode, DebugMenuEvent);
+    update_mode!(update_ending_mode, EndingEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_title_mode, TitleEvent);
