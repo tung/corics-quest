@@ -39,6 +39,7 @@ pub struct Battle {
     change_text: Text,
     change_visible: bool,
     enemy: Enemy,
+    enemy_max_hp: i32,
     boss_fight: bool,
 }
 
@@ -66,6 +67,8 @@ impl Battle {
     ) -> Self {
         let mut enemy_sprite = Sprite::new(gctx, res, enemy.sprite_path);
         enemy_sprite.start_animation("idle");
+
+        let enemy_max_hp = enemy.hp;
 
         Self {
             enemy_window: Window::new(gctx, res, ENEMY_X, ENEMY_Y, 112, 80),
@@ -111,6 +114,7 @@ impl Battle {
             change_text: Text::new(res, 0, 0),
             change_visible: false,
             enemy,
+            enemy_max_hp,
             boss_fight,
         }
     }
@@ -441,22 +445,27 @@ impl Battle {
                 };
             }
 
+            let player_damage = calc_magic_damage(
+                mctx.rng,
+                mctx.progress.attack,
+                self.enemy.defense,
+                follow_up,
+                self.enemy.weakness,
+            );
+            let mut run_after_enemy_turn = false;
+
             match self.action_menu(mctx, follow_up.is_some()).await {
                 PlayerChoice::Fight => {
-                    let damage = calc_magic_damage(
-                        mctx.rng,
-                        mctx.progress.attack,
-                        self.enemy.defense,
-                        follow_up,
-                        self.enemy.weakness,
-                    );
-                    self.enemy_hit_animation(mctx, damage).await;
-                    self.enemy.hp -= damage.min(self.enemy.hp);
+                    self.enemy_hit_animation(mctx, player_damage).await;
+                    self.enemy.hp -= player_damage.min(self.enemy.hp);
 
                     self.message_text.set_text(
                         mctx.gctx,
                         mctx.res,
-                        &format!("Coric attacks!\n{damage} HP damage to {}.", self.enemy.name),
+                        &format!(
+                            "Coric attacks!\n{player_damage} HP damage to {}.",
+                            self.enemy.name,
+                        ),
                     );
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
@@ -567,10 +576,20 @@ impl Battle {
 
                 PlayerChoice::Run => {
                     self.message_text
-                        .set_text(mctx.gctx, mctx.res, "Coric ran away!");
+                        .set_text(mctx.gctx, mctx.res, "Coric turns to flee…");
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;
-                    return BattleEvent::RanAway;
+
+                    let hp_run_threshold = self.enemy_max_hp - self.enemy.hp + player_damage;
+                    if mctx.rng.random(self.enemy_max_hp as u32) < hp_run_threshold as u32 {
+                        self.message_text
+                            .set_text(mctx.gctx, mctx.res, "Coric ran away!");
+                        self.message_text.reveal().await;
+                        self.wait_for_confirmation(mctx).await;
+                        return BattleEvent::RanAway;
+                    } else {
+                        run_after_enemy_turn = true;
+                    }
                 }
             }
 
@@ -729,6 +748,12 @@ impl Battle {
 
             if mctx.progress.hp <= 0 {
                 return BattleEvent::Defeat;
+            } else if run_after_enemy_turn {
+                self.message_text
+                    .set_text(mctx.gctx, mctx.res, "Coric ran away!");
+                self.message_text.reveal().await;
+                self.wait_for_confirmation(mctx).await;
+                return BattleEvent::RanAway;
             }
         }
     }
