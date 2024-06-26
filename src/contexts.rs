@@ -247,6 +247,12 @@ impl ScriptContext {
         self.modes.push(Ending::new(gctx, &self.res));
     }
 
+    pub fn push_intro_mode(&mut self) {
+        let gctx = get_gctx();
+
+        self.modes.push(Intro::new(gctx, &self.res));
+    }
+
     pub fn push_main_menu_mode(&mut self) {
         let gctx = get_gctx();
 
@@ -292,6 +298,7 @@ impl ScriptContext {
     update_mode!(update_battle_mode, BattleEvent);
     update_mode!(update_debug_menu_mode, DebugMenuEvent);
     update_mode!(update_ending_mode, EndingEvent);
+    update_mode!(update_intro_mode, IntroEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_title_mode, TitleEvent);

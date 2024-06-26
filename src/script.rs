@@ -452,11 +452,50 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
 pub async fn script_main(mut sctx: ScriptContext) {
     validate_level_scripts(&mut sctx);
 
+    let mut play_intro_sequence = false;
+
     sctx.push_title_mode();
     loop {
         match sctx.update_title_mode().await {
             TitleEvent::NewGame => {
+                sctx.fade_out(30).await;
                 sctx.pop_mode(); // Title
+
+                sctx.push_intro_mode();
+                let IntroEvent::Done = sctx.update_intro_mode().await; // formality
+                sctx.fade_in(120).await;
+
+                sctx.push_text_box_mode(
+                    "Air:\n\
+                     Coric… listen well.\n\
+                     I am the Spirit of Air.",
+                );
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.push_text_box_mode(
+                    "Air:\n\
+                     A foul curse has befallen my kin.\n\
+                     Even now, our power wanes…",
+                );
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                sctx.pop_mode();
+
+                sctx.push_text_box_mode(
+                    "Air:\n\
+                     Please… you must save us…\n\
+                     Before all is lost…",
+                );
+                let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+
+                sctx.fade_color(120, [1.0, 1.0, 1.0, 1.0]).await;
+                sctx.fade_color(120, [0.0, 0.0, 0.0, 1.0]).await;
+
+                sctx.pop_mode(); // TextBox
+                sctx.pop_mode(); // Intro
+
+                play_intro_sequence = true;
+
                 break;
             }
             TitleEvent::Continue => {
@@ -464,6 +503,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     Ok(progress) => {
                         sctx.progress = progress;
                         sctx.confirm_save_overwrite = false;
+                        sctx.fade_out(30).await;
                         sctx.pop_mode(); // Title
                         break;
                     }
@@ -478,6 +518,38 @@ pub async fn script_main(mut sctx: ScriptContext) {
     }
 
     sctx.push_walk_around_mode();
+
+    if play_intro_sequence {
+        sctx.fade_in(120).await;
+
+        sctx.actors[0].start_animation("face_e");
+        for _ in 0..30 {
+            wait_once().await;
+        }
+        sctx.actors[0].start_animation("face_w");
+        for _ in 0..30 {
+            wait_once().await;
+        }
+        sctx.actors[0].start_animation("face_e");
+        for _ in 0..30 {
+            wait_once().await;
+        }
+        sctx.actors[0].start_animation("face_s");
+        for _ in 0..30 {
+            wait_once().await;
+        }
+
+        sctx.push_text_box_mode(
+            "Coric:\n\
+             That vision…\n\
+             I'd better speak with the others.",
+        );
+        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+        sctx.pop_mode();
+    } else {
+        sctx.fade_in(30).await;
+    }
+
     loop {
         match sctx.update_walk_around_mode().await {
             WalkAroundEvent::DebugMenu => {
