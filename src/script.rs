@@ -44,12 +44,32 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         "Don't save",
                         false,
                     );
-                    let save_prompt_event = sctx.update_yes_no_prompt_mode().await;
+                    let mut do_save = matches!(
+                        sctx.update_yes_no_prompt_mode().await,
+                        YesNoPromptEvent::Yes
+                    );
                     sctx.pop_mode();
 
-                    if matches!(save_prompt_event, YesNoPromptEvent::Yes) {
+                    if do_save && sctx.confirm_save_overwrite {
+                        sctx.push_yes_no_prompt_mode(
+                            "Save data exists; overwrite it?",
+                            "Overwrite",
+                            "Cancel",
+                            false,
+                        );
+                        do_save = matches!(
+                            sctx.update_yes_no_prompt_mode().await,
+                            YesNoPromptEvent::Yes
+                        );
+                        sctx.pop_mode();
+                    }
+
+                    if do_save {
                         match sctx.progress.save() {
-                            Ok(()) => sctx.push_text_box_mode("Progress has been saved."),
+                            Ok(()) => {
+                                sctx.push_text_box_mode("Progress has been saved.");
+                                sctx.confirm_save_overwrite = false;
+                            }
                             Err(e) => sctx.push_text_box_mode(&format!("Save error:\n{e}")),
                         }
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
@@ -443,6 +463,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 match Progress::load() {
                     Ok(progress) => {
                         sctx.progress = progress;
+                        sctx.confirm_save_overwrite = false;
                         sctx.pop_mode(); // Title
                         break;
                     }

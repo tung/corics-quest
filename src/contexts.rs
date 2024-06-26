@@ -62,6 +62,7 @@ pub struct ScriptContext {
     pub actors: SharedMut<Vec<Actor>>,
     pub fade: SharedMut<[f32; 4]>,
     pub encounter_steps: i32,
+    pub confirm_save_overwrite: bool,
 }
 
 impl ScriptContext {
@@ -89,6 +90,7 @@ impl ScriptContext {
                 actors: SharedMut::clone(actors),
                 fade: SharedMut::clone(fade),
                 encounter_steps,
+                confirm_save_overwrite: true,
             }
         }
     }
