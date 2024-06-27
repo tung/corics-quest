@@ -25,13 +25,13 @@ impl TryFrom<KeyCode> for GameKey {
 
     fn try_from(value: KeyCode) -> Result<Self, Self::Error> {
         Ok(match value {
-            KeyCode::D => Self::DebugMenu,
+            KeyCode::Backslash => Self::DebugMenu,
             KeyCode::Up => Self::Up,
             KeyCode::Down => Self::Down,
             KeyCode::Left => Self::Left,
             KeyCode::Right => Self::Right,
-            KeyCode::Z => Self::Confirm,
-            KeyCode::X => Self::Cancel,
+            KeyCode::Space => Self::Confirm,
+            KeyCode::LeftControl => Self::Cancel,
             _ => return Err(()),
         })
     }
