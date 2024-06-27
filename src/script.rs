@@ -457,7 +457,13 @@ pub async fn script_main(mut sctx: ScriptContext) {
     sctx.push_title_mode();
     loop {
         match sctx.update_title_mode().await {
-            TitleEvent::NewGame => {
+            TitleEvent::NewGame(false) => {
+                // Start a new game, but skip the intro.
+                sctx.fade_out(30).await;
+                sctx.pop_mode(); // Title
+                break;
+            }
+            TitleEvent::NewGame(true) => {
                 sctx.fade_out(30).await;
                 sctx.pop_mode(); // Title
 

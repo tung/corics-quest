@@ -17,7 +17,7 @@ pub struct Title {
 }
 
 pub enum TitleEvent {
-    NewGame,
+    NewGame(bool),
     Continue,
 }
 
@@ -65,12 +65,12 @@ impl Title {
             if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return if self.can_continue {
                     match self.selection {
-                        0 => TitleEvent::NewGame,
+                        0 => TitleEvent::NewGame(true),
                         1 => TitleEvent::Continue,
                         _ => unreachable!(),
                     }
                 } else {
-                    TitleEvent::NewGame
+                    TitleEvent::NewGame(true)
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 if self.selection == 0 {
@@ -86,6 +86,8 @@ impl Title {
                     self.selection += 1;
                 }
                 self.update_cursor_pos();
+            } else if mctx.input.is_key_pressed(GameKey::DebugMenu) && self.selection == 0 {
+                return TitleEvent::NewGame(false);
             }
 
             self.title.animate();
