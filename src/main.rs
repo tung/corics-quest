@@ -157,11 +157,7 @@ impl EventHandler for App {
     }
 
     fn key_down_event(&mut self, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) {
-        if keycode == KeyCode::Escape {
-            miniquad::window::request_quit();
-        } else {
-            self.input.handle_key_down_event(keycode);
-        }
+        self.input.handle_key_down_event(keycode);
     }
 
     fn key_up_event(&mut self, keycode: KeyCode, _keymods: KeyMods) {
