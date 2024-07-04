@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::enemy::*;
 use crate::input::*;
@@ -435,6 +436,14 @@ impl Battle {
         let mut follow_up: Option<(Magic, usize)> = None;
 
         self.update_status(mctx);
+
+        mctx.audio
+            .play_music(Some(if self.boss_fight {
+                Music::Boss
+            } else {
+                Music::Battle
+            }))
+            .await;
 
         loop {
             if let Some((magic, turns)) = follow_up {

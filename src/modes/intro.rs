@@ -1,3 +1,4 @@
+use crate::audio::*;
 use crate::contexts::*;
 use crate::resources::*;
 use crate::sprite::*;
@@ -23,7 +24,8 @@ impl Intro {
         self.air.draw(dctx.gctx, 144, 56);
     }
 
-    pub async fn update(&mut self, _mctx: &mut ModeContext<'_, '_>) -> IntroEvent {
+    pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> IntroEvent {
+        mctx.audio.play_music(Some(Music::Intro)).await;
         IntroEvent::Done
     }
 }

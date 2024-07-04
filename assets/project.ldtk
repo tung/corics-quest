@@ -11,7 +11,7 @@
 	"iid": "00979bb0-b0a0-11ee-b761-dd5714ea4fc9",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 119,
+	"nextUid": 121,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -1659,6 +1659,11 @@
 			{ "id": "SteelArmor", "tileRect": null, "color": 7552569 },
 			{ "id": "ValorBlade", "tileRect": null, "color": 16690740 },
 			{ "id": "MythicPlate", "tileRect": null, "color": 16705377 }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "Music", "uid": 119, "values": [
+			{ "id": "Town", "tileRect": null, "color": 39387 },
+			{ "id": "Overworld", "tileRect": null, "color": 4098376 },
+			{ "id": "Dungeon", "tileRect": null, "color": 12470831 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
@@ -1667,6 +1672,43 @@
 			"__type": "LocalEnum.EncounterGroup",
 			"uid": 84,
 			"type": "F_Enum(83)",
+			"isArray": false,
+			"canBeNull": true,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "Hidden",
+			"editorDisplayScale": 1,
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorDisplayColor": null,
+			"editorAlwaysShow": false,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"exportToToc": false,
+			"searchable": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": null,
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefsEntityUid": null,
+			"allowedRefTags": [],
+			"tilesetUid": null
+		},
+		{
+			"identifier": "Music",
+			"doc": null,
+			"__type": "LocalEnum.Music",
+			"uid": 120,
+			"type": "F_Enum(119)",
 			"isArray": false,
 			"canBeNull": true,
 			"arrayMinLength": null,
@@ -1719,7 +1761,13 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Town", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Town"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -3621,10 +3669,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness1"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness1"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -5389,10 +5443,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness1"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness1"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -7507,10 +7567,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness1"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness1"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -8472,10 +8538,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness1"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness1", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness1"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -9295,10 +9367,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["EarthCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["EarthCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -10060,10 +10138,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["EarthCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["EarthCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -11459,10 +11543,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["EarthCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["EarthCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -12889,10 +12979,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["EarthCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "EarthCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["EarthCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -14282,10 +14378,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness2"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness2"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -15828,10 +15930,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness2"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness2", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness2"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -17660,10 +17768,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["WaterCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["WaterCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -18290,10 +18404,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["WaterCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["WaterCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -19494,10 +19614,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["WaterCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["WaterCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -20662,10 +20788,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["WaterCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "WaterCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["WaterCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -21901,10 +22033,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness3"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness3"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -23302,10 +23440,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness3"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness3"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -24054,10 +24198,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["Wilderness3"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "Wilderness3", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Wilderness3"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Overworld", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Overworld"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -25450,10 +25600,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["FireCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FireCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -26178,10 +26334,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["FireCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FireCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -27537,10 +27699,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["FireCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FireCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",
@@ -28982,10 +29150,16 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
-				"id": "V_String",
-				"params": ["FireCastle"]
-			}] }],
+			"fieldInstances": [
+				{ "__identifier": "EncounterGroup", "__type": "LocalEnum.EncounterGroup", "__value": "FireCastle", "__tile": null, "defUid": 84, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FireCastle"]
+				}] },
+				{ "__identifier": "Music", "__type": "LocalEnum.Music", "__value": "Dungeon", "__tile": null, "defUid": 120, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Dungeon"]
+				}] }
+			],
 			"layerInstances": [
 				{
 					"__identifier": "Actors",

@@ -1,4 +1,5 @@
 use crate::actor::*;
+use crate::audio::*;
 use crate::direction::*;
 use crate::enemy::*;
 use crate::resources::*;
@@ -34,6 +35,7 @@ pub struct Level {
     layers: Vec<Layer>,
     pub neighbours: Vec<NeighbourLevel>,
     pub encounters: Option<EncounterGroup>,
+    pub music: Option<Music>,
 }
 
 pub struct LevelSet {
@@ -288,6 +290,7 @@ impl Level {
             .collect::<Vec<Layer>>();
 
         let mut encounters: Option<EncounterGroup> = None;
+        let mut music: Option<Music> = None;
         for field in &level_json.field_instances {
             match &field.identifier[..] {
                 "EncounterGroup" => {
@@ -296,6 +299,13 @@ impl Level {
                         None | Some(json::Value::Null) => None,
                         v => panic!("EncounterGroup must be a string or null: {:?}", v),
                     };
+                }
+                "Music" => {
+                    music = match &field.value {
+                        Some(json::Value::String(s)) => Some(s.as_str().into()),
+                        None | Some(json::Value::Null) => None,
+                        v => panic!("Music must be a string or null: {:?}", v),
+                    }
                 }
                 id => panic!("unknown level field: {id}"),
             }
@@ -315,6 +325,7 @@ impl Level {
                     .filter_map(NeighbourLevel::new)
                     .collect(),
                 encounters,
+                music,
             },
             actors,
         )

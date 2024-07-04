@@ -1,6 +1,7 @@
 mod actor;
 mod aseprite;
 mod async_utils;
+mod audio;
 mod contexts;
 mod direction;
 mod enemy;

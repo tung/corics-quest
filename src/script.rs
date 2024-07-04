@@ -468,7 +468,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.pop_mode(); // Title
 
                 sctx.push_intro_mode();
-                let IntroEvent::Done = sctx.update_intro_mode().await; // formality
+                let IntroEvent::Done = sctx.update_intro_mode().await;
                 sctx.fade_in(120).await;
 
                 sctx.push_text_box_mode(
@@ -496,6 +496,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
 
                 sctx.fade_color(120, [1.0, 1.0, 1.0, 1.0]).await;
                 sctx.fade_color(120, [0.0, 0.0, 0.0, 1.0]).await;
+                sctx.audio.play_music(None).await;
 
                 sctx.pop_mode(); // TextBox
                 sctx.pop_mode(); // Intro
@@ -556,6 +557,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
         sctx.fade_in(30).await;
     }
 
+    sctx.audio.play_music(sctx.level.music).await;
+
     loop {
         match sctx.update_walk_around_mode().await {
             WalkAroundEvent::DebugMenu => {
@@ -599,6 +602,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         };
                         sctx.push_battle_mode(enemy, boss_fight);
                         handle_battle(&mut sctx).await;
+                        sctx.audio.play_music(sctx.level.music).await;
                     }
                     DebugMenuEvent::SetWeapon(weapon) => {
                         sctx.progress.attack += weapon.as_ref().map(|w| w.attack).unwrap_or(0)
@@ -680,6 +684,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 if let Some(enemy) = sctx.level.encounters.map(|g| g.random_enemy(&mut sctx.rng)) {
                     sctx.push_battle_mode(enemy, false);
                     handle_battle(&mut sctx).await;
+                    sctx.audio.play_music(sctx.level.music).await;
                 }
                 sctx.encounter_steps = 20 + sctx.rng.random(31) as i32;
             }
@@ -712,6 +717,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         loop {
                             wait_once().await;
                         }
+                    } else {
+                        sctx.audio.play_music(sctx.level.music).await;
                     }
                 } else if sctx.actors[actor].identifier == ActorType::Chest {
                     if !sctx
@@ -855,6 +862,7 @@ async fn run_level_on_enter(sctx: &mut ScriptContext) {
     {
         (on_enter)(sctx).await;
     }
+    sctx.audio.play_music(sctx.level.music).await;
 }
 
 async fn warp_to_level(sctx: &mut ScriptContext, level_id: &'static str, x: i32, y: i32) {
@@ -876,6 +884,7 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
     let event = sctx.update_battle_mode().await;
     sctx.pop_mode();
     sctx.actors[0].visible = true;
+    sctx.audio.play_music(None).await;
     match event {
         BattleEvent::Victory => true,
         BattleEvent::RanAway => false,

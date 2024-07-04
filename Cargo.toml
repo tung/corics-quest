@@ -9,6 +9,7 @@ edition = "2021"
 miniquad = "0.4.2"
 miniserde = "0.1.36"
 png = "0.17.11"
+quad-snd = "0.2.8"
 quad-storage = "0.1.3"
 
 [profile.dev]

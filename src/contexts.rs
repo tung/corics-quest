@@ -1,5 +1,6 @@
 use crate::actor::*;
 use crate::async_utils::*;
+use crate::audio::*;
 use crate::direction::*;
 use crate::enemy::*;
 use crate::get_gctx;
@@ -22,6 +23,7 @@ macro_rules! update_mode {
                     gctx,
                     res: &self.res,
                     input: &self.input,
+                    audio: &mut self.audio,
                     rng: &mut self.rng,
                     progress: &mut self.progress,
                     level: &self.level,
@@ -44,6 +46,7 @@ pub struct ModeContext<'a, 'g> {
     pub gctx: &'g mut GlContext,
     pub res: &'a Resources,
     pub input: &'a SharedMut<Input>,
+    pub audio: &'a mut Audio,
     pub rng: &'a mut Rng,
     pub progress: &'a mut Progress,
     pub level: &'a SharedMut<Level>,
@@ -55,6 +58,7 @@ pub struct ModeContext<'a, 'g> {
 pub struct ScriptContext {
     pub res: Resources,
     pub input: SharedMut<Input>,
+    pub audio: Audio,
     pub modes: SharedMut<ModeStack>,
     pub rng: Rng,
     pub progress: Progress,
@@ -83,6 +87,7 @@ impl ScriptContext {
             Self {
                 res,
                 input: SharedMut::clone(input),
+                audio: Audio::new(),
                 modes: SharedMut::clone(modes),
                 rng,
                 progress: Progress::new(),

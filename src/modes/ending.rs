@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::resources::*;
 use crate::text::*;
@@ -53,7 +54,9 @@ impl Ending {
         }
     }
 
-    pub async fn update(&mut self, _mctx: &mut ModeContext<'_, '_>) -> EndingEvent {
+    pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> EndingEvent {
+        mctx.audio.play_music(Some(Music::Ending)).await;
+
         for t in &mut self.texts {
             t.hide_all_chars();
         }
