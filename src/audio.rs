@@ -17,6 +17,7 @@ pub enum Music {
 pub struct Audio {
     audio_context: AudioContext,
     music: Option<(Music, Sound)>,
+    music_volume_scripted: f32,
 }
 
 impl Music {
@@ -60,6 +61,7 @@ impl Audio {
         Self {
             audio_context: AudioContext::new(),
             music: None,
+            music_volume_scripted: 1.0,
         }
     }
 
@@ -89,10 +91,20 @@ impl Audio {
                 &self.audio_context,
                 PlaySoundParams {
                     looped: true,
-                    volume: music.base_volume(),
+                    volume: music.base_volume() * self.music_volume_scripted,
                 },
             );
             self.music = Some((music, sound));
+        }
+    }
+
+    pub fn set_music_volume_scripted(&mut self, volume: f32) {
+        self.music_volume_scripted = volume;
+        if let Some((music, sound)) = &self.music {
+            sound.set_volume(
+                &self.audio_context,
+                music.base_volume() * self.music_volume_scripted,
+            );
         }
     }
 }

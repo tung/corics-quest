@@ -28,8 +28,10 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     if sctx.progress.hp < sctx.progress.max_hp
                         || sctx.progress.mp < sctx.progress.max_mp
                     {
+                        sctx.audio.set_music_volume_scripted(0.4);
                         sctx.fade_out(60).await;
                         sctx.fade_in(60).await;
+                        sctx.audio.set_music_volume_scripted(1.0);
                         sctx.progress.hp = sctx.progress.max_hp;
                         sctx.progress.mp = sctx.progress.max_mp;
 
@@ -494,9 +496,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 );
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
 
+                sctx.audio.set_music_volume_scripted(0.4);
                 sctx.fade_color(120, [1.0, 1.0, 1.0, 1.0]).await;
                 sctx.fade_color(120, [0.0, 0.0, 0.0, 1.0]).await;
                 sctx.audio.play_music(None).await;
+                sctx.audio.set_music_volume_scripted(1.0);
 
                 sctx.pop_mode(); // TextBox
                 sctx.pop_mode(); // Intro
@@ -885,6 +889,7 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
     sctx.pop_mode();
     sctx.actors[0].visible = true;
     sctx.audio.play_music(None).await;
+    sctx.audio.set_music_volume_scripted(1.0);
     match event {
         BattleEvent::Victory => true,
         BattleEvent::RanAway => false,

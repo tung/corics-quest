@@ -591,6 +591,7 @@ impl Battle {
 
                     let hp_run_threshold = self.enemy_max_hp - self.enemy.hp + player_damage;
                     if mctx.rng.random(self.enemy_max_hp as u32) < hp_run_threshold as u32 {
+                        mctx.audio.set_music_volume_scripted(0.4);
                         self.message_text
                             .set_text(mctx.gctx, mctx.res, "Coric ran away!");
                         self.message_text.reveal().await;
@@ -606,6 +607,8 @@ impl Battle {
 
             if self.enemy.hp <= 0 {
                 self.enemy_visible = false;
+
+                mctx.audio.set_music_volume_scripted(0.4);
 
                 self.message_text.set_text(
                     mctx.gctx,
@@ -756,8 +759,10 @@ impl Battle {
             self.wait_for_confirmation(mctx).await;
 
             if mctx.progress.hp <= 0 {
+                mctx.audio.set_music_volume_scripted(0.4);
                 return BattleEvent::Defeat;
             } else if run_after_enemy_turn {
+                mctx.audio.set_music_volume_scripted(0.4);
                 self.message_text
                     .set_text(mctx.gctx, mctx.res, "Coric ran away!");
                 self.message_text.reveal().await;
