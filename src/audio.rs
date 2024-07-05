@@ -17,8 +17,11 @@ pub enum Music {
 pub struct Audio {
     audio_context: AudioContext,
     music: Option<(Music, Sound)>,
+    music_volume_custom: u8,
     music_volume_scripted: f32,
 }
+
+pub const MAX_MUSIC_VOLUME_CUSTOM: u8 = 8;
 
 impl Music {
     fn sound_data(&self) -> &'static [u8] {
@@ -61,8 +64,22 @@ impl Audio {
         Self {
             audio_context: AudioContext::new(),
             music: None,
+            music_volume_custom: MAX_MUSIC_VOLUME_CUSTOM,
             music_volume_scripted: 1.0,
         }
+    }
+
+    fn calc_music_volume(&self) -> f32 {
+        self.music
+            .as_ref()
+            .map(|(m, _)| m.base_volume())
+            .unwrap_or(1.0)
+            * (self.music_volume_custom as f32 / MAX_MUSIC_VOLUME_CUSTOM as f32)
+            * self.music_volume_scripted
+    }
+
+    pub fn get_music_volume_custom(&self) -> u8 {
+        self.music_volume_custom
     }
 
     pub async fn play_music(&mut self, music: Option<Music>) {
@@ -91,20 +108,24 @@ impl Audio {
                 &self.audio_context,
                 PlaySoundParams {
                     looped: true,
-                    volume: music.base_volume() * self.music_volume_scripted,
+                    volume: self.calc_music_volume(),
                 },
             );
             self.music = Some((music, sound));
         }
     }
 
+    pub fn set_music_volume_custom(&mut self, volume: u8) {
+        self.music_volume_custom = volume.min(MAX_MUSIC_VOLUME_CUSTOM);
+        if let Some((_, sound)) = &self.music {
+            sound.set_volume(&self.audio_context, self.calc_music_volume());
+        }
+    }
+
     pub fn set_music_volume_scripted(&mut self, volume: f32) {
         self.music_volume_scripted = volume;
-        if let Some((music, sound)) = &self.music {
-            sound.set_volume(
-                &self.audio_context,
-                music.base_volume() * self.music_volume_scripted,
-            );
+        if let Some((_, sound)) = &self.music {
+            sound.set_volume(&self.audio_context, self.calc_music_volume());
         }
     }
 }

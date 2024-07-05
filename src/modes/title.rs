@@ -19,6 +19,7 @@ pub struct Title {
 pub enum TitleEvent {
     NewGame(bool),
     Continue,
+    Options,
 }
 
 const TITLE_X: i32 = 120;
@@ -31,16 +32,11 @@ const CURSOR_Y: i32 = MENU_Y;
 impl Title {
     pub fn new(gctx: &mut GlContext, res: &Resources) -> Self {
         let can_continue = save_data_exists();
-        let menu_text = if can_continue {
-            Text::from_str(gctx, res, MENU_X, MENU_Y, "New Game\nContinue")
-        } else {
-            Text::from_str(gctx, res, MENU_X, MENU_Y, "New Game")
-        };
 
         Self {
             title: Sprite::new(gctx, res, "title.png"),
-            menu_text,
-            cursor: Text::from_str(gctx, res, CURSOR_X, CURSOR_Y, "►"),
+            menu_text: Text::new(res, MENU_X, MENU_Y),
+            cursor: Text::new(res, CURSOR_X, CURSOR_Y),
             can_continue,
             selection: can_continue as i32,
         }
@@ -53,24 +49,41 @@ impl Title {
     }
 
     fn num_menu_entries(&self) -> i32 {
-        1 + self.can_continue as i32
+        2 + self.can_continue as i32
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> TitleEvent {
+        self.menu_text.set_text(
+            mctx.gctx,
+            mctx.res,
+            if self.can_continue {
+                "New Game\nContinue\nOptions"
+            } else {
+                "New Game\nOptions"
+            },
+        );
+
+        self.cursor.set_text(mctx.gctx, mctx.res, "►");
         self.update_cursor_pos();
 
         loop {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Confirm) {
-                return if self.can_continue {
-                    match self.selection {
-                        0 => TitleEvent::NewGame(true),
-                        1 => TitleEvent::Continue,
-                        _ => unreachable!(),
-                    }
+                let real_selection = if !self.can_continue && self.selection >= 1 {
+                    self.selection + 1
                 } else {
-                    TitleEvent::NewGame(true)
+                    self.selection
+                };
+                return match real_selection {
+                    0 => TitleEvent::NewGame(true),
+                    1 => TitleEvent::Continue,
+                    2 => {
+                        self.menu_text.set_text(mctx.gctx, mctx.res, "");
+                        self.cursor.set_text(mctx.gctx, mctx.res, "");
+                        TitleEvent::Options
+                    }
+                    _ => unreachable!(),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 if self.selection == 0 {

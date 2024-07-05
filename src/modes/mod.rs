@@ -3,6 +3,7 @@ mod debug_menu;
 mod ending;
 mod intro;
 mod main_menu;
+mod options;
 mod text_box;
 mod title;
 mod walk_around;
@@ -13,6 +14,7 @@ pub use debug_menu::*;
 pub use ending::*;
 pub use intro::*;
 pub use main_menu::*;
+pub use options::*;
 pub use text_box::*;
 pub use title::*;
 pub use walk_around::*;
@@ -52,6 +54,7 @@ pub enum Mode {
     Ending(Box<Ending>),
     Intro(Box<Intro>),
     MainMenu(Box<MainMenu>),
+    Options(Box<Options>),
     TextBox(Box<TextBox>),
     Title(Box<Title>),
     WalkAround(Box<WalkAround>),
@@ -63,6 +66,7 @@ impl_mode!(DebugMenu, DebugMenuEvent, update_debug_menu_mode);
 impl_mode!(Ending, EndingEvent, update_ending_mode);
 impl_mode!(Intro, IntroEvent, update_intro_mode);
 impl_mode!(MainMenu, MainMenuEvent, update_main_menu_mode);
+impl_mode!(Options, OptionsEvent, update_options_mode);
 impl_mode!(TextBox, TextBoxEvent, update_text_box_mode);
 impl_mode!(Title, TitleEvent, update_title_mode);
 impl_mode!(WalkAround, WalkAroundEvent, update_walk_around_mode);
@@ -80,6 +84,7 @@ impl Mode {
             Ending(m) => m.draw(dctx),
             Intro(m) => m.draw(dctx),
             MainMenu(m) => m.draw(dctx),
+            Options(m) => m.draw(dctx),
             TextBox(m) => m.draw(dctx),
             Title(m) => m.draw(dctx),
             WalkAround(m) => m.draw(dctx),

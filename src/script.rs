@@ -525,6 +525,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     }
                 }
             }
+            TitleEvent::Options => {
+                sctx.push_options_mode(82, 112, true);
+                let OptionsEvent::Done = sctx.update_options_mode().await;
+                sctx.pop_mode(); // Options
+            }
         }
     }
 
@@ -694,8 +699,19 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             WalkAroundEvent::MainMenu => {
                 sctx.push_main_menu_mode();
-                let MainMenuEvent::Done = sctx.update_main_menu_mode().await;
-                sctx.pop_mode();
+                loop {
+                    match sctx.update_main_menu_mode().await {
+                        MainMenuEvent::Done => {
+                            sctx.pop_mode(); // MainMenu
+                            break;
+                        }
+                        MainMenuEvent::Options => {
+                            sctx.push_options_mode(52, 78, false);
+                            let OptionsEvent::Done = sctx.update_options_mode().await;
+                            sctx.pop_mode();
+                        }
+                    }
+                }
             }
             WalkAroundEvent::TalkActor(actor) => {
                 if let Some((_, talk_script)) = LEVEL_SCRIPTS

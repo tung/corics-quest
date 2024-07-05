@@ -265,6 +265,13 @@ impl ScriptContext {
             .push(MainMenu::new(gctx, &self.res, &self.progress));
     }
 
+    pub fn push_options_mode(&mut self, base_x: i32, base_y: i32, preview_music: bool) {
+        let gctx = get_gctx();
+
+        self.modes
+            .push(Options::new(gctx, &self.res, base_x, base_y, preview_music));
+    }
+
     pub fn push_text_box_mode(&mut self, s: &str) {
         let gctx = get_gctx();
 
@@ -305,6 +312,7 @@ impl ScriptContext {
     update_mode!(update_ending_mode, EndingEvent);
     update_mode!(update_intro_mode, IntroEvent);
     update_mode!(update_main_menu_mode, MainMenuEvent);
+    update_mode!(update_options_mode, OptionsEvent);
     update_mode!(update_text_box_mode, TextBoxEvent);
     update_mode!(update_title_mode, TitleEvent);
     update_mode!(update_walk_around_mode, WalkAroundEvent);

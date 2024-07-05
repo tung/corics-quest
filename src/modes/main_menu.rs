@@ -9,7 +9,7 @@ use crate::window::*;
 
 use miniquad::GlContext;
 
-const TOP_X: i32 = 47;
+const TOP_X: i32 = 44;
 const TOP_Y: i32 = 25;
 const TOP_WIDTH: i32 = 25 * 6 + 16;
 const TOP_HEIGHT: i32 = 3 * 8 + 5 + 16;
@@ -19,10 +19,11 @@ const BOTTOM_WIDTH: i32 = TOP_WIDTH;
 const BOTTOM_HEIGHT: i32 = 8 * 8 + 16;
 const MENU_X: i32 = TOP_X + TOP_WIDTH;
 const MENU_Y: i32 = TOP_Y;
-const MENU_WIDTH: i32 = 60;
-const MENU_HEIGHT: i32 = 56;
+const MENU_WIDTH: i32 = 66;
+const MENU_HEIGHT: i32 = 72;
 
 pub struct MainMenu {
+    selection: i32,
     top_window: Window,
     name_text: Text,
     level_text: Text,
@@ -43,6 +44,7 @@ pub struct MainMenu {
 
 pub enum MainMenuEvent {
     Done,
+    Options,
 }
 
 impl MainMenu {
@@ -116,11 +118,12 @@ impl MainMenu {
             res,
             MENU_X + 14,
             MENU_Y + 8,
-            "Return\n\nMagic\n\nItem",
+            "Return\n\nMagic\n\nItem\n\nOptions",
         );
         let menu_cursor = Text::from_str(gctx, res, MENU_X + 8, MENU_Y + 8, "►");
 
         Self {
+            selection: 0,
             top_window,
             name_text,
             level_text,
@@ -303,38 +306,40 @@ impl MainMenu {
         self.update_hp_and_mp(mctx);
         self.update_bottom_text_for_status(mctx);
 
-        let mut selection = 0;
-
         loop {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
                 return MainMenuEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
-                match selection {
+                match self.selection {
                     0 => return MainMenuEvent::Done,
                     1 => self.magic_menu(mctx).await,
                     2 => self.item_menu(mctx).await,
+                    3 => {
+                        self.bottom_text.set_text(mctx.gctx, mctx.res, "");
+                        return MainMenuEvent::Options;
+                    }
                     _ => unreachable!(),
                 }
                 self.update_bottom_text_for_status(mctx);
                 self.bottom_line.set_text(mctx.gctx, mctx.res, "");
                 self.bottom_cursor_visible = false;
             } else if mctx.input.is_key_pressed(GameKey::Up) {
-                if selection == 0 {
-                    selection = 2;
+                if self.selection == 0 {
+                    self.selection = 3;
                 } else {
-                    selection -= 1;
+                    self.selection -= 1;
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
-                if selection == 2 {
-                    selection = 0;
+                if self.selection == 3 {
+                    self.selection = 0;
                 } else {
-                    selection += 1;
+                    self.selection += 1;
                 }
             }
             self.menu_cursor
-                .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * selection);
+                .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * self.selection);
         }
     }
 
