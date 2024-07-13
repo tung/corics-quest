@@ -58,7 +58,7 @@ pub struct ModeContext<'a, 'g> {
 pub struct ScriptContext {
     pub res: Resources,
     pub input: SharedMut<Input>,
-    pub audio: Audio,
+    pub audio: SharedMut<Audio>,
     pub modes: SharedMut<ModeStack>,
     pub rng: Rng,
     pub progress: Progress,
@@ -73,6 +73,7 @@ impl ScriptContext {
     pub fn new(
         res: Resources,
         input: &SharedMut<Input>,
+        audio: &SharedMut<Audio>,
         modes: &SharedMut<ModeStack>,
         level: &SharedMut<Level>,
         actors: &SharedMut<Vec<Actor>>,
@@ -87,7 +88,7 @@ impl ScriptContext {
             Self {
                 res,
                 input: SharedMut::clone(input),
-                audio: Audio::new(),
+                audio: SharedMut::clone(audio),
                 modes: SharedMut::clone(modes),
                 rng,
                 progress: Progress::new(),

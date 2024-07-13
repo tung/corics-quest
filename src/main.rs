@@ -21,6 +21,7 @@ mod window;
 
 use actor::*;
 use async_utils::*;
+use audio::*;
 use contexts::*;
 use input::*;
 use levels::*;
@@ -53,6 +54,7 @@ struct App {
     window_width: f32,
     window_height: f32,
     input: SharedMut<Input>,
+    audio: SharedMut<Audio>,
     modes: SharedMut<ModeStack>,
     level: SharedMut<Level>,
     actors: SharedMut<Vec<Actor>>,
@@ -92,6 +94,7 @@ impl App {
         let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
 
         let input = SharedMut::new(Input::new());
+        let audio = SharedMut::new(Audio::new());
         let modes = SharedMut::new(ModeStack::new());
         let (level, actors) = {
             let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");
@@ -101,7 +104,7 @@ impl App {
             (SharedMut::new(level), SharedMut::new(actors))
         };
         let fade = SharedMut::new([0.0; 4]);
-        let sctx = ScriptContext::new(res, &input, &modes, &level, &actors, &fade);
+        let sctx = ScriptContext::new(res, &input, &audio, &modes, &level, &actors, &fade);
 
         Self {
             script: Some(Box::pin(script::script_main(sctx))),
@@ -114,6 +117,7 @@ impl App {
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
             input,
+            audio,
             modes,
             level,
             actors,
@@ -180,6 +184,7 @@ impl EventHandler for App {
         self.last_time = current_time;
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
+            self.audio.adjust_music_volume_scripted();
             let mut dummy_context = Context::from_waker(&self.dummy_waker);
             if let Some(script) = &mut self.script {
                 if let Poll::Ready(()) = script.as_mut().poll(&mut dummy_context) {

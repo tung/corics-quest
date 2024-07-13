@@ -3,6 +3,8 @@ use crate::async_utils::wait_once;
 
 use quad_snd::{AudioContext, PlaySoundParams, Sound};
 
+use std::cmp::Ordering;
+
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Music {
     Battle,
@@ -19,6 +21,7 @@ pub struct Audio {
     music: Option<(Music, Sound)>,
     music_volume_custom: u8,
     music_volume_scripted: u8,
+    music_volume_scripted_target: u8,
 }
 
 pub const MAX_MUSIC_VOLUME: u8 = 100;
@@ -66,6 +69,21 @@ impl Audio {
             music: None,
             music_volume_custom: MAX_MUSIC_VOLUME,
             music_volume_scripted: MAX_MUSIC_VOLUME,
+            music_volume_scripted_target: MAX_MUSIC_VOLUME,
+        }
+    }
+
+    pub fn adjust_music_volume_scripted(&mut self) {
+        match self
+            .music_volume_scripted
+            .cmp(&self.music_volume_scripted_target)
+        {
+            Ordering::Less => self.music_volume_scripted += 1,
+            Ordering::Greater => self.music_volume_scripted -= 1,
+            _ => return,
+        }
+        if let Some((_, sound)) = &self.music {
+            sound.set_volume(&self.audio_context, self.calc_music_volume());
         }
     }
 
@@ -124,9 +142,6 @@ impl Audio {
 
     pub fn set_music_volume_scripted(&mut self, volume: u8) {
         assert!(volume <= MAX_MUSIC_VOLUME);
-        self.music_volume_scripted = volume;
-        if let Some((_, sound)) = &self.music {
-            sound.set_volume(&self.audio_context, self.calc_music_volume());
-        }
+        self.music_volume_scripted_target = volume;
     }
 }
