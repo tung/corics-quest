@@ -46,7 +46,7 @@ impl Options {
                 base_y + 2 * 8 + 2,
                 12 * 6,
                 [192, 192, 192],
-                MAX_MUSIC_VOLUME_CUSTOM as i32,
+                MAX_MUSIC_VOLUME as i32,
             ),
         }
     }
@@ -93,14 +93,14 @@ impl Options {
                 }
             } else if self.selection == 1 {
                 if mctx.input.is_key_pressed(GameKey::Left) {
-                    let new_volume = mctx.audio.get_music_volume_custom().saturating_sub(1);
+                    let new_volume = mctx.audio.get_music_volume_custom().saturating_sub(10);
                     mctx.audio.set_music_volume_custom(new_volume);
                     self.update_volume(mctx);
                     if self.preview_music {
                         mctx.audio.play_music(Some(Music::Overworld)).await;
                     }
                 } else if mctx.input.is_key_pressed(GameKey::Right) {
-                    let new_volume = mctx.audio.get_music_volume_custom().saturating_add(1);
+                    let new_volume = mctx.audio.get_music_volume_custom().saturating_add(10);
                     mctx.audio.set_music_volume_custom(new_volume);
                     self.update_volume(mctx);
                     if self.preview_music {
@@ -125,7 +125,7 @@ impl Options {
         self.volume_text.set_text(
             mctx.gctx,
             mctx.res,
-            &format!("Music{music_volume_custom:>4}"),
+            &format!("Music{:>4}", music_volume_custom / 10),
         );
         self.volume_meter
             .set_value(mctx.gctx, music_volume_custom as i32);

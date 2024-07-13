@@ -18,10 +18,10 @@ pub struct Audio {
     audio_context: AudioContext,
     music: Option<(Music, Sound)>,
     music_volume_custom: u8,
-    music_volume_scripted: f32,
+    music_volume_scripted: u8,
 }
 
-pub const MAX_MUSIC_VOLUME_CUSTOM: u8 = 8;
+pub const MAX_MUSIC_VOLUME: u8 = 100;
 
 impl Music {
     fn sound_data(&self) -> &'static [u8] {
@@ -64,8 +64,8 @@ impl Audio {
         Self {
             audio_context: AudioContext::new(),
             music: None,
-            music_volume_custom: MAX_MUSIC_VOLUME_CUSTOM,
-            music_volume_scripted: 1.0,
+            music_volume_custom: MAX_MUSIC_VOLUME,
+            music_volume_scripted: MAX_MUSIC_VOLUME,
         }
     }
 
@@ -74,8 +74,8 @@ impl Audio {
             .as_ref()
             .map(|(m, _)| m.base_volume())
             .unwrap_or(1.0)
-            * (self.music_volume_custom as f32 / MAX_MUSIC_VOLUME_CUSTOM as f32)
-            * self.music_volume_scripted
+            * (self.music_volume_custom as f32 / MAX_MUSIC_VOLUME as f32)
+            * (self.music_volume_scripted as f32 / MAX_MUSIC_VOLUME as f32)
     }
 
     pub fn get_music_volume_custom(&self) -> u8 {
@@ -116,13 +116,14 @@ impl Audio {
     }
 
     pub fn set_music_volume_custom(&mut self, volume: u8) {
-        self.music_volume_custom = volume.min(MAX_MUSIC_VOLUME_CUSTOM);
+        self.music_volume_custom = volume.min(MAX_MUSIC_VOLUME);
         if let Some((_, sound)) = &self.music {
             sound.set_volume(&self.audio_context, self.calc_music_volume());
         }
     }
 
-    pub fn set_music_volume_scripted(&mut self, volume: f32) {
+    pub fn set_music_volume_scripted(&mut self, volume: u8) {
+        assert!(volume <= MAX_MUSIC_VOLUME);
         self.music_volume_scripted = volume;
         if let Some((_, sound)) = &self.music {
             sound.set_volume(&self.audio_context, self.calc_music_volume());
