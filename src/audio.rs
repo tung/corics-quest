@@ -82,16 +82,13 @@ impl Audio {
             Ordering::Greater => self.music_volume_scripted -= 1,
             _ => return,
         }
-        if let Some((_, sound)) = &self.music {
-            sound.set_volume(&self.audio_context, self.calc_music_volume());
+        if let Some((music, sound)) = &self.music {
+            sound.set_volume(&self.audio_context, self.calc_music_volume(*music));
         }
     }
 
-    fn calc_music_volume(&self) -> f32 {
-        self.music
-            .as_ref()
-            .map(|(m, _)| m.base_volume())
-            .unwrap_or(1.0)
+    fn calc_music_volume(&self, music: Music) -> f32 {
+        music.base_volume()
             * (self.music_volume_custom as f32 / MAX_MUSIC_VOLUME as f32)
             * (self.music_volume_scripted as f32 / MAX_MUSIC_VOLUME as f32)
     }
@@ -126,7 +123,7 @@ impl Audio {
                 &self.audio_context,
                 PlaySoundParams {
                     looped: true,
-                    volume: self.calc_music_volume(),
+                    volume: self.calc_music_volume(music),
                 },
             );
             self.music = Some((music, sound));
@@ -135,8 +132,8 @@ impl Audio {
 
     pub fn set_music_volume_custom(&mut self, volume: u8) {
         self.music_volume_custom = volume.min(MAX_MUSIC_VOLUME);
-        if let Some((_, sound)) = &self.music {
-            sound.set_volume(&self.audio_context, self.calc_music_volume());
+        if let Some((music, sound)) = &self.music {
+            sound.set_volume(&self.audio_context, self.calc_music_volume(*music));
         }
     }
 
