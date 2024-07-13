@@ -216,6 +216,14 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     if !sctx.progress.earth_defeated {
                         sctx.push_text_box_mode(
                             "Julis:\n\
+                             Press Left Ctrl to view your status,\n\
+                             and use items and magic.",
+                        );
+                        let TextBoxEvent::Done = sctx.update_text_box_mode().await;
+                        sctx.pop_mode();
+
+                        sctx.push_text_box_mode(
+                            "Julis:\n\
                              Talk to us when you make progress;\n\
                              we'll have more to tell you.",
                         );
