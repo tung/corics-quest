@@ -66,6 +66,9 @@ impl Options {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                if self.preview_music {
+                    mctx.audio.play_music(None).await;
+                }
                 return OptionsEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if self.selection == 0 {
