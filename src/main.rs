@@ -185,8 +185,8 @@ impl EventHandler for App {
         while self.time_bank >= FRAME_TIME {
             self.time_bank -= FRAME_TIME;
             self.audio.adjust_music_volume_scripted();
-            let mut dummy_context = Context::from_waker(&self.dummy_waker);
             if let Some(script) = &mut self.script {
+                let mut dummy_context = Context::from_waker(&self.dummy_waker);
                 if let Poll::Ready(()) = script.as_mut().poll(&mut dummy_context) {
                     miniquad::window::order_quit();
                     self.script = None;
