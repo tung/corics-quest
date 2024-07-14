@@ -179,16 +179,13 @@ impl Audio {
     }
 
     pub fn play_sfx(&self, sfx: Sfx) {
-        let is_cursor_sound = matches!(sfx, Sfx::Cancel | Sfx::Chime | Sfx::Confirm | Sfx::Cursor);
-        if is_cursor_sound {
-            // Don't let cursor sounds stack on top of each other.
-            for s in [Sfx::Cancel, Sfx::Confirm, Sfx::Cursor] {
-                self.sound_effects[s as usize].stop(&self.audio_context);
-            }
+        // Stop cursor sounds when anything else plays.
+        for s in [Sfx::Cancel, Sfx::Confirm, Sfx::Cursor] {
+            self.sound_effects[s as usize].stop(&self.audio_context);
         }
         let sound = &self.sound_effects[sfx as usize];
-        if !is_cursor_sound {
-            // Also stop non-cursor sounds from stacking on top of themselves.
+        if !matches!(sfx, Sfx::Cancel | Sfx::Confirm | Sfx::Cursor) {
+            // Stop non-cursor sounds from stacking on top of themselves.
             sound.stop(&self.audio_context);
         }
         sound.play(
