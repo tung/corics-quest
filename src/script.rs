@@ -31,6 +31,10 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                     {
                         sctx.audio.set_music_volume_scripted(40);
                         sctx.fade_out(60).await;
+                        sctx.audio.play_sfx(Sfx::Heal);
+                        for _ in 0..30 {
+                            wait_once().await;
+                        }
                         sctx.fade_in(60).await;
                         sctx.audio.set_music_volume_scripted(100);
                         sctx.progress.hp = sctx.progress.max_hp;
