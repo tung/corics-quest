@@ -658,6 +658,7 @@ impl Battle {
                         msg.push('!');
                     }
 
+                    mctx.audio.play_sfx(Sfx::LevelUp);
                     self.message_text.set_text(mctx.gctx, mctx.res, &msg);
                     self.message_text.reveal().await;
                     self.wait_for_confirmation(mctx).await;

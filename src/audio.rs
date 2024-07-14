@@ -25,6 +25,7 @@ pub enum Sfx {
     Cursor,
     Heal,
     Hurt,
+    LevelUp,
     Magic,
 }
 
@@ -48,6 +49,7 @@ const SFX_SOUND_DATA: [&[u8]; Sfx::NUM_SFXS] = [
     include_bytes!("../assets/cursor.ogg"), // Sfx::Cursor
     include_bytes!("../assets/heal.ogg"), // Sfx::Heal
     include_bytes!("../assets/hurt.ogg"), // Sfx::Hurt
+    include_bytes!("../assets/levelup.ogg"), // Sfx::LevelUp
     include_bytes!("../assets/magic.ogg"), // Sfx::Magic
 ];
 
@@ -96,6 +98,7 @@ impl Sfx {
             Sfx::Chime => 0.6,
             Sfx::Heal => 0.5,
             Sfx::Hurt => 0.5,
+            Sfx::LevelUp => 0.4,
             Sfx::Magic => 0.6,
             _ => 1.0,
         }

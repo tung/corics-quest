@@ -598,6 +598,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     DebugMenuEvent::GainLevel => {
                         sctx.progress.exp = 0;
                         sctx.progress.gain_level();
+                        sctx.audio.play_sfx(Sfx::LevelUp);
                         sctx.push_text_box_mode(&format!(
                             "Coric is now level {}!",
                             sctx.progress.level,
