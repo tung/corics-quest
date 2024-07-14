@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::enemy::*;
 use crate::input::*;
@@ -46,6 +47,8 @@ impl DebugMenu {
     }
 
     async fn battle_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<i32> {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -69,13 +72,18 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return None;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return match selection {
-                    0 => None,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        None
+                    }
                     s => Some(s - 1),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 9;
                 } else {
@@ -83,6 +91,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 9 {
                     selection = 0;
                 } else {
@@ -100,6 +109,8 @@ impl DebugMenu {
     }
 
     async fn flags_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<i32> {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -122,13 +133,18 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return None;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return match selection {
-                    0 => None,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        None
+                    }
                     s => Some(s - 1),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 3;
                 } else {
@@ -136,6 +152,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 3 {
                     selection = 0;
                 } else {
@@ -147,6 +164,8 @@ impl DebugMenu {
     }
 
     async fn set_armor_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<Option<Armor>> {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -166,10 +185,14 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return None;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return match selection {
-                    0 => None,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        None
+                    }
                     1 => Some(None),
                     s => Some(Some(match s {
                         2 => Armor {
@@ -192,6 +215,7 @@ impl DebugMenu {
                     })),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 5;
                 } else {
@@ -199,6 +223,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 5 {
                     selection = 0;
                 } else {
@@ -210,6 +235,8 @@ impl DebugMenu {
     }
 
     async fn set_weapon_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<Option<Weapon>> {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -229,10 +256,14 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return None;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return match selection {
-                    0 => None,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        None
+                    }
                     1 => Some(None),
                     s => Some(Some(match s {
                         2 => Weapon {
@@ -255,6 +286,7 @@ impl DebugMenu {
                     })),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 5;
                 } else {
@@ -262,6 +294,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 5 {
                     selection = 0;
                 } else {
@@ -273,6 +306,8 @@ impl DebugMenu {
     }
 
     async fn step_counts_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> bool {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -312,12 +347,21 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return false;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
-                return selection == 1;
+                return match selection {
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        false
+                    }
+                    1 => true,
+                    _ => unreachable!(),
+                };
             } else if mctx.input.is_key_pressed(GameKey::Up)
                 || mctx.input.is_key_pressed(GameKey::Down)
             {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 selection ^= 1;
                 self.update_cursor_pos(selection);
             }
@@ -347,6 +391,7 @@ impl DebugMenu {
             if mctx.input.is_key_pressed(GameKey::Cancel)
                 || mctx.input.is_key_pressed(GameKey::DebugMenu)
             {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return DebugMenuEvent::Cancel;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 let choice = match selection {
@@ -373,11 +418,16 @@ impl DebugMenu {
                     _ => unreachable!(),
                 };
                 if let Some(choice) = choice {
+                    mctx.audio.play_sfx(match choice {
+                        DebugMenuEvent::Cancel => Sfx::Cancel,
+                        _ => Sfx::Confirm,
+                    });
                     return choice;
                 }
                 self.text.set_text(mctx.gctx, mctx.res, DEBUG_MENU_TEXT);
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 10;
                 } else {
@@ -385,6 +435,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 10 {
                     selection = 0;
                 } else {
@@ -400,6 +451,8 @@ impl DebugMenu {
     }
 
     async fn warp_menu(&mut self, mctx: &mut ModeContext<'_, '_>) -> Option<DebugMenuEvent> {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.text.set_text(
             mctx.gctx,
             mctx.res,
@@ -418,10 +471,14 @@ impl DebugMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return None;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return match selection {
-                    0 => None,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        None
+                    }
                     s => Some(match s {
                         1 => DebugMenuEvent::Warp {
                             level_id: "Start",
@@ -447,6 +504,7 @@ impl DebugMenu {
                     }),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 4;
                 } else {
@@ -454,6 +512,7 @@ impl DebugMenu {
                 }
                 self.update_cursor_pos(selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 4 {
                     selection = 0;
                 } else {

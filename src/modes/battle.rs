@@ -191,6 +191,7 @@ impl Battle {
                     self.menu_visible = false;
                     return choice;
                 } else {
+                    mctx.audio.play_sfx(Sfx::Cancel);
                     set_all_text(
                         mctx,
                         &mut self.message_text,
@@ -201,12 +202,14 @@ impl Battle {
                     update_action_cursor(&mut self.cursor, selection);
                 }
             } else if mctx.input.is_key_pressed(GameKey::Left) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     0 => selection = 3,
                     _ => selection -= 1,
                 }
                 update_action_cursor(&mut self.cursor, selection);
             } else if mctx.input.is_key_pressed(GameKey::Right) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     3 => selection = 0,
                     _ => selection += 1,
@@ -268,6 +271,8 @@ impl Battle {
             cursor.set_offset(MESSAGE_X + 8 + x, MESSAGE_Y + 24 + y);
         }
 
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.message_text.set_text(mctx.gctx, mctx.res, "Use item:");
         self.menu_text.set_text(
             mctx.gctx,
@@ -298,11 +303,14 @@ impl Battle {
                     let choice = selection - 1;
                     if mctx.progress.items[choice].amount > 0 {
                         return Some(choice);
+                    } else {
+                        mctx.audio.play_sfx(Sfx::Cancel);
                     }
                 }
             } else if mctx.input.is_key_pressed(GameKey::Up)
                 || mctx.input.is_key_pressed(GameKey::Down)
             {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     0 => {}
                     1 | 2 => selection += 2,
@@ -311,6 +319,7 @@ impl Battle {
                 }
                 update_item_cursor(&mut self.cursor, selection);
             } else if mctx.input.is_key_pressed(GameKey::Left) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     0 => selection = 2,
                     3 => selection = 4,
@@ -319,6 +328,7 @@ impl Battle {
                 }
                 update_item_cursor(&mut self.cursor, selection);
             } else if mctx.input.is_key_pressed(GameKey::Right) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     2 => selection = 0,
                     4 => selection = 3,
@@ -341,6 +351,8 @@ impl Battle {
             let y = MAGIC_POSITIONS[which].1 * 8;
             cursor.set_offset(MESSAGE_X + 8 + x, MESSAGE_Y + 24 + y);
         }
+
+        mctx.audio.play_sfx(Sfx::Confirm);
 
         self.message_text
             .set_text(mctx.gctx, mctx.res, "Cast magic:");
@@ -375,11 +387,14 @@ impl Battle {
                     let mp_cost = mctx.progress.magic[choice].magic.mp_cost();
                     if magic_known && mctx.progress.mp >= mp_cost {
                         return Some(choice);
+                    } else {
+                        mctx.audio.play_sfx(Sfx::Cancel);
                     }
                 }
             } else if mctx.input.is_key_pressed(GameKey::Up)
                 || mctx.input.is_key_pressed(GameKey::Down)
             {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     0 => {}
                     1 | 2 => selection += 2,
@@ -388,6 +403,7 @@ impl Battle {
                 }
                 update_magic_cursor(&mut self.cursor, selection);
             } else if mctx.input.is_key_pressed(GameKey::Left) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     0 => selection = 2,
                     3 => selection = 4,
@@ -396,6 +412,7 @@ impl Battle {
                 }
                 update_magic_cursor(&mut self.cursor, selection);
             } else if mctx.input.is_key_pressed(GameKey::Right) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 match selection {
                     2 => selection = 0,
                     4 => selection = 3,
@@ -465,6 +482,7 @@ impl Battle {
 
             match self.action_menu(mctx, follow_up.is_some()).await {
                 PlayerChoice::Fight => {
+                    mctx.audio.play_sfx(Sfx::Attack);
                     self.enemy_hit_animation(mctx, player_damage).await;
                     self.enemy.hp -= player_damage.min(self.enemy.hp);
 
@@ -486,6 +504,8 @@ impl Battle {
 
                     match mctx.progress.magic[choice].magic {
                         Magic::Heal => {
+                            mctx.audio.play_sfx(Sfx::Heal);
+
                             let heal_amount = (mctx.progress.max_hp + 1) / 2;
                             self.show_status_change(mctx, &format!("{heal_amount:+}"));
                             mctx.progress.hp =
@@ -508,6 +528,7 @@ impl Battle {
                                 follow_up,
                                 self.enemy.weakness,
                             );
+                            mctx.audio.play_sfx(Sfx::Magic);
                             self.enemy_hit_animation(mctx, damage).await;
                             self.enemy.hp -= damage.min(self.enemy.hp);
 
@@ -538,6 +559,8 @@ impl Battle {
                 }
 
                 PlayerChoice::Item(choice) => {
+                    mctx.audio.play_sfx(Sfx::Heal);
+
                     mctx.progress.items[choice].amount -= 1;
 
                     let item = mctx.progress.items[choice].item;
@@ -584,6 +607,8 @@ impl Battle {
                 }
 
                 PlayerChoice::Run => {
+                    mctx.audio.play_sfx(Sfx::Confirm);
+
                     self.message_text
                         .set_text(mctx.gctx, mctx.res, "Coric turns to flee…");
                     self.message_text.reveal().await;
@@ -738,6 +763,7 @@ impl Battle {
                         0
                     };
 
+                mctx.audio.play_sfx(Sfx::Hurt);
                 for _ in 0..5 {
                     self.status_visible = false;
                     wait_once().await;
@@ -789,6 +815,7 @@ impl Battle {
             wait_once().await;
         }
         self.change_visible = false;
+        mctx.audio.play_sfx(Sfx::Confirm);
     }
 }
 

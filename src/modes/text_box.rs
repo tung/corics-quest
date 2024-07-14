@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::input::*;
 use crate::resources::*;
@@ -34,6 +35,7 @@ impl TextBox {
         loop {
             wait_once().await;
             if mctx.input.is_key_pressed(GameKey::Confirm) {
+                mctx.audio.play_sfx(Sfx::Confirm);
                 return TextBoxEvent::Done;
             }
         }

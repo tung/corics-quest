@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::input::*;
 use crate::progress::*;
@@ -70,6 +71,7 @@ impl Title {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Confirm) {
+                mctx.audio.play_sfx(Sfx::Confirm);
                 let real_selection = if !self.can_continue && self.selection >= 1 {
                     self.selection + 1
                 } else {
@@ -86,6 +88,7 @@ impl Title {
                     _ => unreachable!(),
                 };
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
                     self.selection = self.num_menu_entries() - 1;
                 } else {
@@ -93,6 +96,7 @@ impl Title {
                 }
                 self.update_cursor_pos();
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == self.num_menu_entries() - 1 {
                     self.selection = 0;
                 } else {
@@ -100,6 +104,7 @@ impl Title {
                 }
                 self.update_cursor_pos();
             } else if mctx.input.is_key_pressed(GameKey::DebugMenu) && self.selection == 0 {
+                mctx.audio.play_sfx(Sfx::Confirm);
                 return TitleEvent::NewGame(false);
             }
 

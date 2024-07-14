@@ -66,15 +66,18 @@ impl Options {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 if self.preview_music {
                     mctx.audio.play_music(None).await;
                 }
                 return OptionsEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if self.selection == 0 {
+                    mctx.audio.play_sfx(Sfx::Cancel);
                     return OptionsEvent::Done;
                 }
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
                     self.selection = 1;
                 } else {
@@ -85,6 +88,7 @@ impl Options {
                     mctx.audio.play_music(None).await;
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 1 {
                     self.selection = 0;
                 } else {

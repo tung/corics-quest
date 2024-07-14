@@ -1,4 +1,5 @@
 use crate::actor::*;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::enemy::*;
 use crate::levels::TILE_SIZE;
@@ -579,6 +580,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
     loop {
         match sctx.update_walk_around_mode().await {
             WalkAroundEvent::DebugMenu => {
+                sctx.audio.play_sfx(Sfx::Confirm);
                 sctx.push_debug_menu_mode();
                 let debug_menu_event = sctx.update_debug_menu_mode().await;
                 sctx.pop_mode();
@@ -706,6 +708,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 sctx.encounter_steps = 20 + sctx.rng.random(31) as i32;
             }
             WalkAroundEvent::MainMenu => {
+                sctx.audio.play_sfx(Sfx::Confirm);
                 sctx.push_main_menu_mode();
                 loop {
                     match sctx.update_main_menu_mode().await {

@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::input::*;
 use crate::resources::*;
@@ -66,14 +67,18 @@ impl YesNoPrompt {
 
             if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return if self.choice {
+                    mctx.audio.play_sfx(Sfx::Confirm);
                     YesNoPromptEvent::Yes
                 } else {
+                    mctx.audio.play_sfx(Sfx::Cancel);
                     YesNoPromptEvent::No
                 };
             } else if mctx.input.is_key_pressed(GameKey::Left) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 self.choice = true;
                 self.update_cursor_pos();
             } else if mctx.input.is_key_pressed(GameKey::Right) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 self.choice = false;
                 self.update_cursor_pos();
             }

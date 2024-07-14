@@ -1,4 +1,5 @@
 use crate::async_utils::wait_once;
+use crate::audio::*;
 use crate::contexts::*;
 use crate::input::*;
 use crate::meter::*;
@@ -166,6 +167,8 @@ impl MainMenu {
     }
 
     async fn item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.update_bottom_text_for_item_menu(mctx);
 
         let mut selection = 0;
@@ -177,9 +180,11 @@ impl MainMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if selection == 0 {
+                    mctx.audio.play_sfx(Sfx::Cancel);
                     return;
                 } else {
                     let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
@@ -187,39 +192,54 @@ impl MainMenu {
                         match mctx.progress.items[choice].item {
                             Item::Salve => {
                                 if mctx.progress.hp < mctx.progress.max_hp {
+                                    mctx.audio.play_sfx(Sfx::Heal);
                                     mctx.progress.items[choice].amount -= 1;
                                     let heal_hp = (mctx.progress.max_hp * 3 + 9) / 10;
                                     mctx.progress.hp =
                                         mctx.progress.max_hp.min(mctx.progress.hp + heal_hp);
+                                } else {
+                                    mctx.audio.play_sfx(Sfx::Cancel);
                                 }
                             }
                             Item::XSalve => {
                                 if mctx.progress.hp < mctx.progress.max_hp {
+                                    mctx.audio.play_sfx(Sfx::Heal);
                                     mctx.progress.items[choice].amount -= 1;
                                     mctx.progress.hp = mctx.progress.max_hp;
+                                } else {
+                                    mctx.audio.play_sfx(Sfx::Cancel);
                                 }
                             }
                             Item::Tonic => {
                                 if mctx.progress.mp < mctx.progress.max_mp {
+                                    mctx.audio.play_sfx(Sfx::Heal);
                                     mctx.progress.items[choice].amount -= 1;
                                     let heal_mp = (mctx.progress.max_mp * 3 + 9) / 10;
                                     mctx.progress.mp =
                                         mctx.progress.max_mp.min(mctx.progress.mp + heal_mp);
+                                } else {
+                                    mctx.audio.play_sfx(Sfx::Cancel);
                                 }
                             }
                             Item::XTonic => {
                                 if mctx.progress.mp < mctx.progress.max_mp {
+                                    mctx.audio.play_sfx(Sfx::Heal);
                                     mctx.progress.items[choice].amount -= 1;
                                     mctx.progress.mp = mctx.progress.max_mp;
+                                } else {
+                                    mctx.audio.play_sfx(Sfx::Cancel);
                                 }
                             }
                         }
                         self.update_hp_and_mp(mctx);
                         self.update_bottom_text_for_item_menu(mctx);
                         self.update_bottom_line_for_item_menu(mctx, selection);
+                    } else {
+                        mctx.audio.play_sfx(Sfx::Cancel);
                     }
                 }
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 4;
                 } else {
@@ -228,6 +248,7 @@ impl MainMenu {
                 self.place_bottom_cursor(selection);
                 self.update_bottom_line_for_item_menu(mctx, selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 4 {
                     selection = 0;
                 } else {
@@ -240,6 +261,8 @@ impl MainMenu {
     }
 
     async fn magic_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
+        mctx.audio.play_sfx(Sfx::Confirm);
+
         self.update_bottom_text_for_magic_menu(mctx);
 
         let mut selection = 0;
@@ -251,9 +274,11 @@ impl MainMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 if selection == 0 {
+                    mctx.audio.play_sfx(Sfx::Cancel);
                     return;
                 } else {
                     let choice = usize::try_from(selection - 1).expect("selection - 1 as usize");
@@ -263,13 +288,17 @@ impl MainMenu {
                         && mctx.progress.mp >= magic_slot.magic.mp_cost()
                         && mctx.progress.hp < mctx.progress.max_hp
                     {
+                        mctx.audio.play_sfx(Sfx::Heal);
                         mctx.progress.mp -= magic_slot.magic.mp_cost();
                         let heal_amount = (mctx.progress.max_hp + 1) / 2;
                         mctx.progress.hp = mctx.progress.max_hp.min(mctx.progress.hp + heal_amount);
                         self.update_hp_and_mp(mctx);
+                    } else {
+                        mctx.audio.play_sfx(Sfx::Cancel);
                     }
                 }
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 0 {
                     selection = 4;
                 } else {
@@ -278,6 +307,7 @@ impl MainMenu {
                 self.place_bottom_cursor(selection);
                 self.update_bottom_line_for_magic_menu(mctx, selection);
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if selection == 4 {
                     selection = 0;
                 } else {
@@ -310,13 +340,18 @@ impl MainMenu {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
                 return MainMenuEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 match self.selection {
-                    0 => return MainMenuEvent::Done,
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        return MainMenuEvent::Done;
+                    }
                     1 => self.magic_menu(mctx).await,
                     2 => self.item_menu(mctx).await,
                     3 => {
+                        mctx.audio.play_sfx(Sfx::Confirm);
                         self.bottom_text.set_text(mctx.gctx, mctx.res, "");
                         return MainMenuEvent::Options;
                     }
@@ -326,12 +361,14 @@ impl MainMenu {
                 self.bottom_line.set_text(mctx.gctx, mctx.res, "");
                 self.bottom_cursor_visible = false;
             } else if mctx.input.is_key_pressed(GameKey::Up) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
                     self.selection = 3;
                 } else {
                     self.selection -= 1;
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
+                mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 3 {
                     self.selection = 0;
                 } else {

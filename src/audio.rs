@@ -16,15 +16,38 @@ pub enum Music {
     Town,
 }
 
+#[derive(Clone, Copy)]
+pub enum Sfx {
+    Attack,
+    Cancel,
+    Confirm,
+    Cursor,
+    Heal,
+    Hurt,
+    Magic,
+}
+
 pub struct Audio {
     audio_context: AudioContext,
     music: Option<(Music, Sound)>,
     music_volume_custom: u8,
     music_volume_scripted: u8,
     music_volume_scripted_target: u8,
+    sound_effects: [Sound; Sfx::NUM_SFXS],
 }
 
 pub const MAX_MUSIC_VOLUME: u8 = 100;
+
+#[rustfmt::skip]
+const SFX_SOUND_DATA: [&[u8]; Sfx::NUM_SFXS] = [
+    include_bytes!("../assets/attack.ogg"), // Sfx::Attack
+    include_bytes!("../assets/cancel.ogg"), // Sfx::Cancel
+    include_bytes!("../assets/confirm.ogg"), // Sfx::Confirm
+    include_bytes!("../assets/cursor.ogg"), // Sfx::Cursor
+    include_bytes!("../assets/heal.ogg"), // Sfx::Heal
+    include_bytes!("../assets/hurt.ogg"), // Sfx::Hurt
+    include_bytes!("../assets/magic.ogg"), // Sfx::Magic
+];
 
 impl Music {
     fn sound_data(&self) -> &'static [u8] {
@@ -62,14 +85,33 @@ impl From<&str> for Music {
     }
 }
 
+impl Sfx {
+    const NUM_SFXS: usize = Self::Magic as usize + 1;
+
+    fn base_volume(&self) -> f32 {
+        match self {
+            Sfx::Cursor => 0.8,
+            Sfx::Heal => 0.5,
+            Sfx::Hurt => 0.5,
+            Sfx::Magic => 0.6,
+            _ => 1.0,
+        }
+    }
+}
+
 impl Audio {
     pub fn new() -> Self {
+        let audio_context = AudioContext::new();
+        let sound_effects =
+            core::array::from_fn(|i| Sound::load(&audio_context, SFX_SOUND_DATA[i]));
+
         Self {
-            audio_context: AudioContext::new(),
+            audio_context,
             music: None,
             music_volume_custom: MAX_MUSIC_VOLUME,
             music_volume_scripted: MAX_MUSIC_VOLUME,
             music_volume_scripted_target: MAX_MUSIC_VOLUME,
+            sound_effects,
         }
     }
 
@@ -128,6 +170,28 @@ impl Audio {
             );
             self.music = Some((music, sound));
         }
+    }
+
+    pub fn play_sfx(&self, sfx: Sfx) {
+        let is_cursor_sound = matches!(sfx, Sfx::Cancel | Sfx::Confirm | Sfx::Cursor);
+        if is_cursor_sound {
+            // Don't let cursor sounds stack on top of each other.
+            for s in [Sfx::Cancel, Sfx::Confirm, Sfx::Cursor] {
+                self.sound_effects[s as usize].stop(&self.audio_context);
+            }
+        }
+        let sound = &self.sound_effects[sfx as usize];
+        if !is_cursor_sound {
+            // Also stop non-cursor sounds from stacking on top of themselves.
+            sound.stop(&self.audio_context);
+        }
+        sound.play(
+            &self.audio_context,
+            PlaySoundParams {
+                looped: false,
+                volume: sfx.base_volume(),
+            },
+        );
     }
 
     pub fn set_music_volume_custom(&mut self, volume: u8) {
