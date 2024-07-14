@@ -676,6 +676,7 @@ impl Battle {
                             .expect("salve item slot");
                         if salves.amount < 9 {
                             salves.amount += 1;
+                            mctx.audio.play_sfx(Sfx::Chime);
                             self.message_text
                                 .set_text(mctx.gctx, mctx.res, "Coric found a Salve!");
                             self.message_text.reveal().await;
@@ -690,6 +691,7 @@ impl Battle {
                             .expect("tonic item slot");
                         if tonics.amount < 9 {
                             tonics.amount += 1;
+                            mctx.audio.play_sfx(Sfx::Chime);
                             self.message_text
                                 .set_text(mctx.gctx, mctx.res, "Coric found a Tonic!");
                             self.message_text.reveal().await;
@@ -704,6 +706,7 @@ impl Battle {
                             .expect("xsalve item slot");
                         if xsalves.amount < 9 {
                             xsalves.amount += 1;
+                            mctx.audio.play_sfx(Sfx::Chime);
                             self.message_text.set_text(
                                 mctx.gctx,
                                 mctx.res,
@@ -721,6 +724,7 @@ impl Battle {
                             .expect("xtonic item slot");
                         if xtonics.amount < 9 {
                             xtonics.amount += 1;
+                            mctx.audio.play_sfx(Sfx::Chime);
                             self.message_text.set_text(
                                 mctx.gctx,
                                 mctx.res,

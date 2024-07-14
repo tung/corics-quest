@@ -20,6 +20,7 @@ pub enum Music {
 pub enum Sfx {
     Attack,
     Cancel,
+    Chime,
     Confirm,
     Cursor,
     Heal,
@@ -42,6 +43,7 @@ pub const MAX_MUSIC_VOLUME: u8 = 100;
 const SFX_SOUND_DATA: [&[u8]; Sfx::NUM_SFXS] = [
     include_bytes!("../assets/attack.ogg"), // Sfx::Attack
     include_bytes!("../assets/cancel.ogg"), // Sfx::Cancel
+    include_bytes!("../assets/chime.ogg"), // Sfx::Chime
     include_bytes!("../assets/confirm.ogg"), // Sfx::Confirm
     include_bytes!("../assets/cursor.ogg"), // Sfx::Cursor
     include_bytes!("../assets/heal.ogg"), // Sfx::Heal
@@ -91,6 +93,7 @@ impl Sfx {
     fn base_volume(&self) -> f32 {
         match self {
             Sfx::Cursor => 0.8,
+            Sfx::Chime => 0.6,
             Sfx::Heal => 0.5,
             Sfx::Hurt => 0.5,
             Sfx::Magic => 0.6,
@@ -173,7 +176,7 @@ impl Audio {
     }
 
     pub fn play_sfx(&self, sfx: Sfx) {
-        let is_cursor_sound = matches!(sfx, Sfx::Cancel | Sfx::Confirm | Sfx::Cursor);
+        let is_cursor_sound = matches!(sfx, Sfx::Cancel | Sfx::Chime | Sfx::Confirm | Sfx::Cursor);
         if is_cursor_sound {
             // Don't let cursor sounds stack on top of each other.
             for s in [Sfx::Cancel, Sfx::Confirm, Sfx::Cursor] {

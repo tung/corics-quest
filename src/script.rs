@@ -106,6 +106,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.pop_mode();
                     }
                     if salves_given > 0 {
+                        sctx.audio.play_sfx(Sfx::Chime);
                         if salves_given == 1 {
                             sctx.push_text_box_mode("Coric got a Salve!");
                         } else {
@@ -115,6 +116,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.pop_mode();
                     }
                     if xsalves_given > 0 {
+                        sctx.audio.play_sfx(Sfx::Chime);
                         if xsalves_given == 1 {
                             sctx.push_text_box_mode("Coric got an XSalve!");
                         } else {
@@ -124,6 +126,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.pop_mode();
                     }
                     if tonics_given > 0 {
+                        sctx.audio.play_sfx(Sfx::Chime);
                         if tonics_given == 1 {
                             sctx.push_text_box_mode("Coric got a Tonic!");
                         } else {
@@ -267,11 +270,13 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.pop_mode();
                     }
                     if weapon_given {
+                        sctx.audio.play_sfx(Sfx::Chime);
                         sctx.push_text_box_mode("Coric got a Short Sword!");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
                     if armor_given {
+                        sctx.audio.play_sfx(Sfx::Chime);
                         sctx.push_text_box_mode("Coric got a Leather Armor!");
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
@@ -951,6 +956,7 @@ async fn chest_with_armor(
 ) -> bool {
     sctx.actors[chest].start_animation("open");
     if sctx.progress.maybe_upgrade_armor(name, defense) {
+        sctx.audio.play_sfx(Sfx::Chime);
         sctx.push_text_box_mode(&format!("Coric found the {name}!"));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
@@ -972,6 +978,7 @@ async fn chest_with_weapon(
 ) -> bool {
     sctx.actors[chest].start_animation("open");
     if sctx.progress.maybe_upgrade_weapon(name, attack) {
+        sctx.audio.play_sfx(Sfx::Chime);
         sctx.push_text_box_mode(&format!("Coric found the {name}!"));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
@@ -994,6 +1001,7 @@ async fn learn_magic(sctx: &mut ScriptContext, magic: Magic) {
         .expect("magic slot");
     magic_slot.known = true;
 
+    sctx.audio.play_sfx(Sfx::Chime);
     sctx.push_text_box_mode(&format!("Coric learned {}!", magic.name()));
     let TextBoxEvent::Done = sctx.update_text_box_mode().await;
     sctx.pop_mode();
