@@ -36,9 +36,11 @@ pub struct Audio {
     music_volume_scripted: u8,
     music_volume_scripted_target: u8,
     sound_effects: [Sound; Sfx::NUM_SFXS],
+    sound_volume_custom: u8,
 }
 
 pub const MAX_MUSIC_VOLUME: u8 = 100;
+pub const MAX_SOUND_VOLUME: u8 = 100;
 
 #[rustfmt::skip]
 const SFX_SOUND_DATA: [&[u8]; Sfx::NUM_SFXS] = [
@@ -118,6 +120,7 @@ impl Audio {
             music_volume_scripted: MAX_MUSIC_VOLUME,
             music_volume_scripted_target: MAX_MUSIC_VOLUME,
             sound_effects,
+            sound_volume_custom: MAX_SOUND_VOLUME,
         }
     }
 
@@ -143,6 +146,10 @@ impl Audio {
 
     pub fn get_music_volume_custom(&self) -> u8 {
         self.music_volume_custom
+    }
+
+    pub fn get_sound_volume_custom(&self) -> u8 {
+        self.sound_volume_custom
     }
 
     pub async fn play_music(&mut self, music: Option<Music>) {
@@ -192,7 +199,8 @@ impl Audio {
             &self.audio_context,
             PlaySoundParams {
                 looped: false,
-                volume: sfx.base_volume(),
+                volume: sfx.base_volume() * self.sound_volume_custom as f32
+                    / MAX_SOUND_VOLUME as f32,
             },
         );
     }
@@ -207,5 +215,9 @@ impl Audio {
     pub fn set_music_volume_scripted(&mut self, volume: u8) {
         assert!(volume <= MAX_MUSIC_VOLUME);
         self.music_volume_scripted_target = volume;
+    }
+
+    pub fn set_sound_volume_custom(&mut self, volume: u8) {
+        self.sound_volume_custom = volume.min(MAX_SOUND_VOLUME);
     }
 }
