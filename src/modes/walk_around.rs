@@ -92,7 +92,7 @@ impl WalkAround {
                     {
                         return WalkAroundEvent::TouchLevelEdge(dir);
                     } else {
-                        walk_player(&mut mctx.actors[..], dir, None).await;
+                        walk_player(&mut mctx.actors[..], dir, |_, _| ()).await;
 
                         // slide over ice tiles until level or blocking tile edge is reached
                         loop {
@@ -113,7 +113,7 @@ impl WalkAround {
                             }
 
                             mctx.actors[0].stop_walk_animation();
-                            walk_player(&mut mctx.actors[..], dir, None).await;
+                            walk_player(&mut mctx.actors[..], dir, |_, _| ()).await;
                         }
 
                         // track steps

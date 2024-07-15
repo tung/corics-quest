@@ -5,6 +5,7 @@ mod audio;
 mod contexts;
 mod direction;
 mod enemy;
+mod fade;
 mod input;
 mod ldtk;
 mod levels;
@@ -24,6 +25,7 @@ use actor::*;
 use async_utils::*;
 use audio::*;
 use contexts::*;
+use fade::*;
 use input::*;
 use levels::*;
 use modes::*;
@@ -60,7 +62,7 @@ struct App {
     modes: SharedMut<ModeStack>,
     level: SharedMut<Level>,
     actors: SharedMut<Vec<Actor>>,
-    fade: SharedMut<[f32; 4]>,
+    fade: SharedMut<Fade>,
 }
 
 impl App {
@@ -108,7 +110,7 @@ impl App {
             actors.insert(0, player);
             (SharedMut::new(level), SharedMut::new(actors))
         };
-        let fade = SharedMut::new([0.0; 4]);
+        let fade = SharedMut::new(Fade::new());
         let sctx = ScriptContext::new(res, &input, &audio, &modes, &level, &actors, &fade);
 
         Self {
@@ -158,7 +160,7 @@ impl EventHandler for App {
         gctx.apply_bindings(&self.screen_bindings);
         gctx.apply_uniforms(UniformsSource::table(&screen_shader::Uniforms {
             scale: self.window_scale(),
-            fade: *self.fade,
+            fade: (&*self.fade).into(),
         }));
         gctx.draw(0, 6, 1);
         gctx.end_render_pass();

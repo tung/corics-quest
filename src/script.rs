@@ -30,12 +30,12 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         || sctx.progress.mp < sctx.progress.max_mp
                     {
                         sctx.audio.set_music_volume_scripted(40);
-                        sctx.fade_out(60).await;
+                        sctx.fade.out_to_black(60).await;
                         sctx.audio.play_sfx(Sfx::Heal);
                         for _ in 0..30 {
                             wait_once().await;
                         }
-                        sctx.fade_in(60).await;
+                        sctx.fade.in_from_black(60).await;
                         sctx.audio.set_music_volume_scripted(100);
                         sctx.progress.hp = sctx.progress.max_hp;
                         sctx.progress.mp = sctx.progress.max_mp;
@@ -479,17 +479,17 @@ pub async fn script_main(mut sctx: ScriptContext) {
         match sctx.update_title_mode().await {
             TitleEvent::NewGame(false) => {
                 // Start a new game, but skip the intro.
-                sctx.fade_out(30).await;
+                sctx.fade.out_to_black(30).await;
                 sctx.pop_mode(); // Title
                 break;
             }
             TitleEvent::NewGame(true) => {
-                sctx.fade_out(30).await;
+                sctx.fade.out_to_black(30).await;
                 sctx.pop_mode(); // Title
 
                 sctx.push_intro_mode();
                 let IntroEvent::Done = sctx.update_intro_mode().await;
-                sctx.fade_in(120).await;
+                sctx.fade.in_from_black(120).await;
 
                 sctx.push_text_box_mode(
                     "Air:\n\
@@ -515,8 +515,8 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 let TextBoxEvent::Done = sctx.update_text_box_mode().await;
 
                 sctx.audio.set_music_volume_scripted(40);
-                sctx.fade_color(120, [1.0, 1.0, 1.0, 1.0]).await;
-                sctx.fade_color(120, [0.0, 0.0, 0.0, 1.0]).await;
+                sctx.fade.to_color(120, [1.0, 1.0, 1.0, 1.0]).await;
+                sctx.fade.to_color(120, [0.0, 0.0, 0.0, 1.0]).await;
                 sctx.audio.play_music(None).await;
                 sctx.audio.set_music_volume_scripted(100);
 
@@ -532,7 +532,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     Ok(progress) => {
                         sctx.progress = progress;
                         sctx.confirm_save_overwrite = false;
-                        sctx.fade_out(30).await;
+                        sctx.fade.out_to_black(30).await;
                         sctx.pop_mode(); // Title
                         break;
                     }
@@ -554,7 +554,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
     sctx.push_walk_around_mode();
 
     if play_intro_sequence {
-        sctx.fade_in(120).await;
+        sctx.fade.in_from_black(120).await;
 
         sctx.actors[0].start_animation("face_e");
         for _ in 0..30 {
@@ -581,7 +581,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
     } else {
-        sctx.fade_in(30).await;
+        sctx.fade.in_from_black(30).await;
     }
 
     sctx.audio.play_music(sctx.level.music).await;
@@ -748,9 +748,9 @@ pub async fn script_main(mut sctx: ScriptContext) {
 
                     // Trigger the ending when defeating the final boss.
                     if sctx.progress.fire_defeated {
-                        sctx.fade_color(180, [1.0, 1.0, 1.0, 1.0]).await;
-                        sctx.fade_color(180, [0.0, 0.0, 0.0, 1.0]).await;
-                        *sctx.fade = [0.0; 4];
+                        sctx.fade.to_color(180, [1.0, 1.0, 1.0, 1.0]).await;
+                        sctx.fade.to_color(180, [0.0, 0.0, 0.0, 1.0]).await;
+                        sctx.fade.set([0.0; 4]);
 
                         sctx.pop_mode(); // WalkAround
                         sctx.push_ending_mode();
@@ -839,11 +839,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             WalkAroundEvent::TouchLevelEdge(dir) => {
                 if let Some((level, mut actors)) = sctx.level_by_neighbour(dir) {
-                    // prepare black fade color
-                    *sctx.fade = [0.0; 4];
-
                     // walk out of old level
-                    walk_player(&mut sctx.actors[..], dir, Some((&mut sctx.fade[3], 1.0))).await;
+                    walk_player(&mut sctx.actors[..], dir, |i, max| {
+                        sctx.fade.set([0.0, 0.0, 0.0, i as f32 / max as f32])
+                    })
+                    .await;
 
                     // move player to the new level
                     sctx.actors.truncate(1);
@@ -859,7 +859,11 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     run_level_on_enter(&mut sctx).await;
 
                     // walk into the new level
-                    walk_player(&mut sctx.actors[..], dir, Some((&mut sctx.fade[3], 0.0))).await;
+                    walk_player(&mut sctx.actors[..], dir, |i, max| {
+                        let alpha = 1.0 - i as f32 / max as f32;
+                        sctx.fade.set([0.0, 0.0, 0.0, alpha]);
+                    })
+                    .await;
                 } else {
                     sctx.actors[0].stop_walk_animation();
                 }
@@ -931,14 +935,14 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
         BattleEvent::Victory => true,
         BattleEvent::RanAway => false,
         BattleEvent::Defeat => {
-            sctx.fade_out(90).await;
+            sctx.fade.out_to_black(90).await;
 
             // warp player back to town
             warp_to_level(sctx, "Start", 6, 3).await;
 
             sctx.progress.hp = sctx.progress.max_hp;
             sctx.progress.mp = sctx.progress.max_mp;
-            sctx.fade_in(90).await;
+            sctx.fade.in_from_black(90).await;
 
             sctx.push_text_box_mode("Coric:\nOuch!");
             let TextBoxEvent::Done = sctx.update_text_box_mode().await;

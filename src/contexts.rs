@@ -3,6 +3,7 @@ use crate::async_utils::*;
 use crate::audio::*;
 use crate::direction::*;
 use crate::enemy::*;
+use crate::fade::*;
 use crate::get_gctx;
 use crate::input::*;
 use crate::levels::*;
@@ -28,7 +29,6 @@ macro_rules! update_mode {
                     progress: &mut self.progress,
                     level: &self.level,
                     actors: &mut self.actors,
-                    fade: &self.fade,
                     encounter_steps: &mut self.encounter_steps,
                 })
                 .await
@@ -51,7 +51,6 @@ pub struct ModeContext<'a, 'g> {
     pub progress: &'a mut Progress,
     pub level: &'a SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
-    pub fade: &'a SharedMut<[f32; 4]>,
     pub encounter_steps: &'a mut i32,
 }
 
@@ -64,7 +63,7 @@ pub struct ScriptContext {
     pub progress: Progress,
     pub level: SharedMut<Level>,
     pub actors: SharedMut<Vec<Actor>>,
-    pub fade: SharedMut<[f32; 4]>,
+    pub fade: SharedMut<Fade>,
     pub encounter_steps: i32,
     pub confirm_save_overwrite: bool,
 }
@@ -77,7 +76,7 @@ impl ScriptContext {
         modes: &SharedMut<ModeStack>,
         level: &SharedMut<Level>,
         actors: &SharedMut<Vec<Actor>>,
-        fade: &SharedMut<[f32; 4]>,
+        fade: &SharedMut<Fade>,
     ) -> Self {
         let mut rng = Rng::new(miniquad::date::now() as _);
         let encounter_steps = 20 + rng.random(31) as i32;
@@ -99,31 +98,6 @@ impl ScriptContext {
                 confirm_save_overwrite: true,
             }
         }
-    }
-
-    pub async fn fade_color(&mut self, frames: u16, target: [f32; 4]) {
-        let start: [f32; 4] = *self.fade;
-        for frame in 1..frames {
-            let f = frame as f32 / frames as f32;
-            self.fade[0] = start[0] + (target[0] - start[0]) * f;
-            self.fade[1] = start[1] + (target[1] - start[1]) * f;
-            self.fade[2] = start[2] + (target[2] - start[2]) * f;
-            self.fade[3] = start[3] + (target[3] - start[3]) * f;
-            wait_once().await;
-        }
-        *self.fade = target;
-    }
-
-    pub async fn fade_in(&mut self, frames: u16) {
-        let target = [self.fade[0], self.fade[1], self.fade[2], 0.0];
-        self.fade[3] = 1.0;
-        self.fade_color(frames, target).await;
-    }
-
-    pub async fn fade_out(&mut self, frames: u16) {
-        let target = [self.fade[0], self.fade[1], self.fade[2], 1.0];
-        self.fade[3] = 0.0;
-        self.fade_color(frames, target).await;
     }
 
     fn prepare_level_and_actors(&self, level: &mut Level, actors: &mut [Actor]) {
