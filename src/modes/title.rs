@@ -11,9 +11,11 @@ use miniquad::GlContext;
 
 pub struct Title {
     title: Sprite,
+    confirm_text: Text,
     menu_text: Text,
     cursor: Text,
     can_continue: bool,
+    confirm_pressed: bool,
     selection: i32,
 }
 
@@ -25,6 +27,8 @@ pub enum TitleEvent {
 
 const TITLE_X: i32 = 120;
 const TITLE_Y: i32 = 38;
+const CONFIRM_X: i32 = 127;
+const CONFIRM_Y: i32 = TITLE_Y + 36 + 46;
 const MENU_X: i32 = 136;
 const MENU_Y: i32 = TITLE_Y + 36 + 38;
 const CURSOR_X: i32 = MENU_X - 8;
@@ -36,15 +40,18 @@ impl Title {
 
         Self {
             title: Sprite::new(gctx, res, "title.png"),
+            confirm_text: Text::new(res, CONFIRM_X, CONFIRM_Y),
             menu_text: Text::new(res, MENU_X, MENU_Y),
             cursor: Text::new(res, CURSOR_X, CURSOR_Y),
             can_continue,
+            confirm_pressed: false,
             selection: can_continue as i32,
         }
     }
 
     pub fn draw(&self, dctx: &mut DrawContext) {
         self.title.draw(dctx.gctx, TITLE_X, TITLE_Y);
+        self.confirm_text.draw(dctx.gctx);
         self.menu_text.draw(dctx.gctx);
         self.cursor.draw(dctx.gctx);
     }
@@ -54,6 +61,22 @@ impl Title {
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> TitleEvent {
+        if !self.confirm_pressed {
+            mctx.fade.in_from_black(60).await;
+            self.confirm_text
+                .set_text(mctx.gctx, mctx.res, "Press Space");
+            self.confirm_text.reveal().await;
+            loop {
+                wait_once().await;
+                if mctx.input.is_key_pressed(GameKey::Confirm) {
+                    self.confirm_pressed = true;
+                    self.confirm_text.set_text(mctx.gctx, mctx.res, "");
+                    mctx.audio.play_sfx(Sfx::Confirm);
+                    break;
+                }
+            }
+        }
+
         self.menu_text.set_text(
             mctx.gctx,
             mctx.res,

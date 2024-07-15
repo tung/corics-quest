@@ -29,6 +29,7 @@ macro_rules! update_mode {
                     progress: &mut self.progress,
                     level: &self.level,
                     actors: &mut self.actors,
+                    fade: &mut self.fade,
                     encounter_steps: &mut self.encounter_steps,
                 })
                 .await
@@ -51,6 +52,7 @@ pub struct ModeContext<'a, 'g> {
     pub progress: &'a mut Progress,
     pub level: &'a SharedMut<Level>,
     pub actors: &'a mut SharedMut<Vec<Actor>>,
+    pub fade: &'a mut SharedMut<Fade>,
     pub encounter_steps: &'a mut i32,
 }
 
