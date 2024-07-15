@@ -65,7 +65,10 @@ impl YesNoPrompt {
         loop {
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Confirm) {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Cancel);
+                return YesNoPromptEvent::No;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 return if self.choice {
                     mctx.audio.play_sfx(Sfx::Confirm);
                     YesNoPromptEvent::Yes
