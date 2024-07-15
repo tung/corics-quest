@@ -13,6 +13,7 @@ mod modes;
 mod progress;
 mod random;
 mod resources;
+mod saved_options;
 mod script;
 mod shaders;
 mod sprite;
@@ -27,6 +28,7 @@ use input::*;
 use levels::*;
 use modes::*;
 use resources::*;
+use saved_options::*;
 use shaders::*;
 
 use miniquad::{
@@ -93,8 +95,11 @@ impl App {
 
         let res = Resources::new(gctx, quad_vbuf, quad_ibuf);
 
+        // Load options on a best-effort basis.
+        let opts = SavedOptions::load().unwrap_or_else(|_| SavedOptions::new());
+
         let input = SharedMut::new(Input::new());
-        let audio = SharedMut::new(Audio::new());
+        let audio = SharedMut::new(Audio::new(opts.music_volume, opts.sound_volume));
         let modes = SharedMut::new(ModeStack::new());
         let (level, actors) = {
             let (level, mut actors) = res.levels.level_by_identifier(gctx, &res, "Start");

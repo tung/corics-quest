@@ -4,6 +4,7 @@ use crate::contexts::*;
 use crate::input::*;
 use crate::meter::*;
 use crate::resources::*;
+use crate::saved_options::*;
 use crate::text::*;
 
 use miniquad::GlContext;
@@ -19,6 +20,7 @@ pub struct Options {
     music_meter: Meter,
     sound_text: Text,
     sound_meter: Meter,
+    options_changed: bool,
 }
 
 pub enum OptionsEvent {
@@ -60,6 +62,7 @@ impl Options {
                 [192, 192, 192],
                 MAX_SOUND_VOLUME as i32,
             ),
+            options_changed: false,
         }
     }
 
@@ -79,17 +82,20 @@ impl Options {
         loop {
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Cancel) {
+            if mctx.input.is_key_pressed(GameKey::Cancel)
+                || (mctx.input.is_key_pressed(GameKey::Confirm) && self.selection == 0)
+            {
                 mctx.audio.play_sfx(Sfx::Cancel);
-                if self.preview_music {
-                    mctx.audio.play_music(None).await;
+                if self.options_changed {
+                    let opts = SavedOptions {
+                        music_volume: mctx.audio.get_music_volume_custom(),
+                        sound_volume: mctx.audio.get_sound_volume_custom(),
+                    };
+                    // Save options on a best-effort basis.
+                    let _ = opts.save();
+                    self.options_changed = false;
                 }
                 return OptionsEvent::Done;
-            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
-                if self.selection == 0 {
-                    mctx.audio.play_sfx(Sfx::Cancel);
-                    return OptionsEvent::Done;
-                }
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
@@ -113,32 +119,45 @@ impl Options {
                     mctx.audio.play_music(None).await;
                 }
             } else if self.selection == 1 {
+                let old_volume = mctx.audio.get_music_volume_custom();
+                let mut music_volume_changed = false;
+
                 if mctx.input.is_key_pressed(GameKey::Left) {
-                    let new_volume = mctx.audio.get_music_volume_custom().saturating_sub(10);
-                    mctx.audio.set_music_volume_custom(new_volume);
-                    self.update_volumes(mctx);
-                    if self.preview_music {
-                        mctx.audio.play_music(Some(Music::Overworld)).await;
-                    }
+                    mctx.audio
+                        .set_music_volume_custom(old_volume.saturating_sub(10));
+                    music_volume_changed = true;
                 } else if mctx.input.is_key_pressed(GameKey::Right) {
-                    let new_volume = mctx.audio.get_music_volume_custom().saturating_add(10);
-                    mctx.audio.set_music_volume_custom(new_volume);
+                    let old_volume = mctx.audio.get_music_volume_custom();
+                    mctx.audio
+                        .set_music_volume_custom(old_volume.saturating_add(10));
+                    music_volume_changed = true;
+                }
+
+                if music_volume_changed {
+                    self.options_changed |= mctx.audio.get_music_volume_custom() != old_volume;
                     self.update_volumes(mctx);
                     if self.preview_music {
                         mctx.audio.play_music(Some(Music::Overworld)).await;
                     }
                 }
             } else if self.selection == 2 {
+                let old_volume = mctx.audio.get_sound_volume_custom();
+                let mut sound_volume_changed = false;
+
                 if mctx.input.is_key_pressed(GameKey::Left) {
-                    let new_volume = mctx.audio.get_sound_volume_custom().saturating_sub(10);
-                    mctx.audio.set_sound_volume_custom(new_volume);
-                    self.update_volumes(mctx);
-                    mctx.audio.play_sfx(Sfx::Cursor);
+                    mctx.audio
+                        .set_sound_volume_custom(old_volume.saturating_sub(10));
+                    sound_volume_changed = true;
                 } else if mctx.input.is_key_pressed(GameKey::Right) {
-                    let new_volume = mctx.audio.get_sound_volume_custom().saturating_add(10);
-                    mctx.audio.set_sound_volume_custom(new_volume);
+                    mctx.audio
+                        .set_sound_volume_custom(old_volume.saturating_add(10));
+                    sound_volume_changed = true;
+                }
+
+                if sound_volume_changed {
+                    self.options_changed |= mctx.audio.get_sound_volume_custom() != old_volume;
                     self.update_volumes(mctx);
-                    mctx.audio.play_sfx(Sfx::Cursor);
+                    mctx.audio.play_sfx(Sfx::Confirm);
                 }
             }
         }

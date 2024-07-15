@@ -108,7 +108,7 @@ impl Sfx {
 }
 
 impl Audio {
-    pub fn new() -> Self {
+    pub fn new(music_volume_custom: u8, sound_volume_custom: u8) -> Self {
         let audio_context = AudioContext::new();
         let sound_effects =
             core::array::from_fn(|i| Sound::load(&audio_context, SFX_SOUND_DATA[i]));
@@ -116,11 +116,11 @@ impl Audio {
         Self {
             audio_context,
             music: None,
-            music_volume_custom: MAX_MUSIC_VOLUME,
+            music_volume_custom,
             music_volume_scripted: MAX_MUSIC_VOLUME,
             music_volume_scripted_target: MAX_MUSIC_VOLUME,
             sound_effects,
-            sound_volume_custom: MAX_SOUND_VOLUME,
+            sound_volume_custom,
         }
     }
 
