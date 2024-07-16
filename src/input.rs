@@ -66,6 +66,10 @@ impl Input {
         self.keys_pressed[game_key as usize]
     }
 
+    pub fn reset_keys_down(&mut self) {
+        self.keys_down.fill(false);
+    }
+
     pub fn reset_keys_pressed(&mut self) {
         self.keys_pressed.fill(false);
     }

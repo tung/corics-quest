@@ -203,6 +203,14 @@ impl EventHandler for App {
             self.input.reset_keys_pressed();
         }
     }
+
+    fn window_minimized_event(&mut self) {
+        self.input.reset_keys_down();
+    }
+
+    fn window_restored_event(&mut self) {
+        self.input.reset_keys_down();
+    }
 }
 
 fn get_gctx() -> &'static mut GlContext {
