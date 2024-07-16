@@ -20,10 +20,12 @@ pub struct Options {
     music_meter: Meter,
     sound_text: Text,
     sound_meter: Meter,
+    credits_text: Text,
     options_changed: bool,
 }
 
 pub enum OptionsEvent {
+    Credits,
     Done,
 }
 
@@ -62,6 +64,7 @@ impl Options {
                 [192, 192, 192],
                 MAX_SOUND_VOLUME as i32,
             ),
+            credits_text: Text::from_str(gctx, res, base_x + 6, base_y + 4 * 8, "Credits"),
             options_changed: false,
         }
     }
@@ -73,6 +76,7 @@ impl Options {
         self.music_meter.draw(dctx.gctx);
         self.sound_text.draw(dctx.gctx);
         self.sound_meter.draw(dctx.gctx);
+        self.credits_text.draw(dctx.gctx);
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> OptionsEvent {
@@ -96,10 +100,12 @@ impl Options {
                     self.options_changed = false;
                 }
                 return OptionsEvent::Done;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) && self.selection == 3 {
+                return OptionsEvent::Credits;
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
-                    self.selection = 2;
+                    self.selection = 3;
                 } else {
                     self.selection -= 1;
                 }
@@ -109,7 +115,7 @@ impl Options {
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
                 mctx.audio.play_sfx(Sfx::Cursor);
-                if self.selection == 2 {
+                if self.selection == 3 {
                     self.selection = 0;
                 } else {
                     self.selection += 1;

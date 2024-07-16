@@ -545,8 +545,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             TitleEvent::Options => {
                 sctx.push_options_mode(82, 112, true);
-                let OptionsEvent::Done = sctx.update_options_mode().await;
-                sctx.pop_mode(); // Options
+                handle_options(&mut sctx).await;
             }
         }
     }
@@ -728,8 +727,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         }
                         MainMenuEvent::Options => {
                             sctx.push_options_mode(52, 78, false);
-                            let OptionsEvent::Done = sctx.update_options_mode().await;
-                            sctx.pop_mode();
+                            handle_options(&mut sctx).await;
                         }
                     }
                 }
@@ -949,6 +947,28 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
             sctx.pop_mode();
 
             false
+        }
+    }
+}
+
+async fn handle_options(sctx: &mut ScriptContext) {
+    loop {
+        match sctx.update_options_mode().await {
+            OptionsEvent::Credits => {
+                sctx.audio.set_music_volume_scripted(40);
+                sctx.fade.out_to_black(60).await;
+                sctx.push_credits_mode();
+                sctx.fade.in_from_black(60).await;
+                let CreditsEvent::Done = sctx.update_credits_mode().await;
+                sctx.fade.out_to_black(60).await;
+                sctx.pop_mode(); // Credits
+                sctx.fade.in_from_black(60).await;
+                sctx.audio.set_music_volume_scripted(100);
+            }
+            OptionsEvent::Done => {
+                sctx.pop_mode(); // Options
+                break;
+            }
         }
     }
 }

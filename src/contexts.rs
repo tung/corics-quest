@@ -217,6 +217,12 @@ impl ScriptContext {
         ));
     }
 
+    pub fn push_credits_mode(&mut self) {
+        let gctx = get_gctx();
+
+        self.modes.push(Credits::new(gctx, &self.res));
+    }
+
     pub fn push_debug_menu_mode(&mut self) {
         let gctx = get_gctx();
 
@@ -285,6 +291,7 @@ impl ScriptContext {
     }
 
     update_mode!(update_battle_mode, BattleEvent);
+    update_mode!(update_credits_mode, CreditsEvent);
     update_mode!(update_debug_menu_mode, DebugMenuEvent);
     update_mode!(update_ending_mode, EndingEvent);
     update_mode!(update_intro_mode, IntroEvent);

@@ -1,4 +1,5 @@
 mod battle;
+mod credits;
 mod debug_menu;
 mod ending;
 mod intro;
@@ -10,6 +11,7 @@ mod walk_around;
 mod yes_no_prompt;
 
 pub use battle::*;
+pub use credits::*;
 pub use debug_menu::*;
 pub use ending::*;
 pub use intro::*;
@@ -50,6 +52,7 @@ macro_rules! impl_mode {
 
 pub enum Mode {
     Battle(Box<Battle>),
+    Credits(Box<Credits>),
     DebugMenu(Box<DebugMenu>),
     Ending(Box<Ending>),
     Intro(Box<Intro>),
@@ -62,6 +65,7 @@ pub enum Mode {
 }
 
 impl_mode!(Battle, BattleEvent, update_battle_mode);
+impl_mode!(Credits, CreditsEvent, update_credits_mode);
 impl_mode!(DebugMenu, DebugMenuEvent, update_debug_menu_mode);
 impl_mode!(Ending, EndingEvent, update_ending_mode);
 impl_mode!(Intro, IntroEvent, update_intro_mode);
@@ -80,6 +84,7 @@ impl Mode {
 
         match self {
             Battle(m) => m.draw(dctx),
+            Credits(m) => m.draw(dctx),
             DebugMenu(m) => m.draw(dctx),
             Ending(m) => m.draw(dctx),
             Intro(m) => m.draw(dctx),
@@ -99,7 +104,13 @@ impl ModeStack {
     }
 
     pub fn draw(&self, dctx: &mut DrawContext) {
-        for mode in &self.0 {
+        let start_with = self
+            .0
+            .iter()
+            .rposition(|m| matches!(m, Mode::Credits(_) | Mode::WalkAround(_)))
+            .unwrap_or(0);
+
+        for mode in &self.0[start_with..] {
             mode.draw(dctx);
         }
     }
