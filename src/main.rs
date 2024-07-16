@@ -57,6 +57,7 @@ struct App {
     screen_bindings: Bindings,
     window_width: f32,
     window_height: f32,
+    mouse_shown: bool,
     input: SharedMut<Input>,
     audio: SharedMut<Audio>,
     modes: SharedMut<ModeStack>,
@@ -123,6 +124,7 @@ impl App {
             screen_bindings,
             window_width: SCREEN_WIDTH as f32,
             window_height: SCREEN_HEIGHT as f32,
+            mouse_shown: true,
             input,
             audio,
             modes,
@@ -170,10 +172,21 @@ impl EventHandler for App {
 
     fn key_down_event(&mut self, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) {
         self.input.handle_key_down_event(keycode);
+        if self.mouse_shown {
+            miniquad::window::show_mouse(false);
+            self.mouse_shown = false;
+        }
     }
 
     fn key_up_event(&mut self, keycode: KeyCode, _keymods: KeyMods) {
         self.input.handle_key_up_event(keycode);
+    }
+
+    fn mouse_motion_event(&mut self, _x: f32, _y: f32) {
+        if !self.mouse_shown {
+            miniquad::window::show_mouse(true);
+            self.mouse_shown = true;
+        }
     }
 
     fn resize_event(&mut self, width: f32, height: f32) {
