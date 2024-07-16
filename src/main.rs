@@ -235,7 +235,7 @@ fn get_gctx() -> &'static mut GlContext {
 fn main() {
     miniquad::start(
         miniquad::conf::Conf {
-            window_title: "RPG".to_string(),
+            window_title: "Coric's Quest".to_string(),
             window_width: 960,
             window_height: 528,
             ..Default::default()
