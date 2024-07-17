@@ -35,7 +35,7 @@ impl TextBox {
         loop {
             wait_once().await;
             if mctx.input.is_key_pressed(GameKey::Confirm) {
-                mctx.audio.play_sfx(Sfx::Confirm);
+                mctx.audio.play_sfx(Sfx::Cursor);
                 return TextBoxEvent::Done;
             }
         }
