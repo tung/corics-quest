@@ -473,31 +473,33 @@ impl Progress {
         }
     }
 
-    pub fn maybe_upgrade_armor(&mut self, name: &str, defense: i32) -> bool {
+    pub fn maybe_upgrade_armor(&mut self, name: &str, defense: i32) -> Option<i32> {
         let current_armor_defense = self.armor.as_ref().map(|a| a.defense).unwrap_or(0);
         if defense <= current_armor_defense {
-            false
+            None
         } else {
-            self.defense += defense - current_armor_defense;
+            let defense_boost = defense - current_armor_defense;
+            self.defense += defense_boost;
             self.armor = Some(Armor {
                 name: name.to_string(),
                 defense,
             });
-            true
+            Some(defense_boost)
         }
     }
 
-    pub fn maybe_upgrade_weapon(&mut self, name: &str, attack: i32) -> bool {
+    pub fn maybe_upgrade_weapon(&mut self, name: &str, attack: i32) -> Option<i32> {
         let current_weapon_attack = self.weapon.as_ref().map(|w| w.attack).unwrap_or(0);
         if attack <= current_weapon_attack {
-            false
+            None
         } else {
-            self.attack += attack - current_weapon_attack;
+            let attack_boost = attack - current_weapon_attack;
+            self.attack += attack_boost;
             self.weapon = Some(Weapon {
                 name: name.to_string(),
                 attack,
             });
-            true
+            Some(attack_boost)
         }
     }
 

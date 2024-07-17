@@ -258,9 +258,9 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
             }),
             (ActorType::Matero, |sctx| {
                 Box::pin(async {
-                    let weapon_given = sctx.progress.maybe_upgrade_weapon("Short Sword", 2);
-                    let armor_given = sctx.progress.maybe_upgrade_armor("Leather Armor", 2);
-                    if weapon_given || armor_given {
+                    let attack_boost = sctx.progress.maybe_upgrade_weapon("Short Sword", 2);
+                    let defense_boost = sctx.progress.maybe_upgrade_armor("Leather Armor", 2);
+                    if attack_boost.is_some() || defense_boost.is_some() {
                         sctx.push_text_box_mode(
                             "Matero:\n\
                              Going on a quest?\n\
@@ -269,15 +269,21 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
-                    if weapon_given {
+                    if let Some(attack_boost) = attack_boost {
                         sctx.audio.play_sfx(Sfx::Chime);
-                        sctx.push_text_box_mode("Coric got a Short Sword!");
+                        sctx.push_text_box_mode(&format!(
+                            "Coric got a Short Sword!\n\
+                             Attack increased by {attack_boost}!",
+                        ));
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
-                    if armor_given {
+                    if let Some(defense_boost) = defense_boost {
                         sctx.audio.play_sfx(Sfx::Chime);
-                        sctx.push_text_box_mode("Coric got a Leather Armor!");
+                        sctx.push_text_box_mode(&format!(
+                            "Coric got a Leather Armor!\n\
+                             Defense increased by {defense_boost}!",
+                        ));
                         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
                         sctx.pop_mode();
                     }
@@ -981,14 +987,20 @@ async fn chest_with_armor(
     defense: i32,
 ) -> bool {
     sctx.actors[chest].start_animation("open");
-    if sctx.progress.maybe_upgrade_armor(name, defense) {
+    if let Some(defense_boost) = sctx.progress.maybe_upgrade_armor(name, defense) {
         sctx.audio.play_sfx(Sfx::Chime);
-        sctx.push_text_box_mode(&format!("Coric found the {name}!"));
+        sctx.push_text_box_mode(&format!(
+            "Coric found a {name}!\n\
+             Defense increased by {defense_boost}!",
+        ));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
         true
     } else {
-        sctx.push_text_box_mode(&format!("Coric found the {name}, but\ndoesn't need it."));
+        sctx.push_text_box_mode(&format!(
+            "Coric found a {name},\n\
+             but doesn't need it.",
+        ));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
         sctx.actors[chest].start_animation("closed");
@@ -1003,14 +1015,20 @@ async fn chest_with_weapon(
     attack: i32,
 ) -> bool {
     sctx.actors[chest].start_animation("open");
-    if sctx.progress.maybe_upgrade_weapon(name, attack) {
+    if let Some(attack_boost) = sctx.progress.maybe_upgrade_weapon(name, attack) {
         sctx.audio.play_sfx(Sfx::Chime);
-        sctx.push_text_box_mode(&format!("Coric found the {name}!"));
+        sctx.push_text_box_mode(&format!(
+            "Coric found a {name}!\n\
+             Attack increased by {attack_boost}!",
+        ));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
         true
     } else {
-        sctx.push_text_box_mode(&format!("Coric found the {name}, but\ndoesn't need it."));
+        sctx.push_text_box_mode(&format!(
+            "Coric found a {name},\n\
+             but doesn't need it.",
+        ));
         let TextBoxEvent::Done = sctx.update_text_box_mode().await;
         sctx.pop_mode();
         sctx.actors[chest].start_animation("closed");
