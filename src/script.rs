@@ -955,6 +955,7 @@ async fn handle_options(sctx: &mut ScriptContext) {
     loop {
         match sctx.update_options_mode().await {
             OptionsEvent::Credits => {
+                sctx.audio.play_sfx(Sfx::Confirm);
                 sctx.audio.set_music_volume_scripted(40);
                 sctx.fade.out_to_black(60).await;
                 sctx.push_credits_mode();
