@@ -820,7 +820,7 @@ impl Battle {
             wait_once().await;
         }
         self.change_visible = false;
-        mctx.audio.play_sfx(Sfx::Confirm);
+        mctx.audio.play_sfx(Sfx::Cursor);
     }
 }
 
