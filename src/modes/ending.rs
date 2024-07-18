@@ -14,6 +14,7 @@ pub struct Ending {
 
 pub enum EndingEvent {
     Credits,
+    Status,
 }
 
 impl Ending {
@@ -96,7 +97,15 @@ impl Ending {
         loop {
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Confirm) {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
+                mctx.audio.play_sfx(Sfx::Confirm);
+                mctx.audio.set_music_volume_scripted(40);
+                mctx.fade.out_to_black(60).await;
+                for t in &mut self.texts {
+                    t.hide_all_chars();
+                }
+                return EndingEvent::Status;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 mctx.audio.play_sfx(Sfx::Confirm);
                 mctx.audio.set_music_volume_scripted(40);
                 mctx.fade.out_to_black(60).await;

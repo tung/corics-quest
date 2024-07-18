@@ -241,11 +241,11 @@ impl ScriptContext {
         self.modes.push(Intro::new(gctx, &self.res));
     }
 
-    pub fn push_main_menu_mode(&mut self) {
+    pub fn push_main_menu_mode(&mut self, status_only: bool) {
         let gctx = get_gctx();
 
         self.modes
-            .push(MainMenu::new(gctx, &self.res, &self.progress));
+            .push(MainMenu::new(gctx, &self.res, &self.progress, status_only));
     }
 
     pub fn push_options_mode(&mut self, base_x: i32, base_y: i32, preview_music: bool) {

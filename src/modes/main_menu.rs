@@ -25,6 +25,7 @@ const MENU_HEIGHT: i32 = 72;
 
 pub struct MainMenu {
     selection: i32,
+    status_only: bool,
     top_window: Window,
     name_text: Text,
     level_text: Text,
@@ -49,26 +50,33 @@ pub enum MainMenuEvent {
 }
 
 impl MainMenu {
-    pub fn new(gctx: &mut GlContext, res: &Resources, progress: &Progress) -> Self {
-        let top_window = Window::new(gctx, res, TOP_X, TOP_Y, TOP_WIDTH, TOP_HEIGHT);
+    pub fn new(
+        gctx: &mut GlContext,
+        res: &Resources,
+        progress: &Progress,
+        status_only: bool,
+    ) -> Self {
+        let offset = status_only as i32 * MENU_WIDTH / 2;
+
+        let top_window = Window::new(gctx, res, offset + TOP_X, TOP_Y, TOP_WIDTH, TOP_HEIGHT);
         let name_text = Text::from_str(
             gctx,
             res,
-            TOP_X + 8,
+            offset + TOP_X + 8,
             TOP_Y + 8,
             &format!("Coric\n {:^11}", player_rank(progress.level)),
         );
         let level_text = Text::from_str(
             gctx,
             res,
-            TOP_X + 8,
+            offset + TOP_X + 8,
             TOP_Y + 8 + 2 * 8,
             &format!("Level {}", progress.level),
         );
         let mut exp_meter = Meter::new(
             gctx,
             res,
-            TOP_X + 8,
+            offset + TOP_X + 8,
             TOP_Y + 8 + 3 * 8 + 1,
             12 * 6,
             [255, 128, 50],
@@ -78,14 +86,14 @@ impl MainMenu {
         let hp_text = Text::from_str(
             gctx,
             res,
-            TOP_X + 8 + 13 * 6,
+            offset + TOP_X + 8 + 13 * 6,
             TOP_Y + 8,
             &format!("HP {:>3} / {:>3}", progress.hp, progress.max_hp),
         );
         let hp_meter = Meter::new(
             gctx,
             res,
-            TOP_X + 8 + 13 * 6,
+            offset + TOP_X + 8 + 13 * 6,
             TOP_Y + 8 + 8 + 1,
             12 * 6,
             [0, 192, 0],
@@ -94,24 +102,35 @@ impl MainMenu {
         let mp_text = Text::from_str(
             gctx,
             res,
-            TOP_X + 8 + 13 * 6,
+            offset + TOP_X + 8 + 13 * 6,
             TOP_Y + 8 + 2 * 8,
             &format!("MP {:>3} / {:>3}", progress.mp, progress.max_mp),
         );
         let mp_meter = Meter::new(
             gctx,
             res,
-            TOP_X + 8 + 13 * 6,
+            offset + TOP_X + 8 + 13 * 6,
             TOP_Y + 8 + 3 * 8 + 1,
             12 * 6,
             [0, 192, 192],
             progress.max_mp,
         );
 
-        let bottom_window = Window::new(gctx, res, BOTTOM_X, BOTTOM_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT);
-        let bottom_text = Text::new(res, BOTTOM_X + 8, BOTTOM_Y + 8);
-        let bottom_line = Text::new(res, BOTTOM_X + 8 + 6, BOTTOM_Y + BOTTOM_HEIGHT - 8 - 8);
-        let bottom_cursor = Text::from_str(gctx, res, BOTTOM_X + 8, BOTTOM_Y + 8, "►");
+        let bottom_window = Window::new(
+            gctx,
+            res,
+            offset + BOTTOM_X,
+            BOTTOM_Y,
+            BOTTOM_WIDTH,
+            BOTTOM_HEIGHT,
+        );
+        let bottom_text = Text::new(res, offset + BOTTOM_X + 8, BOTTOM_Y + 8);
+        let bottom_line = Text::new(
+            res,
+            offset + BOTTOM_X + 8 + 6,
+            BOTTOM_Y + BOTTOM_HEIGHT - 8 - 8,
+        );
+        let bottom_cursor = Text::from_str(gctx, res, offset + BOTTOM_X + 8, BOTTOM_Y + 8, "►");
 
         let menu_window = Window::new(gctx, res, MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT);
         let menu_text = Text::from_str(
@@ -125,6 +144,7 @@ impl MainMenu {
 
         Self {
             selection: 0,
+            status_only,
             top_window,
             name_text,
             level_text,
@@ -161,9 +181,11 @@ impl MainMenu {
             self.bottom_cursor.draw(dctx.gctx);
         }
 
-        self.menu_window.draw(dctx.gctx);
-        self.menu_text.draw(dctx.gctx);
-        self.menu_cursor.draw(dctx.gctx);
+        if !self.status_only {
+            self.menu_window.draw(dctx.gctx);
+            self.menu_text.draw(dctx.gctx);
+            self.menu_cursor.draw(dctx.gctx);
+        }
     }
 
     async fn item_menu(&mut self, mctx: &mut ModeContext<'_, '_>) {
@@ -336,16 +358,26 @@ impl MainMenu {
         self.update_hp_and_mp(mctx);
         self.update_bottom_text_for_status(mctx);
 
+        if self.status_only {
+            mctx.fade.in_from_black(60).await;
+        }
+
         loop {
             wait_once().await;
 
             if mctx.input.is_key_pressed(GameKey::Cancel) {
                 mctx.audio.play_sfx(Sfx::Cancel);
+                if self.status_only {
+                    mctx.fade.out_to_black(60).await;
+                }
                 return MainMenuEvent::Done;
             } else if mctx.input.is_key_pressed(GameKey::Confirm) {
                 match self.selection {
                     0 => {
                         mctx.audio.play_sfx(Sfx::Cancel);
+                        if self.status_only {
+                            mctx.fade.out_to_black(60).await;
+                        }
                         return MainMenuEvent::Done;
                     }
                     1 => self.magic_menu(mctx).await,
@@ -360,23 +392,25 @@ impl MainMenu {
                 self.update_bottom_text_for_status(mctx);
                 self.bottom_line.set_text(mctx.gctx, mctx.res, "");
                 self.bottom_cursor_visible = false;
-            } else if mctx.input.is_key_pressed(GameKey::Up) {
-                mctx.audio.play_sfx(Sfx::Cursor);
-                if self.selection == 0 {
-                    self.selection = 3;
-                } else {
-                    self.selection -= 1;
+            } else if !self.status_only {
+                if mctx.input.is_key_pressed(GameKey::Up) {
+                    mctx.audio.play_sfx(Sfx::Cursor);
+                    if self.selection == 0 {
+                        self.selection = 3;
+                    } else {
+                        self.selection -= 1;
+                    }
+                } else if mctx.input.is_key_pressed(GameKey::Down) {
+                    mctx.audio.play_sfx(Sfx::Cursor);
+                    if self.selection == 3 {
+                        self.selection = 0;
+                    } else {
+                        self.selection += 1;
+                    }
                 }
-            } else if mctx.input.is_key_pressed(GameKey::Down) {
-                mctx.audio.play_sfx(Sfx::Cursor);
-                if self.selection == 3 {
-                    self.selection = 0;
-                } else {
-                    self.selection += 1;
-                }
+                self.menu_cursor
+                    .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * self.selection);
             }
-            self.menu_cursor
-                .set_offset(MENU_X + 8, MENU_Y + 8 + 16 * self.selection);
         }
     }
 

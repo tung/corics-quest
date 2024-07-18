@@ -724,7 +724,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
             }
             WalkAroundEvent::MainMenu => {
                 sctx.audio.play_sfx(Sfx::Confirm);
-                sctx.push_main_menu_mode();
+                sctx.push_main_menu_mode(false);
                 loop {
                     match sctx.update_main_menu_mode().await {
                         MainMenuEvent::Done => {
@@ -759,11 +759,20 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         sctx.pop_mode(); // WalkAround
                         sctx.push_ending_mode();
                         loop {
-                            let EndingEvent::Credits = sctx.update_ending_mode().await;
-
-                            sctx.push_credits_mode();
-                            let CreditsEvent::Done = sctx.update_credits_mode().await;
-                            sctx.pop_mode();
+                            match sctx.update_ending_mode().await {
+                                EndingEvent::Credits => {
+                                    sctx.push_credits_mode();
+                                    let CreditsEvent::Done = sctx.update_credits_mode().await;
+                                    sctx.pop_mode(); // Credits
+                                }
+                                EndingEvent::Status => {
+                                    sctx.push_main_menu_mode(true);
+                                    match sctx.update_main_menu_mode().await {
+                                        MainMenuEvent::Done => sctx.pop_mode(), // MainMenu
+                                        _ => unreachable!(),
+                                    }
+                                }
+                            }
                         }
                     } else {
                         sctx.audio.play_music(sctx.level.music).await;
