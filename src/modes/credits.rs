@@ -48,6 +48,8 @@ impl Credits {
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> CreditsEvent {
+        mctx.fade.in_from_black(60).await;
+
         loop {
             wait_once().await;
 
@@ -55,6 +57,7 @@ impl Credits {
                 || mctx.input.is_key_pressed(GameKey::Confirm)
             {
                 mctx.audio.play_sfx(Sfx::Cancel);
+                mctx.fade.out_to_black(60).await;
                 return CreditsEvent::Done;
             }
         }

@@ -758,9 +758,12 @@ pub async fn script_main(mut sctx: ScriptContext) {
 
                         sctx.pop_mode(); // WalkAround
                         sctx.push_ending_mode();
-                        let EndingEvent::Done = sctx.update_ending_mode().await;
                         loop {
-                            wait_once().await;
+                            let EndingEvent::Credits = sctx.update_ending_mode().await;
+
+                            sctx.push_credits_mode();
+                            let CreditsEvent::Done = sctx.update_credits_mode().await;
+                            sctx.pop_mode();
                         }
                     } else {
                         sctx.audio.play_music(sctx.level.music).await;
@@ -964,11 +967,11 @@ async fn handle_options(sctx: &mut ScriptContext) {
                 sctx.audio.play_sfx(Sfx::Confirm);
                 sctx.audio.set_music_volume_scripted(40);
                 sctx.fade.out_to_black(60).await;
+
                 sctx.push_credits_mode();
-                sctx.fade.in_from_black(60).await;
                 let CreditsEvent::Done = sctx.update_credits_mode().await;
-                sctx.fade.out_to_black(60).await;
                 sctx.pop_mode(); // Credits
+
                 sctx.fade.in_from_black(60).await;
                 sctx.audio.set_music_volume_scripted(100);
             }

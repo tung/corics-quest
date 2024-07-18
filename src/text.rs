@@ -162,6 +162,10 @@ impl Text {
         }
     }
 
+    pub fn show_all_chars(&mut self) {
+        self.shown_chars = self.local_buf.len() as i32;
+    }
+
     pub fn show_one_char(&mut self) {
         if self.shown_chars < self.local_buf.len() as i32 {
             self.shown_chars += 1;
