@@ -576,7 +576,7 @@ impl Enemy {
             attack: 77,
             defense: 74,
             weakness: Some(Magic::WaterEdge),
-            exp: 9000,
+            exp: 0,
             actions: &[
                 EnemyAction {
                     chance: 10,
