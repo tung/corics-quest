@@ -485,11 +485,13 @@ pub async fn script_main(mut sctx: ScriptContext) {
         match sctx.update_title_mode().await {
             TitleEvent::NewGame(false) => {
                 // Start a new game, but skip the intro.
+                sctx.confirm_save_overwrite = save_data_exists();
                 sctx.fade.out_to_black(30).await;
                 sctx.pop_mode(); // Title
                 break;
             }
             TitleEvent::NewGame(true) => {
+                sctx.confirm_save_overwrite = save_data_exists();
                 sctx.fade.out_to_black(30).await;
                 sctx.pop_mode(); // Title
 
