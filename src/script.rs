@@ -722,7 +722,7 @@ pub async fn script_main(mut sctx: ScriptContext) {
                     handle_battle(&mut sctx).await;
                     sctx.audio.play_music(sctx.level.music).await;
                 }
-                sctx.encounter_steps = 20 + sctx.rng.random(31) as i32;
+                sctx.encounter_steps = 15 + sctx.rng.random(26) as i32;
             }
             WalkAroundEvent::MainMenu => {
                 sctx.audio.play_sfx(Sfx::Confirm);

@@ -81,7 +81,7 @@ impl ScriptContext {
         fade: &SharedMut<Fade>,
     ) -> Self {
         let mut rng = Rng::new(miniquad::date::now() as _);
-        let encounter_steps = 20 + rng.random(31) as i32;
+        let encounter_steps = 15 + rng.random(26) as i32;
 
         // SAFETY: This is immediately sent into the async script function.
         // Access from outside that async function never goes through this.
