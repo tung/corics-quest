@@ -8,14 +8,15 @@ use crate::text::*;
 use miniquad::GlContext;
 
 pub struct Credits {
-    text: Text,
+    credits_text: Text,
+    version_text: Text,
 }
 
 pub enum CreditsEvent {
     Done,
 }
 
-const CREDITS_TEXT: &str = r#"Coric's Quest (0.0.1)
+const CREDITS_TEXT: &str = r#"Coric's Quest
 
 Created By
   tungtn (tung.github.io)
@@ -39,12 +40,20 @@ Made with Rust and Miniquad
 impl Credits {
     pub fn new(gctx: &mut GlContext, res: &Resources) -> Self {
         Self {
-            text: Text::from_str(gctx, res, 6, 4, CREDITS_TEXT),
+            credits_text: Text::from_str(gctx, res, 6, 4, CREDITS_TEXT),
+            version_text: Text::from_str(
+                gctx,
+                res,
+                6 + 14 * 6,
+                4,
+                &format!("({})", env!("CARGO_PKG_VERSION")),
+            ),
         }
     }
 
     pub fn draw(&self, dctx: &mut DrawContext) {
-        self.text.draw(dctx.gctx);
+        self.credits_text.draw(dctx.gctx);
+        self.version_text.draw(dctx.gctx);
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> CreditsEvent {
