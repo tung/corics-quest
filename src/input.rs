@@ -47,8 +47,10 @@ impl Input {
 
     pub fn handle_key_down_event(&mut self, keycode: KeyCode) {
         if let Ok(game_key) = GameKey::try_from(keycode) {
-            self.keys_down[game_key as usize] = true;
-            self.keys_pressed[game_key as usize] = true;
+            if cfg!(debug_assertions) || !matches!(game_key, GameKey::DebugMenu) {
+                self.keys_down[game_key as usize] = true;
+                self.keys_pressed[game_key as usize] = true;
+            }
         }
     }
 
