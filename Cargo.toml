@@ -12,6 +12,9 @@ png = "0.17.11"
 quad-snd = "0.2.8"
 quad-storage = "0.1.3"
 
+[build-dependencies]
+winresource = { version = "0.1.17", default-features = false }
+
 [profile.dev]
 opt-level = 1
 
