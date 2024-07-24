@@ -233,11 +233,28 @@ fn get_gctx() -> &'static mut GlContext {
 }
 
 fn main() {
+    let mut icon = miniquad::conf::Icon {
+        small: [0; 1024],
+        medium: [0; 4096],
+        big: [0; 16384],
+    };
+
+    icon.small
+        .as_mut_slice()
+        .copy_from_slice(&load_png(include_bytes!("../assets/icon-16.png")).0);
+    icon.medium
+        .as_mut_slice()
+        .copy_from_slice(&load_png(include_bytes!("../assets/icon-32.png")).0);
+    icon.big
+        .as_mut_slice()
+        .copy_from_slice(&load_png(include_bytes!("../assets/icon-64.png")).0);
+
     miniquad::start(
         miniquad::conf::Conf {
             window_title: "Coric's Quest".to_string(),
             window_width: 960,
             window_height: 528,
+            icon: Some(icon),
             ..Default::default()
         },
         || Box::new(App::new()),

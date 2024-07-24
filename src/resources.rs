@@ -212,7 +212,7 @@ impl WindowTextures {
     }
 }
 
-pub fn texture_from_png_bytes(gctx: &mut GlContext, png_bytes: &[u8]) -> Texture {
+pub fn load_png(png_bytes: &[u8]) -> (Vec<u8>, u32, u32) {
     let mut decoder = png::Decoder::new(Cursor::new(png_bytes));
     decoder.set_transformations(png::Transformations::normalize_to_color8());
     let mut reader = decoder.read_info().expect("reader");
@@ -247,16 +247,22 @@ pub fn texture_from_png_bytes(gctx: &mut GlContext, png_bytes: &[u8]) -> Texture
         _ => unreachable!("color type"),
     };
 
+    (pixels, info.width, info.height)
+}
+
+pub fn texture_from_png_bytes(gctx: &mut GlContext, png_bytes: &[u8]) -> Texture {
+    let (pixels, width, height) = load_png(png_bytes);
     let tex_id = gctx.new_texture_from_rgba8(
-        info.width.try_into().expect("width"),
-        info.height.try_into().expect("height"),
+        u16::try_from(width).expect("width as u16"),
+        u16::try_from(height).expect("height as u16"),
         &pixels[..],
     );
+
     gctx.texture_set_filter(tex_id, FilterMode::Nearest, MipmapFilterMode::None);
 
     Texture {
         tex_id,
-        width: info.width,
-        height: info.height,
+        width,
+        height,
     }
 }
