@@ -1,7 +1,11 @@
 [package]
-name = "rpg"
+name = "corics-quest"
 version = "0.1.0"
 edition = "2021"
+authors = ["Tung Nguyen"]
+description = "A small, complete 2D fantasy-themed console-style RPG, made with Rust and Miniquad"
+keywords = ["rpg", "2d", "game"]
+categories = ["games"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
