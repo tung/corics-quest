@@ -2,6 +2,17 @@
 set -Eeuo pipefail
 #set -x
 
+function linux-glibc { ## Check glibc versions used in Linux release
+    TARGET=x86_64-unknown-linux-gnu
+    LINUX_RELEASE_BIN="target/$TARGET/release/corics-quest"
+    [[ -e "$LINUX_RELEASE_BIN" ]] || {
+        echo "Error: run cargo b --release --target $TARGET first"
+        exit 1
+    }
+    echo glibc versions used in Linux release:
+    objdump -T "$LINUX_RELEASE_BIN" | grep GLIBC | sed 's/.*GLIBC_\([.0-9]*\).*/\1/g' | sort -u
+}
+
 function linux-zip { ## Build and zip Linux release
     TARGET=x86_64-unknown-linux-gnu
     cargo build --release --target "$TARGET"
