@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+#set -x
+
+function linux-zip { ## Build and zip Linux release
+    TARGET=x86_64-unknown-linux-gnu
+    cargo build --release --target "$TARGET"
+
+    # Prepare zip directory.
+    VERSION=$(cargo read-manifest | jq --raw-output '.version')
+    BASE_NAME="corics_quest-$VERSION-$TARGET"
+    DEST_DIR="target/zip/$BASE_NAME"
+    mkdir --parents "$DEST_DIR"
+    cp "target/$TARGET/release/corics-quest" "$DEST_DIR/"
+    awk -f prepare_txt.awk README.md > "$DEST_DIR/README.txt"
+    awk -f prepare_txt.awk LICENSE.txt > "$DEST_DIR/LICENSE.txt"
+    cp assets/icon-64.png "$DEST_DIR/corics-quest.png"
+
+    # shellcheck disable=SC2269
+    BASE_NAME="$BASE_NAME" && (
+        # Make the zip with the directory.
+        cd target/zip/
+        zip --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+
+        ZIP_URI=$(realpath "$BASE_NAME.zip")
+        echo Linux zip: "file://$ZIP_URI"
+    )
+}
+
+function windows-zip { ## Build and zip Windows release
+    TARGET=x86_64-pc-windows-gnu
+    cargo build --release --target "$TARGET"
+
+    # Prepare zip directory.
+    VERSION=$(cargo read-manifest | jq --raw-output '.version')
+    BASE_NAME="corics_quest-$VERSION-$TARGET"
+    DEST_DIR="target/zip/$BASE_NAME"
+    mkdir --parents "$DEST_DIR"
+    cp "target/$TARGET/release/corics-quest.exe" "$DEST_DIR/"
+    awk -f prepare_txt.awk README.md | unix2dos > "$DEST_DIR/README.txt"
+    awk -f prepare_txt.awk LICENSE.txt | unix2dos > "$DEST_DIR/LICENSE.txt"
+    cp assets/icon-64.png "$DEST_DIR/corics-quest.png"
+
+    # shellcheck disable=SC2269
+    BASE_NAME="$BASE_NAME" && (
+        # Make the zip with the directory.
+        cd target/zip/
+        zip --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+
+        ZIP_URI=$(realpath "$BASE_NAME.zip")
+        echo Windows zip: "file://$ZIP_URI"
+    )
+}
+
+function help { ## Show this help text
+    echo "Usage: $0 [task-name]"
+    echo Tasks:
+    awk 'BEGIN { n = 0 } \
+        /^function [^#]+##/ { \
+            n++; \
+            split($0, t, /## /); \
+            printf "%6d  %-16s %s\n", n, $2, t[2]; \
+        }' \
+        "$0"
+}
+
+if [[ $# -gt 0 && ("$1" = "-h" || "$1" = "--help") ]]; then
+    help
+else
+    "${@:-help}"
+fi
