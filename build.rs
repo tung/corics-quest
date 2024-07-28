@@ -5,5 +5,7 @@ fn main() {
         res.set_icon_with_id("win-icon.ico", "1");
         println!("cargo::rerun-if-changed=win-icon.ico");
         res.compile().unwrap();
+    } else {
+        println!("cargo::rerun-if-changed=build.rs");
     }
 }
