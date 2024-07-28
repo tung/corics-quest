@@ -21,7 +21,9 @@ Controls:
  - **Space**: Talk/interact, confirm in menus.
  - **Left Ctrl**: Bring up main menu, cancel in menus.
 
-*Coric's Quest* can be played natively on Windows and Linux (needs `libasound.so.2`), and in a web browser thanks to WebAssembly.
+*Coric's Quest* can be played natively on Windows and Linux, and in a web browser thanks to WebAssembly.
+
+The Linux native build requires `libasound2`, as well as `glibc` version 2.34; the game is tested on Debian 12, though it should also run on Ubuntu 21.10 and newer.
 
 Save data and options are stored in a file named `local.data` for native builds in the current directory, usually the same place as the executable, and as LocalStorage for the web browser version.
 
