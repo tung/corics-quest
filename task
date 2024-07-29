@@ -2,6 +2,24 @@
 set -Eeuo pipefail
 #set -x
 
+function json-minify { ## Minify JSON data
+    for JSON in assets/project.ldtk assets/*.json; do
+        if [[ -e "$JSON".orig ]]; then
+            echo "Error: $JSON.orig already exists"
+            exit 1
+        fi
+        mv "$JSON"{,.orig} && jq '.' --compact-output "$JSON".orig > "$JSON"
+    done
+}
+
+function json-restore { ## Restore original JSON data
+    for JSON in assets/project.ldtk assets/*.json; do
+        if [[ -e "$JSON".orig ]]; then
+            mv "$JSON"{.orig,}
+        fi
+    done
+}
+
 function linux-glibc { ## Check glibc versions used in Linux release
     TARGET=x86_64-unknown-linux-gnu
     LINUX_RELEASE_BIN="target/$TARGET/release/corics-quest"
