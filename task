@@ -81,6 +81,50 @@ function windows-zip { ## Build and zip Windows release
     )
 }
 
+function wasm-dir-test {
+    if [[ ! -v WASM_DIR || -z $WASM_DIR ]]; then
+        echo Error: set WASM_DIR environment variable first
+        exit 1
+    fi
+    if [[ ! -d $WASM_DIR ]]; then
+        echo Error: create WASM_DIR first "(${WASM_DIR})"
+        exit 1
+    fi
+    if [[ ! -e "${WASM_DIR%/}"/gl.js ]]; then
+        echo Error: WASM_DIR must contain gl.js: "(${WASM_DIR})"
+        exit 1
+    fi
+    echo "WASM_DIR=${WASM_DIR}"
+}
+
+function wasm-site { ## Build and copy Wasm to website directory
+    wasm-dir-test
+    cargo build --release --target wasm32-unknown-unknown
+    cp --update --preserve target/wasm32-unknown-unknown/release/corics-quest.wasm "$WASM_DIR"
+}
+
+function wasm-serve { ## Run HTTP server in Wasm/website directory
+    wasm-dir-test
+    cd "$WASM_DIR" && python3 -m http.server
+}
+
+function wasm-zip { ## Zip Wasm build and website directory
+    # Ensure Wasm build in the website directory is up-to-date and WASM_DIR is set.
+    wasm-site
+
+    VERSION=$(cargo read-manifest | jq --raw-output '.version')
+    WASM_ZIP="corics_quest-$VERSION-wasm.zip" REAL_WASM_DIR=$(realpath "$WASM_DIR") && (
+        mkdir --parents target/zip
+        cd target/zip/
+
+        # Remove '/' suffix from REAL_WASM_DIR to avoid doubling up forward slashes.
+        zip --filesync --junk-paths "$WASM_ZIP" \
+            "${REAL_WASM_DIR%/}"/{corics-quest.wasm,index.html,*.js}
+
+        echo Wasm zip: "file://$(realpath "$WASM_ZIP")"
+    )
+}
+
 function help { ## Show this help text
     echo "Usage: $0 [task-name]"
     echo Tasks:
