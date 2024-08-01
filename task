@@ -39,7 +39,7 @@ function linux-zip { ## Build and zip Linux release
     VERSION=$(cargo read-manifest | jq --raw-output '.version')
     BASE_NAME="corics_quest-$VERSION-$TARGET"
     DEST_DIR="target/zip/$BASE_NAME"
-    mkdir --parents "$DEST_DIR"
+    mkdir --parents "$DEST_DIR" && touch "$DEST_DIR"
     cp "target/$TARGET/release/corics-quest" "$DEST_DIR/"
     awk -f prepare_txt.awk README.md > "$DEST_DIR/README.txt"
     awk -f prepare_txt.awk LICENSE.txt > "$DEST_DIR/LICENSE.txt"
@@ -49,7 +49,7 @@ function linux-zip { ## Build and zip Linux release
     BASE_NAME="$BASE_NAME" && (
         # Make the zip with the directory.
         cd target/zip/
-        zip --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+        zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
 
         ZIP_URI=$(realpath "$BASE_NAME.zip")
         echo Linux zip: "file://$ZIP_URI"
@@ -64,7 +64,7 @@ function windows-zip { ## Build and zip Windows release
     VERSION=$(cargo read-manifest | jq --raw-output '.version')
     BASE_NAME="corics_quest-$VERSION-$TARGET"
     DEST_DIR="target/zip/$BASE_NAME"
-    mkdir --parents "$DEST_DIR"
+    mkdir --parents "$DEST_DIR" && touch "$DEST_DIR"
     cp "target/$TARGET/release/corics-quest.exe" "$DEST_DIR/"
     awk -f prepare_txt.awk README.md | unix2dos > "$DEST_DIR/README.txt"
     awk -f prepare_txt.awk LICENSE.txt | unix2dos > "$DEST_DIR/LICENSE.txt"
@@ -74,7 +74,7 @@ function windows-zip { ## Build and zip Windows release
     BASE_NAME="$BASE_NAME" && (
         # Make the zip with the directory.
         cd target/zip/
-        zip --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+        zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
 
         ZIP_URI=$(realpath "$BASE_NAME.zip")
         echo Windows zip: "file://$ZIP_URI"
