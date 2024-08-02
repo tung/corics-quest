@@ -45,15 +45,10 @@ function linux-zip { ## Build and zip Linux release
     awk -f prepare_txt.awk LICENSE.txt > "$DEST_DIR/LICENSE.txt"
     cp assets/icon-64.png "$DEST_DIR/corics-quest.png"
 
-    # shellcheck disable=SC2269
-    BASE_NAME="$BASE_NAME" && (
-        # Make the zip with the directory.
-        cd target/zip/
-        zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
-
-        ZIP_URI=$(realpath "$BASE_NAME.zip")
-        echo Linux zip: "file://$ZIP_URI"
-    )
+    # Make the zip with the directory.
+    cd target/zip/
+    zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+    echo "Linux zip: file://$(realpath "$BASE_NAME.zip")"
 }
 
 function windows-zip { ## Build and zip Windows release
@@ -70,15 +65,10 @@ function windows-zip { ## Build and zip Windows release
     awk -f prepare_txt.awk LICENSE.txt | unix2dos > "$DEST_DIR/LICENSE.txt"
     cp assets/icon-64.png "$DEST_DIR/corics-quest.png"
 
-    # shellcheck disable=SC2269
-    BASE_NAME="$BASE_NAME" && (
-        # Make the zip with the directory.
-        cd target/zip/
-        zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
-
-        ZIP_URI=$(realpath "$BASE_NAME.zip")
-        echo Windows zip: "file://$ZIP_URI"
-    )
+    # Make the zip with the directory.
+    cd target/zip/
+    zip --filesync --recurse-paths "$BASE_NAME.zip" "$BASE_NAME"
+    echo "Windows zip: file://$(realpath "$BASE_NAME.zip")"
 }
 
 function wasm-dir-test {
@@ -112,17 +102,19 @@ function wasm-zip { ## Zip Wasm build and website directory
     # Ensure Wasm build in the website directory is up-to-date and WASM_DIR is set.
     wasm-site
 
+    REAL_WASM_DIR=$(realpath "$WASM_DIR")
+
+    mkdir --parents target/zip
+    cd target/zip/
+
     VERSION=$(cargo read-manifest | jq --raw-output '.version')
-    WASM_ZIP="corics_quest-$VERSION-wasm.zip" REAL_WASM_DIR=$(realpath "$WASM_DIR") && (
-        mkdir --parents target/zip
-        cd target/zip/
+    WASM_ZIP="corics_quest-$VERSION-wasm.zip"
 
-        # Remove '/' suffix from REAL_WASM_DIR to avoid doubling up forward slashes.
-        zip --filesync --junk-paths "$WASM_ZIP" \
-            "${REAL_WASM_DIR%/}"/{corics-quest.wasm,index.html,*.js}
+    # Remove '/' suffix from REAL_WASM_DIR to avoid doubling up forward slashes.
+    zip --filesync --junk-paths "$WASM_ZIP" \
+        "${REAL_WASM_DIR%/}"/{corics-quest.wasm,index.html,*.js}
 
-        echo Wasm zip: "file://$(realpath "$WASM_ZIP")"
-    )
+    echo "Wasm zip: file://$(realpath "$WASM_ZIP")"
 }
 
 function help { ## Show this help text
