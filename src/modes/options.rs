@@ -21,13 +21,25 @@ pub struct Options {
     sound_text: Text,
     sound_meter: Meter,
     credits_text: Text,
+    quit_text: Text,
     options_changed: bool,
 }
 
 pub enum OptionsEvent {
     Credits,
     Done,
+    Quit,
 }
+
+#[cfg(target_arch = "wasm32")]
+const NUM_ENTRIES: i32 = 4;
+#[cfg(not(target_arch = "wasm32"))]
+const NUM_ENTRIES: i32 = 5;
+
+#[cfg(target_arch = "wasm32")]
+const QUIT_STR: &str = "";
+#[cfg(not(target_arch = "wasm32"))]
+const QUIT_STR: &str = "Quit";
 
 impl Options {
     pub fn new(
@@ -65,6 +77,7 @@ impl Options {
                 MAX_SOUND_VOLUME as i32,
             ),
             credits_text: Text::from_str(gctx, res, base_x + 6, base_y + 4 * 8, "Credits"),
+            quit_text: Text::from_str(gctx, res, base_x + 6, base_y + 5 * 8, QUIT_STR),
             options_changed: false,
         }
     }
@@ -77,6 +90,19 @@ impl Options {
         self.sound_text.draw(dctx.gctx);
         self.sound_meter.draw(dctx.gctx);
         self.credits_text.draw(dctx.gctx);
+        self.quit_text.draw(dctx.gctx);
+    }
+
+    fn save_changed_options(&mut self, mctx: &mut ModeContext) {
+        if self.options_changed {
+            let opts = SavedOptions {
+                music_volume: mctx.audio.get_music_volume_custom(),
+                sound_volume: mctx.audio.get_sound_volume_custom(),
+            };
+            // Save options on a best-effort basis.
+            let _ = opts.save();
+            self.options_changed = false;
+        }
     }
 
     pub async fn update(&mut self, mctx: &mut ModeContext<'_, '_>) -> OptionsEvent {
@@ -86,26 +112,34 @@ impl Options {
         loop {
             wait_once().await;
 
-            if mctx.input.is_key_pressed(GameKey::Cancel)
-                || (mctx.input.is_key_pressed(GameKey::Confirm) && self.selection == 0)
-            {
+            if mctx.input.is_key_pressed(GameKey::Cancel) {
                 mctx.audio.play_sfx(Sfx::Cancel);
-                if self.options_changed {
-                    let opts = SavedOptions {
-                        music_volume: mctx.audio.get_music_volume_custom(),
-                        sound_volume: mctx.audio.get_sound_volume_custom(),
-                    };
-                    // Save options on a best-effort basis.
-                    let _ = opts.save();
-                    self.options_changed = false;
-                }
+                self.save_changed_options(mctx);
                 return OptionsEvent::Done;
-            } else if mctx.input.is_key_pressed(GameKey::Confirm) && self.selection == 3 {
-                return OptionsEvent::Credits;
+            } else if mctx.input.is_key_pressed(GameKey::Confirm) {
+                match self.selection {
+                    0 => {
+                        mctx.audio.play_sfx(Sfx::Cancel);
+                        self.save_changed_options(mctx);
+                        return OptionsEvent::Done;
+                    }
+                    1 => {
+                        if self.preview_music {
+                            mctx.audio.play_music(Some(Music::Overworld)).await;
+                        }
+                    }
+                    2 => mctx.audio.play_sfx(Sfx::Confirm),
+                    3 => return OptionsEvent::Credits,
+                    4 => {
+                        self.save_changed_options(mctx);
+                        return OptionsEvent::Quit;
+                    }
+                    _ => unreachable!(),
+                }
             } else if mctx.input.is_key_pressed(GameKey::Up) {
                 mctx.audio.play_sfx(Sfx::Cursor);
                 if self.selection == 0 {
-                    self.selection = 3;
+                    self.selection = NUM_ENTRIES - 1;
                 } else {
                     self.selection -= 1;
                 }
@@ -115,7 +149,7 @@ impl Options {
                 }
             } else if mctx.input.is_key_pressed(GameKey::Down) {
                 mctx.audio.play_sfx(Sfx::Cursor);
-                if self.selection == 3 {
+                if self.selection == NUM_ENTRIES - 1 {
                     self.selection = 0;
                 } else {
                     self.selection += 1;

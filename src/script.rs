@@ -552,8 +552,10 @@ pub async fn script_main(mut sctx: ScriptContext) {
                 }
             }
             TitleEvent::Options => {
-                sctx.push_options_mode(82, 112, true);
-                handle_options(&mut sctx).await;
+                sctx.push_options_mode(82, 101, true);
+                if !handle_options(&mut sctx).await {
+                    return;
+                }
             }
         }
     }
@@ -735,7 +737,9 @@ pub async fn script_main(mut sctx: ScriptContext) {
                         }
                         MainMenuEvent::Options => {
                             sctx.push_options_mode(52, 78, false);
-                            handle_options(&mut sctx).await;
+                            if !handle_options(&mut sctx).await {
+                                return;
+                            }
                         }
                     }
                 }
@@ -971,7 +975,7 @@ async fn handle_battle(sctx: &mut ScriptContext) -> bool {
     }
 }
 
-async fn handle_options(sctx: &mut ScriptContext) {
+async fn handle_options(sctx: &mut ScriptContext) -> bool {
     loop {
         match sctx.update_options_mode().await {
             OptionsEvent::Credits => {
@@ -988,7 +992,18 @@ async fn handle_options(sctx: &mut ScriptContext) {
             }
             OptionsEvent::Done => {
                 sctx.pop_mode(); // Options
-                break;
+                return true;
+            }
+            OptionsEvent::Quit => {
+                sctx.audio.play_sfx(Sfx::Confirm);
+
+                sctx.push_yes_no_prompt_mode("Really quit?", "Yes", "No", false);
+                match sctx.update_yes_no_prompt_mode().await {
+                    YesNoPromptEvent::Yes => return false,
+                    YesNoPromptEvent::No => {
+                        sctx.pop_mode(); // YesNoPrompt
+                    }
+                }
             }
         }
     }
