@@ -45,12 +45,7 @@ static LEVEL_SCRIPTS: &[LevelScripts] = &[
                         sctx.pop_mode();
                     }
 
-                    sctx.push_yes_no_prompt_mode(
-                        "Save your progress?",
-                        "Save",
-                        "Don't save",
-                        false,
-                    );
+                    sctx.push_yes_no_prompt_mode("Save your progress?", "Save", "Don't save", true);
                     let mut do_save = matches!(
                         sctx.update_yes_no_prompt_mode().await,
                         YesNoPromptEvent::Yes
