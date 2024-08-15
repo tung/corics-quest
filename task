@@ -31,6 +31,11 @@ function linux-glibc { ## Check glibc versions used in Linux release
     objdump -T "$LINUX_RELEASE_BIN" | grep GLIBC | sed 's/.*GLIBC_\([.0-9]*\).*/\1/g' | sort -u
 }
 
+function linux-play-sh {
+    echo '#!/bin/sh'
+    echo 'cd "$(dirname "$(realpath "$0")")" && exec ./corics-quest'
+}
+
 function linux-zip { ## Build and zip Linux release
     TARGET=x86_64-unknown-linux-gnu
     cargo build --release --target "$TARGET"
@@ -44,6 +49,7 @@ function linux-zip { ## Build and zip Linux release
     awk -f prepare_txt.awk README.md > "$DEST_DIR/README.txt"
     awk -f prepare_txt.awk LICENSE.txt > "$DEST_DIR/LICENSE.txt"
     cp assets/icon-64.png "$DEST_DIR/corics-quest.png"
+    linux-play-sh > "$DEST_DIR/play.sh" && chmod +x "$DEST_DIR/play.sh"
 
     # Make the zip with the directory.
     cd target/zip/
