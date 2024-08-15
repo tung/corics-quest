@@ -3,7 +3,10 @@
 *Coric's Quest* is a small, complete 2D fantasy-themed console-style RPG, made with Rust and Miniquad.
 Guide the intrepid hero Coric through a land thrown into chaos, once watched over by the Elemental Spirits, now possessed by a mysterious darkness.
 
-Features:
+ - Play on itch.io: <https://tungtn.itch.io/corics-quest>
+ - Homepage: <https://tung.github.io/corics-quest/>
+
+## Features
 
  - Three realms to explore, each with their own dungeon and boss to defeat.
  - One-on-one turn-based battle system.
@@ -14,8 +17,6 @@ Features:
  - Several simple puzzle mechanics.
 
 ## How to Play
-
-Controls:
 
  - **Arrow keys**: Walk around, move the cursor in menus.
  - **Space**: Talk/interact, confirm in menus.
@@ -32,9 +33,9 @@ Save data and options are stored in a file named `local.data` for native builds 
 *Coric's Quest*, though small in scope, is styled after the kind of RPGs that were common to the video game consoles of the 80s and 90s.
 It's a throw-back to the simple joys of exploring, finding treasure, fighting monsters and watching numbers go up.
 
-The game is written in Rust, which has a strong, expressive type system; good when features are steadily being added and changed, especially when they're cross-cutting, which comes up often during game development.
-Lifetimes categorically eliminate "lurking landmine" issues that tend to crop up in C++ code bases, such as iterator invalidation.
-Async functions have a bad reputation in the Rust community, but they were extremely useful in the making of this game; a far better choice than error-prone manual state machines or typeless, high-overhead scripting language bindings.
+The game is written in Rust, whose strong type system made refactoring code for changes and additions relatively painless.
+Its lifetime system prevented the kinds of "lurking landmine" issues that tend to crop up in C++ code bases, like iterator invalidation.
+Async functions were easy to set up and made directing high-level logic a breeze compared to hand-rolled state machines or full-blown scripting language bindings.
 
 I went with Miniquad as my game framework of choice.
 This makes the final file size small, which is good for players.
