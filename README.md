@@ -1,5 +1,7 @@
 # Coric's Quest
 
+![Coric's Quest screenshot](screenshot.png)
+
 *Coric's Quest* is a small, complete 2D fantasy-themed console-style RPG, made with Rust and Miniquad.
 Guide the intrepid hero Coric through a land thrown into chaos, once watched over by the Elemental Spirits, now possessed by a mysterious darkness.
 

@@ -10,6 +10,10 @@ function flush() {
     }
 }
 
+BEGIN {
+    skip_blank_line = 0;
+}
+
 # Print list lines as-is.
 /^ - / {
     flush();
@@ -24,8 +28,21 @@ function flush() {
     next;
 }
 
+# Skip image lines, as well as any following blank line.
+/^!\[/ {
+    skip_blank_line = 1;
+    next;
+}
+
+# Skip blank line if requested.
+/^$/ && skip_blank_line == 1 {
+    skip_blank_line = 0;
+    next;
+}
+
 # Buffer most text lines.
 {
+    skip_blank_line = 0;
     if (to_wrap && to_wrap != "\n") {
         to_wrap = to_wrap "\n";
     }
