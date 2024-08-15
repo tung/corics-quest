@@ -17,6 +17,8 @@ pub enum CreditsEvent {
 }
 
 const CREDITS_TEXT: &str = r#"Coric's Quest
+  tungtn.itch.io/corics-quest
+  tung.github.io/corics-quest/
 
 Created By
   tungtn (tung.github.io)
