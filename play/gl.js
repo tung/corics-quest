@@ -417,6 +417,14 @@ function resize(canvas, on_resize) {
     var displayWidth = canvas.clientWidth * dpr;
     var displayHeight = canvas.clientHeight * dpr;
 
+    // aspect ratio correction
+    var wantedAspect = 20.0 / 11.0;
+    if (displayWidth / displayHeight < wantedAspect) {
+        displayHeight = displayWidth / wantedAspect;
+    } else {
+        displayWidth = displayHeight * wantedAspect;
+    }
+
     if (canvas.width != displayWidth ||
         canvas.height != displayHeight) {
         canvas.width = displayWidth;
