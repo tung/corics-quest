@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Coric's Quest</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #222;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+#glcanvas {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  object-fit: contain;
+}
+</style>
+</head>
+
+<body>
+<canvas id="glcanvas" tabindex=1></canvas>
+<script src="gl.js"></script>
+<script src="sapp_jsutils.js"></script>
+<script src="quad-storage.js"></script>
+<script src="audio.js"></script>
+<script>load("corics-quest.wasm");</script>
+</body>
+
+</html>
