@@ -98,7 +98,7 @@ register_plugin = function (importObject) {
         return id;
     }
 }
-miniquad_add_plugin({ register_plugin, version: "0.1.5", name: "sapp_jsutils" });
+miniquad_add_plugin({ register_plugin, version: 1 << 16 | 5, name: "sapp_jsutils" });
 
 // Its like https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder, 
 // but works on more browsers
