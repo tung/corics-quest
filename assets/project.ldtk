@@ -1392,7 +1392,7 @@
 			"padding": 0,
 			"tags": [],
 			"tagsSourceEnumUid": 72,
-			"enumTags": [ { "enumValueId": "North", "tileIds": [13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "East", "tileIds": [13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "South", "tileIds": [13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "West", "tileIds": [13,14,15,17,18,19,20,21,22,23,24,25,26,27] } ],
+			"enumTags": [ { "enumValueId": "North", "tileIds": [1,13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "East", "tileIds": [1,13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "South", "tileIds": [1,13,14,15,17,18,19,20,21,22,23,24,25,26,27] }, { "enumValueId": "West", "tileIds": [1,13,14,15,17,18,19,20,21,22,23,24,25,26,27] } ],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
