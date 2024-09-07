@@ -1,6 +1,6 @@
 [package]
 name = "corics-quest"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Tung Nguyen"]
 description = "A small, complete 2D fantasy-themed console-style RPG, made with Rust and Miniquad"
