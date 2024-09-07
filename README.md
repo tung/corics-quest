@@ -52,6 +52,16 @@ I'm happy with the high-level architecture of the code, but there's also a lot t
 I prioritized finishing the game over endless refactoring, which I think was the right call for a solo project like this.
 I hope this inspires people to create their own take on a game like this, or that it at least serves as a useful learning resource for aspiring game developers.
 
+## Version History
+
+### 1.0.1
+
+Fix missing tile collision flags that could let the player walk to unintended places and possibly get stuck.
+
+### 1.0.0
+
+Initial release.
+
 ## Attribution
 
 *Coric's Quest* is written in [Rust][rust] using the following helper libraries:
